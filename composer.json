@@ -1,0 +1,13 @@
+{
+    "name": "ackama/dpc-user-management",
+    "type": "drupal-module",
+    "description": "This module allows you to group users, content and other entities",
+    "support": {
+        "issues": "https://github.com/ackama/dpc-user-management-module/issues",
+        "source": "https://github.com/ackama/dpc-user-management-module.git"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "drupal/core": "^8.0"
+    }
+}
