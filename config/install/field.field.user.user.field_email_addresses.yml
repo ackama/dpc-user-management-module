@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+    config:
+        - field.storage.user.field_email_addresses
+    module:
+        - dpc_user_management
+        - user
+id: user.user.field_email_addresses
+field_name: field_email_addresses
+entity_type: user
+bundle: user
+label: 'Email Addresses'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: email_address
