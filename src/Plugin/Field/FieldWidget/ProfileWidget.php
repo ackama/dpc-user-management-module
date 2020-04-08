@@ -16,34 +16,52 @@ use Drupal\Core\Form\FormStateInterface;
  *   }
  * )
  */
-class ProfileWidget extends WidgetBase {
+class ProfileWidget extends WidgetBase
+{
     /**
      * {@inheritdoc}
      */
-    public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+    public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state)
+    {
+        $element['value']  = [
+            '#title'         => $this->t('Email'),
+            '#type'          => 'textfield',
+            '#default_value' => isset($items[$delta]->value) ? $items[$delta]->value : null,
+        ];
+        $element['label']  = [
+            '#title'         => $this->t('Label'),
+            '#type'          => 'textfield',
+            '#default_value' => isset($items[$delta]->label) ? $items[$delta]->label : null,
+        ];
+        $element['status'] = [
+            '#title'  => $this->t('status'),
+            '#type'   => 'hidden',
+            '#default_value' => isset($items[$delta]->status) ? $items[$delta]->status : null,
+        ];
+        $element['verification'] = [
+            '#title'  => $this->t('status'),
+            '#markup' => $this->getStatusMarkup($items[$delta]),
+        ];
 
-        $element['value'] = array(
-            '#title' => $this->t('Email'),
-            '#type' => 'textfield',
-            '#default_value' => isset($items[$delta]->value) ? $items[$delta]->value : NULL,
-        );
-        $element['label'] = array(
-            '#title' => $this->t('Label'),
-            '#type' => 'textfield',
-            '#default_value' => isset($items[$delta]->label) ? $items[$delta]->label : NULL,
-        );
-        $element['status'] = array(
-            '#title' => $this->t('status'),
-            '#markup' => 'Status:' . (isset($items[$delta]->status) ? $items[$delta]->status : ' UNVERIFIED'),
-        );
-        $element['send_verification'] = array(
-            '#title' => $this->t('Resend verification'),
-            '#markup' => '<a href="example.com">Re-send verification</a>',
-        );
-        $element['is_primary'] = array(
-            '#title' => $this->t('Primary email'),
-            '#markup' => $items[$delta]->value === $form['account']['mail']['#default_value'] ? 'PRIMARY' : NULL,
-        );
         return $element;
+    }
+
+    /**
+     * @param $item
+     *
+     * @return string
+     */
+    private function getStatusMarkup($item)
+    {
+        if ($item->status != 'verified' && $item->value) {
+            return $item->status . '<a class="button button--small" class="dpc_resend_verification" data-value="' . $item->value . '">Resend verification</a>';
+        }
+
+        $markup = '<span class="button button--small disabled ';
+        $markup .= 'status-' . (isset($item->status) ? $item->status : 'unverified');
+        $markup .= $item->value ? '' : ' new-item';
+        $markup .= '">' . $item->status . '</span>';
+
+        return $markup;
     }
 }

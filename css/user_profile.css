@@ -1,0 +1,31 @@
+#edit-field-email-addresses-wrapper .form-item .form-item{
+	display: inline-block;
+	width: 35%;
+	margin-left: 15px;
+}
+#edit-field-email-addresses-wrapper tbody tr {
+	display: flex;
+}
+#edit-field-email-addresses-wrapper tbody tr td {
+	display: flex;
+	align-items: center;
+}
+#edit-field-email-addresses-wrapper .form-item .button{
+	margin-top: 1.4em;
+	width: 153px;
+}
+#edit-field-email-addresses-wrapper .form-item .button.disabled{
+	text-transform: capitalize;
+	cursor: default;
+	background: white;
+}
+#edit-field-email-addresses-wrapper .form-item .button.disabled:hover{
+	box-shadow: none;
+}
+#edit-field-email-addresses-wrapper .form-item .button.status-verified{
+	border-color: green;
+	color: green;
+}
+#edit-field-email-addresses-wrapper .form-item .button.new-item{
+	visibility: hidden;
+}

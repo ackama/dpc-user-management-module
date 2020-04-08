@@ -27,10 +27,11 @@ class EmailItem extends FieldItemBase
      */
     public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition)
     {
-        $properties          = [];
-        $properties['value'] = DataDefinition::create('email')->setLabel(t('Email'));
-        $properties['label'] = DataDefinition::create('string')->setLabel(t('Label'));
-        $properties['status'] = DataDefinition::create('string')->setReadOnly(true)->setLabel(t('Status'));
+        $properties           = [];
+        $properties['value']  = DataDefinition::create('email')->setLabel(t('Email'));
+        $properties['label']  = DataDefinition::create('string')->setLabel(t('Label'));
+        $properties['status'] = DataDefinition::create('string')->setLabel(t('Status'));
+        $properties['verification_token'] = DataDefinition::create('string')->setLabel(t('Token'));
 
         return $properties;
     }
@@ -41,21 +42,24 @@ class EmailItem extends FieldItemBase
     public static function schema(FieldStorageDefinitionInterface $field_definition)
     {
         return [
-            // columns contains the values that the field will store
             'columns' => [
-                'label' => [
+                'label'              => [
                     'type'     => 'text',
                     'size'     => 'tiny',
                     'not null' => false,
                 ],
-                'value' => [
+                'value'              => [
                     'type'   => 'varchar',
                     'length' => Email::EMAIL_MAX_LENGTH,
                 ],
-                'status' => [
-                    'type'   => 'varchar',
-                    'length' => 50,
+                'status'             => [
+                    'type'    => 'varchar',
+                    'length'  => 50,
                     'default' => 'unverified'
+                ],
+                'verification_token' => [
+                    'type'     => 'varchar',
+                    'length'   => 50
                 ],
             ],
         ];
@@ -100,5 +104,4 @@ class EmailItem extends FieldItemBase
     {
         return $this->value === null || $this->value === '';
     }
-
 }
