@@ -11,5 +11,19 @@ use Drupal\user\RoleInterface;
  * Implements hook_install().
  */
 function dpc_user_management_install() {
+    \Drupal::logger('dpc_user_management')->notice('DPC User Management Installed');
+}
 
+/**
+ * Implements hook_uninstall().
+ */
+function dpc_user_management_uninstall() {
+    \Drupal::logger('dpc_user_management')->notice('DPC User Management Uninstalled');
+}
+
+/**
+ * Implements hook_disable().
+ */
+function dpc_user_management_disable() {
+    \Drupal::logger('dpc_user_management')->notice('DPC User Management Disabled');
 }
