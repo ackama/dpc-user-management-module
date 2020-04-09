@@ -1,0 +1,22 @@
+dpc_user_management.verify-email:
+  path: '/verify-email/{user}'
+  defaults:
+    _controller: '\Drupal\dpc_user_management\Controller\UserEntityController::verifyEmail'
+    _title: 'Email Verification'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      user:
+        type: entity:user
+dpc_user_management.send-verification:
+  path: '/send-verification/{user}'
+  defaults:
+    _controller: '\Drupal\dpc_user_management\Controller\UserEntityController::sendVerification'
+    _title: 'Email Verification'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      user:
+        type: entity:user

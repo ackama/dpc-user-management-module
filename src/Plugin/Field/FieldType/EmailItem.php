@@ -59,7 +59,7 @@ class EmailItem extends FieldItemBase
                 ],
                 'verification_token' => [
                     'type'     => 'varchar',
-                    'length'   => 50
+                    'length'   => 100
                 ],
             ],
         ];

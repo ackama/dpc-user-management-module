@@ -4,6 +4,7 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
@@ -66,19 +67,35 @@ function dpc_user_management_user_prepare_form(
  */
 function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, $form_id)
 {
-    // modify only the user profile form
     if ($form_id === 'user_form') {
         // remove the default email field
         unset($form['account']['mail']);
+    }
+    if ($form_id === 'user_register_form') {
+        // hide email addresses form on registration
+        unset($form['field_email_addresses']);
     }
 }
 
 /**
  * Implements hook_element_info_alter().
+ *
+ * Attach our styles
  */
 function dpc_user_management_element_info_alter(array &$types) {
-    // Attach our extra CSS for toolbar icons.
     if (isset($types['toolbar'])) {
         $types['toolbar']['#attached']['library'][] = 'dpc_user_management/user_profile';
+    }
+}
+
+/**
+ * Implements hook_entity_type_build()
+ *
+ * @param EntityTypeInterface[] $entity_types
+ */
+function dpc_user_management_entity_type_build(&$entity_types) {
+    // User Entity class override
+    if (isset($entity_types['user'])) {
+        $entity_types['user']->setClass('Drupal\dpc_user_management\UserEntity');
     }
 }

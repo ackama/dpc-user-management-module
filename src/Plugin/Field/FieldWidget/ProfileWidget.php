@@ -23,24 +23,26 @@ class ProfileWidget extends WidgetBase
      */
     public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state)
     {
-        $element['value']  = [
+        $user = \Drupal::routeMatch()->getParameter('user');
+
+        $element['value']        = [
             '#title'         => $this->t('Email'),
             '#type'          => 'textfield',
             '#default_value' => isset($items[$delta]->value) ? $items[$delta]->value : null,
         ];
-        $element['label']  = [
+        $element['label']        = [
             '#title'         => $this->t('Label'),
             '#type'          => 'textfield',
             '#default_value' => isset($items[$delta]->label) ? $items[$delta]->label : null,
         ];
-        $element['status'] = [
-            '#title'  => $this->t('status'),
-            '#type'   => 'hidden',
+        $element['status']       = [
+            '#title'         => $this->t('status'),
+            '#type'          => 'hidden',
             '#default_value' => isset($items[$delta]->status) ? $items[$delta]->status : null,
         ];
         $element['verification'] = [
             '#title'  => $this->t('status'),
-            '#markup' => $this->getStatusMarkup($items[$delta]),
+            '#markup' => $this->getStatusMarkup($items[$delta], $user ? $user->id() : null),
         ];
 
         return $element;
@@ -51,16 +53,16 @@ class ProfileWidget extends WidgetBase
      *
      * @return string
      */
-    private function getStatusMarkup($item)
+    private function getStatusMarkup($item, $user_id)
     {
-        if ($item->status != 'verified' && $item->value) {
-            return $item->status . '<a class="button button--small" class="dpc_resend_verification" data-value="' . $item->value . '">Resend verification</a>';
-        }
-
         $markup = '<span class="button button--small disabled ';
         $markup .= 'status-' . (isset($item->status) ? $item->status : 'unverified');
         $markup .= $item->value ? '' : ' new-item';
         $markup .= '">' . $item->status . '</span>';
+
+        if ($item->status != 'verified' && $item->value) {
+            $markup .= '<a class="button button--small dpc_resend_verification" data-user-id="' . $user_id . '" data-value="' . $item->value . '">Resend verification</a>';
+        }
 
         return $markup;
     }
