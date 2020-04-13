@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\helloworld\Functional;
+namespace Drupal\Tests\DPC_User_Management\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
@@ -25,7 +25,7 @@ class LoadTest extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['dpc_user_management'];
+  public static $modules = [];
 
   /**
    * A user with permission to administer site configuration.

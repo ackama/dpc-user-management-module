@@ -6,6 +6,7 @@ dependencies:
     module:
         - dpc_user_management
         - user
+        - field
 id: user.user.field_email_addresses
 field_name: field_email_addresses
 entity_type: user
