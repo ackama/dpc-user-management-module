@@ -2,7 +2,6 @@
 namespace Drupal\Tests\DPC_User_Management\Functional;
 
 use Drupal\Core\Test\AssertMailTrait;
-use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
 /**

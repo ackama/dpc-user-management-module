@@ -1,8 +1,7 @@
 <?php
 
-namespace Drupal\dpc_user_management;
+namespace Drupal\DPC_User_Management;
 
-use Drupal;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\user\Entity\User;

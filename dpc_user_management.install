@@ -17,15 +17,15 @@ function dpc_user_management_install()
 
     /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $view_display */
     $view_display = $storage->load('user.user.default');
-    $content      = $view_display->get('content');
 
-    $content['field_email_addresses'] = [
-        'weight'   => 1,
-        'region'   => 'content',
-        'type'     => 'profile_widget',
-        'settings' => []
-    ];
+    if (!$view_display->getComponent('field_email_addresses')) {
+        $view_display->setComponent('field_email_addresses', [
+            'weight'   => 1,
+            'region'   => 'content',
+            'type'     => 'profile_widget',
+            'settings' => []
+        ]);
 
-    $view_display->set('content', $content);
-    $view_display->save();
+        $view_display->save();
+    }
 }
