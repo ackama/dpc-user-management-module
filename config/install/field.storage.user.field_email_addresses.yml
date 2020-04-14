@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+    module:
+        - dpc_user_management
+        - user
+id: user.field_email_addresses
+field_name: field_email_addresses
+entity_type: user
+type: email_address
+settings: {  }
+module: dpc_user_management
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

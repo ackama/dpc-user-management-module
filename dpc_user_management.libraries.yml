@@ -1,0 +1,9 @@
+user_profile:
+  version: 'VERSION'
+  css:
+    theme:
+      css/user_profile.css: {}
+  js:
+    js/user_profile.js: {}
+  dependencies:
+    - 'core/jquery'

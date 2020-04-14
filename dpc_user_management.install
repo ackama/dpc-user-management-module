@@ -48,8 +48,23 @@ function dpc_user_management_install() {
             }
         }
     };
-}
 
+    // add the profile widget to the user settings display
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
+
+    /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $view_display */
+    $view_display = $storage->load('user.user.default');
+    $content      = $view_display->get('content');
+
+    $content['field_email_addresses'] = [
+        'weight'   => 1,
+        'region'   => 'content',
+        'type'     => 'profile_widget',
+        'settings' => []
+    ];
+
+    $view_display->set('content', $content);
+    $view_display->save();
 /**
  * Implements hook_uninstall().
  */

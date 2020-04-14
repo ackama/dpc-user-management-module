@@ -2,17 +2,100 @@
 /**
  * This file is used for hooks
  */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * TODO: add helpful content or remove this hook
  * Implements hook_help().
+ *
+ * @param                     $route_name
+ * @param RouteMatchInterface $route_match
+ *
+ * @return \Drupal\Core\StringTranslation\TranslatableMarkup
  */
-function dpc_user_management_help($route_name, RouteMatchInterface $route_match) {
+function dpc_user_management_help($route_name, RouteMatchInterface $route_match)
+{
     switch ($route_name) {
         case 'help.page.dpc_user_management':
             return t('
         <h2>User management module information.</h2>
       ');
+    }
+}
+
+/**
+ * Implements hook_entity_prepare_form().
+ *
+ * @param EntityInterface                      $entity
+ * @param                                      $operation
+ * @param FormStateInterface                   $form_state
+ */
+function dpc_user_management_user_prepare_form(
+    EntityInterface $entity,
+    $operation,
+    FormStateInterface $form_state
+) {
+    if ($operation == 'default') {
+        /** @var \Drupal\Core\Field\FieldItemList $addresses */
+        try {
+            $addresses = $entity->get('field_email_addresses');
+            // Add the primary email to the list of email addresses if it is empty
+            if (empty($addresses->getValue())) {
+                $addresses->setValue([
+                    [
+                        'label'  => 'Primary email',
+                        'value'  => $entity->mail->value,
+                        'status' => 'verified'
+                    ]
+                ]);
+            }
+        } catch (\Exception $exception) {
+        }
+    }
+}
+
+/**
+ * Implements hook_alter_form().
+ *
+ * @param                    $form
+ * @param FormStateInterface $form_state
+ * @param string             $form_id
+ */
+function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, $form_id)
+{
+    if ($form_id === 'user_form') {
+        // remove the default email field
+        unset($form['account']['mail']);
+    }
+    if ($form_id === 'user_register_form') {
+        // hide email addresses form on registration
+        unset($form['field_email_addresses']);
+    }
+}
+
+/**
+ * Implements hook_element_info_alter().
+ *
+ * Attach our styles
+ */
+function dpc_user_management_element_info_alter(array &$types) {
+    if (isset($types['toolbar'])) {
+        $types['toolbar']['#attached']['library'][] = 'dpc_user_management/user_profile';
+    }
+}
+
+/**
+ * Implements hook_entity_type_build()
+ *
+ * @param EntityTypeInterface[] $entity_types
+ */
+function dpc_user_management_entity_type_build(&$entity_types) {
+    // User Entity class override
+    if (isset($entity_types['user'])) {
+        $entity_types['user']->setClass('Drupal\dpc_user_management\UserEntity');
     }
 }
