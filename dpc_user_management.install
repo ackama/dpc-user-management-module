@@ -9,12 +9,12 @@
  * Implements hook_install().
  */
 function dpc_user_management_install() {
-    \Drupal::logger('dpc_user_management')->notice('DPC User Management Installed');
+    Drupal::logger('dpc_user_management')->notice('DPC User Management Installed');
 
     /**
      * Set visibility for field in views
      */
-    if ($view_displays = \Drupal::entityTypeManager()->getStorage('entity_view_display')->loadByProperties([
+    if ($view_displays = Drupal::entityTypeManager()->getStorage('entity_view_display')->loadByProperties([
         'targetEntityType' => 'user',
         'bundle' => 'user'
     ])) {
@@ -33,7 +33,7 @@ function dpc_user_management_install() {
     /**
      * Set visibility for field in forms
      */
-    if ($view_displays = \Drupal::entityTypeManager()->getStorage('entity_form_display')->loadByProperties([
+    if ($view_displays = Drupal::entityTypeManager()->getStorage('entity_form_display')->loadByProperties([
         'targetEntityType' => 'user',
         'bundle' => 'user'
     ])) {
@@ -54,12 +54,12 @@ function dpc_user_management_install() {
  * Implements hook_uninstall().
  */
 function dpc_user_management_uninstall() {
-    \Drupal::logger('dpc_user_management')->notice('DPC User Management Uninstalled');
+    Drupal::logger('dpc_user_management')->notice('DPC User Management Uninstalled');
 }
 
 /**
  * Implements hook_disable().
  */
 function dpc_user_management_disable() {
-    \Drupal::logger('dpc_user_management')->notice('DPC User Management Disabled');
+    Drupal::logger('dpc_user_management')->notice('DPC User Management Disabled');
 }
