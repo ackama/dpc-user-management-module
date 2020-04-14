@@ -12,6 +12,34 @@ use Drupal\user\RoleInterface;
  */
 function dpc_user_management_install() {
     \Drupal::logger('dpc_user_management')->notice('DPC User Management Installed');
+
+    if ($view_displays = \Drupal::entityTypeManager()->getStorage('entity_view_display')->loadByProperties([
+        'targetEntityType' => 'user',
+        'bundle' => 'user'
+    ])) {
+        foreach ($view_displays as $view) {
+            if (!$view->getComponent('special_group')) {
+                $view->setComponent('special_group', [
+                    'type'=> 'boolean',
+                    'settings' => []
+                ])->save();
+            }
+        }
+    };
+
+    if ($view_displays = \Drupal::entityTypeManager()->getStorage('entity_form_display')->loadByProperties([
+        'targetEntityType' => 'user',
+        'bundle' => 'user'
+    ])) {
+        foreach ($view_displays as $view) {
+            if (!$view->getComponent('special_group')) {
+                $view->setComponent('special_group', [
+                    'type'=> 'boolean_checkbox',
+                    'settings' => []
+                ])->save();
+            }
+        }
+    };
 }
 
 /**
