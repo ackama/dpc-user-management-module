@@ -8,7 +8,8 @@
 /**
  * Implements hook_install().
  */
-function dpc_user_management_install() {
+function dpc_user_management_install()
+{
     Drupal::logger('dpc_user_management')->notice('DPC User Management Installed');
 
     /**
@@ -23,7 +24,7 @@ function dpc_user_management_install() {
             if (!$view->getComponent('special_group')) {
                 /** @var Drupal\Core\Entity\Display\EntityDisplayInterface $view */
                 $view->setComponent('special_group', [
-                    'type'=> 'boolean',
+                    'type' => 'boolean',
                     'settings' => []
                 ])->save();
             }
@@ -42,7 +43,7 @@ function dpc_user_management_install() {
             if (!$view->getComponent('special_group')) {
                 /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
                 $view->setComponent('special_group', [
-                    'type'=> 'boolean_checkbox',
+                    'type' => 'boolean_checkbox',
                     'settings' => []
                 ])->save();
             }
@@ -54,17 +55,19 @@ function dpc_user_management_install() {
 
     /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $view_display */
     $view_display = $storage->load('user.user.default');
-    $content      = $view_display->get('content');
+    $content = $view_display->get('content');
 
     $content['field_email_addresses'] = [
-        'weight'   => 1,
-        'region'   => 'content',
-        'type'     => 'profile_widget',
+        'weight' => 1,
+        'region' => 'content',
+        'type' => 'profile_widget',
         'settings' => []
     ];
 
     $view_display->set('content', $content);
     $view_display->save();
+}
+
 /**
  * Implements hook_uninstall().
  */
