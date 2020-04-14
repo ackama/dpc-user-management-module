@@ -1,6 +1,7 @@
 <?php
 namespace Drupal\Tests\DPC_User_Management\Functional;
 
+use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
@@ -9,7 +10,12 @@ use Drupal\Tests\BrowserTestBase;
  *
  * @group rules_ui
  */
-class UserEditViewTest extends BrowserTestBase {
+class UserEditViewTest extends BrowserTestBase
+{
+    use AssertMailTrait {
+        getMails as drupalGetMails;
+    }
+
     const TESTING_DEFAULT_THEME = 'classy';
     const CORE_TESTING_DEFAULT_THEME = 'stark';
 
@@ -51,9 +57,10 @@ class UserEditViewTest extends BrowserTestBase {
     /**
      * {@inheritdoc}
      */
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
-        $this->user = $this->drupalCreateUser(['administer users',  'administer node fields']);
+        $this->user = $this->drupalCreateUser(['administer users', 'administer node fields']);
         $this->drupalLogin($this->user);
         $this->drupalGet('user/' . $this->user->id() . '/edit');
     }
@@ -66,6 +73,77 @@ class UserEditViewTest extends BrowserTestBase {
     public function testMultipleEmailAddressFieldHasPrimaryEmail()
     {
         $this->assertFieldByXPath("//input[@name='field_email_addresses[0][value]']", $this->user->getEmail());
-        // $this->assertFieldByXPath("//input[@name='field_email_addresses[0][label]']", $this->user->getEmail());
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[0][label]']", 'Primary email');
+    }
+
+    public function testUserCanAddANewEmail()
+    {
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", null);
+
+        $edit = [
+            "field_email_addresses[1][value]" => 'newemail@example.com'
+        ];
+        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", 'newemail@example.com');
+    }
+
+    public function testUserCanVerifyEmail()
+    {
+        // verification flag and button are not present
+        $this->assertElementNotPresent('#field-email-addresses-values span.status-pending');
+        $this->assertElementNotPresent('#field-email-addresses-values dpc_resend_verification');
+
+        // add a new email address
+        $edit = [
+            "field_email_addresses[1][value]" => 'newemail@example.com'
+        ];
+        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+
+        // check the verification email
+        $captured_emails = $this->drupalGetMails();
+        $this->assert(count($captured_emails), 1);
+        $this->assertMail('subject', 'Email verification');
+        $this->assert(preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
+            $verification_link), 1);
+
+        // verification flag and resend button are present
+        $this->assertElementPresent('#field-email-addresses-values span.status-pending');
+        $this->assertElementPresent('#field-email-addresses-values .dpc_resend_verification');
+
+        // visit the verification link
+        $this->drupalGet($verification_link[0]);
+        $this->drupalGet('user/' . $this->user->id() . '/edit');
+
+        // check that the email is verified
+        $this->assertElementPresent('#field-email-addresses-values span.status-verified');
+        $this->assertElementNotPresent('#field-email-addresses-values .dpc_resend_verification');
+    }
+
+    public function testUserCanResendEmailVerification()
+    {
+        $edit = [
+            "field_email_addresses[1][value]" => 'newemail@example.com'
+        ];
+        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+        // "click" the 'resend verification' button
+        $this->click('.dpc_resend_verification');
+        $captured_emails = $this
+            ->drupalGetMails();
+        $this->assert(count($captured_emails), 2);
+    }
+
+    public function testEmailCanBeRemoved()
+    {
+        $edit = [
+            "field_email_addresses[1][value]" => 'newemail@example.com'
+        ];
+        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", 'newemail@example.com');
+        $edit = [
+            "field_email_addresses[1][value]" => ''
+        ];
+        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", '');
     }
 }
