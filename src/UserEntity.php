@@ -29,6 +29,10 @@ class UserEntity extends User
                 $addresses[$key]['status']             = 'pending';
                 $addresses[$key]['verification_token'] = $token;
             }
+            // If a primary email flag has been set then override the mail setting
+            if ($address['is_primary']) {
+                $this->setEmail($address['value']);
+            }
         }
 
         $this->field_email_addresses->setValue($addresses);

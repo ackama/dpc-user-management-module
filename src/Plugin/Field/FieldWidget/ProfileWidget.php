@@ -48,11 +48,6 @@ class ProfileWidget extends WidgetBase
     {
         $user = \Drupal::routeMatch()->getParameter('user');
 
-        $element['is_primary'] = [
-            '#title'         => $this->t('Primary'),
-            '#type'          => 'checkbox',
-            '#default_value' => isset($items[$delta]->is_primary) ? $items[$delta]->is_primary : 0,
-        ];
         $element['value']        = [
             '#title'         => $this->t('Email'),
             '#type'          => 'textfield',
@@ -63,6 +58,12 @@ class ProfileWidget extends WidgetBase
             '#type'          => 'textfield',
             '#default_value' => isset($items[$delta]->label) ? $items[$delta]->label : null,
         ];
+        $element['is_primary'] = [
+            '#title'         => $this->t('Set as Primary'),
+            '#type'          => 'checkbox',
+            '#default_value' => $this->isPrimaryAddress($items[$delta]->value, $user->mail->value)
+        ];
+
         $element['status']       = [
             '#title'         => $this->t('status'),
             '#type'          => 'hidden',
@@ -93,5 +94,16 @@ class ProfileWidget extends WidgetBase
         }
 
         return $markup;
+    }
+
+    /**
+     * @param string $email
+     * @param string $primary_email
+     *
+     * @return bool
+     */
+    private function isPrimaryAddress($email, $primary_email)
+    {
+        return $email === $primary_email;
     }
 }
