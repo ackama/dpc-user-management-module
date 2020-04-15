@@ -27,10 +27,11 @@ class EmailItem extends FieldItemBase
      */
     public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition)
     {
-        $properties           = [];
-        $properties['value']  = DataDefinition::create('email')->setLabel(t('Email'));
-        $properties['label']  = DataDefinition::create('string')->setLabel(t('Label'));
-        $properties['status'] = DataDefinition::create('string')->setLabel(t('Status'));
+        $properties                       = [];
+        $properties['is_primary']         = DataDefinition::create('boolean')->setLabel(t('Primary'));
+        $properties['value']              = DataDefinition::create('email')->setLabel(t('Email'));
+        $properties['label']              = DataDefinition::create('string')->setLabel(t('Label'));
+        $properties['status']             = DataDefinition::create('string')->setLabel(t('Status'));
         $properties['verification_token'] = DataDefinition::create('string')->setLabel(t('Token'));
 
         return $properties;
@@ -51,15 +52,22 @@ class EmailItem extends FieldItemBase
                 'value'              => [
                     'type'   => 'varchar',
                     'length' => Email::EMAIL_MAX_LENGTH,
+                    'not null' => true,
                 ],
                 'status'             => [
                     'type'    => 'varchar',
                     'length'  => 50,
                     'default' => 'unverified'
                 ],
+                'is_primary'         => [
+                    'type' => 'int',
+                    'size' => 'tiny',
+                    'default' => 0,
+                    'not null' => true,
+                ],
                 'verification_token' => [
-                    'type'     => 'varchar',
-                    'length'   => 100
+                    'type'   => 'varchar',
+                    'length' => 100
                 ],
             ],
         ];

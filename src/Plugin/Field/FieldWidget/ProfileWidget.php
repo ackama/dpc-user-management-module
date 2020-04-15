@@ -48,6 +48,11 @@ class ProfileWidget extends WidgetBase
     {
         $user = \Drupal::routeMatch()->getParameter('user');
 
+        $element['is_primary'] = [
+            '#title'         => $this->t('Primary'),
+            '#type'          => 'checkbox',
+            '#default_value' => isset($items[$delta]->is_primary) ? $items[$delta]->is_primary : 0,
+        ];
         $element['value']        = [
             '#title'         => $this->t('Email'),
             '#type'          => 'textfield',

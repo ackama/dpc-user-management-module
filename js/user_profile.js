@@ -25,7 +25,20 @@
           $(this).removeClass('disabled');
         }
       });
-
     });
+
+
+    let primary_checkboxes = $('#field-email-addresses-values').find('input[name$="[is_primary]"]');
+    console.log(primary_checkboxes);
+
+    $(primary_checkboxes).on('change', function () {
+      let primary = $(this);
+      primary_checkboxes.each(function() {
+        if ($(this).attr('id') === primary.attr('id')) {
+          return;
+        }
+        $(this).prop('checked', false);
+      })
+    })
   });
 })(jQuery);
