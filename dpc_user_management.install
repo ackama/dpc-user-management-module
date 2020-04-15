@@ -10,6 +10,22 @@ use Drupal\user\RoleInterface;
 /**
  * Implements hook_install().
  */
-function dpc_user_management_install() {
+function dpc_user_management_install()
+{
+    // add the profile widget to the user settings display
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
 
+    /** @var \Drupal\Core\Entity\Entity\EntityViewDisplay $view_display */
+    $view_display = $storage->load('user.user.default');
+
+    if (!$view_display->getComponent('field_email_addresses')) {
+        $view_display->setComponent('field_email_addresses', [
+            'weight'   => 1,
+            'region'   => 'content',
+            'type'     => 'profile_widget',
+            'settings' => []
+        ]);
+
+        $view_display->save();
+    }
 }
