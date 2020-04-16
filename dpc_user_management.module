@@ -102,3 +102,18 @@ function dpc_user_management_entity_type_build(&$entity_types)
         $entity_types['user']->setClass('Drupal\dpc_user_management\UserEntity');
     }
 }
+
+/**
+ * Implements hook_update_N
+ */
+function dpc_user_management_update_8001()
+{
+    $database = \Drupal::database();
+    $schema = $database->schema();
+    $schema->addField('user__field_email_addresses', 'is_primary', [
+        'type' => 'int',
+        'size' => 'tiny',
+        'default' => 0,
+        'not null' => true,
+    ]);
+}
