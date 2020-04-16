@@ -73,6 +73,7 @@ class UserEditViewTest extends BrowserTestBase
     {
         $this->assertFieldByXPath("//input[@name='field_email_addresses[0][value]']", $this->user->getEmail());
         $this->assertFieldByXPath("//input[@name='field_email_addresses[0][label]']", 'Primary email');
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[0][is_primary]']", 1);
     }
 
     public function testUserCanAddANewEmail()
@@ -144,5 +145,15 @@ class UserEditViewTest extends BrowserTestBase
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", '');
+    }
+
+    public function testPrimaryEmailCanBeSet()
+    {
+        $edit = [
+            "field_email_addresses[1][value]" => 'newprimaryemail@example.com',
+            "field_email_addresses[1][is_primary]" => 1,
+        ];
+        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+        $this->assert('newprimaryemail@example.com', $this->user->getEmail());
     }
 }
