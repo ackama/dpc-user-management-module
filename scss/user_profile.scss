@@ -1,0 +1,100 @@
+#edit-field-email-addresses-wrapper {
+  .form-item .form-item {
+    display: inline-block;
+    width: 350px;
+    margin-left: 15px;
+  }
+
+  tbody tr {
+    display: flex;
+    position: relative;
+
+    td {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .form-item {
+    .button {
+      margin-top: 1.4em;
+
+      &.disabled {
+        text-transform: capitalize;
+        cursor: default;
+        background: transparent;
+
+        &:hover {
+          box-shadow: none;
+        }
+      }
+
+      &.status-verified {
+        border-color: green;
+        color: green;
+      }
+
+      &.status-pending {
+        border-color: #777777;
+        color: #777777;
+      }
+
+      &.new-item {
+        visibility: hidden;
+      }
+    }
+
+    .dpc_resend_verification.disabled {
+      background: transparent;
+      border: transparent;
+    }
+
+    .form-type-checkbox {
+      width: 130px;
+      margin-top: 28px;
+
+      input {
+        display: none;
+      }
+
+      label {
+        position: relative;
+        font-weight: 100;
+        color: grey;
+        line-height: 2;
+
+        &:before {
+          display: inline-block;
+          content: '';
+          vertical-align: middle;
+          border-radius: 100%;
+          height: 16px;
+          width: 16px;
+          margin-right: 10px;
+          border: 1px solid grey;
+        }
+      }
+
+      input:checked + label {
+        &:before {
+          border: 1px solid green;
+        }
+
+        color: green;
+
+        &:after {
+          background: green;
+          display: block;
+          content: '';
+          vertical-align: middle;
+          border-radius: 100%;
+          height: 12px;
+          width: 12px;
+          position: absolute;
+          top: 5px;
+          left: 3px;
+        }
+      }
+    }
+  }
+}
