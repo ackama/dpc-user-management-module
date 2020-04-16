@@ -104,13 +104,14 @@ function dpc_user_management_entity_type_build(&$entity_types)
 }
 
 /**
+ * Adds "is_primary" field to email addresses
  * Implements hook_update_N
  */
 function dpc_user_management_update_8001()
 {
     $database = \Drupal::database();
     $schema = $database->schema();
-    $schema->addField('user__field_email_addresses', 'is_primary', [
+    $schema->addField('user__field_email_addresses', 'field_email_addresses_is_primary', [
         'type' => 'int',
         'size' => 'tiny',
         'default' => 0,
