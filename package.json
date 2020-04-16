@@ -2,9 +2,10 @@
     "name": "dpc-user-management",
     "version": "1.0.0",
     "scripts": {
-        "sass": "node-sass --include-path scss ./scss/main.scss ./css/main.css"
+        "sass": "sass ./scss/main.scss:./css/main.css"
     },
-    "dependencies": {
-        "node-sass": "^4.9.0"
-    }
+    "devDependencies": {
+        "sass": "^1.26.3"
+    },
+    "dependencies": {}
 }
