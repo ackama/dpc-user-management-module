@@ -6,7 +6,11 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
+use Drupal\user\Entity\User;
 
 /**
  * TODO: add helpful content or remove this hook
@@ -110,11 +114,11 @@ function dpc_user_management_entity_type_build(&$entity_types)
 function dpc_user_management_update_8001()
 {
     $database = \Drupal::database();
-    $schema = $database->schema();
+    $schema   = $database->schema();
     $schema->addField('user__field_email_addresses', 'field_email_addresses_is_primary', [
-        'type' => 'int',
-        'size' => 'tiny',
-        'default' => 0,
+        'type'     => 'int',
+        'size'     => 'tiny',
+        'default'  => 0,
         'not null' => true,
     ]);
 }
