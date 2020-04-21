@@ -79,7 +79,6 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
         $form['#validate'][] = 'dpc_user_management_email_validation';
         // add warning for invalidated emails
         $account = User::load(Drupal::currentUser()->id());
-        var_dump($account->field_email_addresses);
         if ($account->field_email_addresses) {
             $addresses = $account->field_email_addresses->getValue();
             foreach ($addresses as $address) {
