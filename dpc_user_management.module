@@ -75,6 +75,21 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
     if ($form_id === 'user_form') {
         // remove the default email field
         unset($form['account']['mail']);
+        // add validation
+        $form['#validate'][] = 'dpc_user_management_email_validation';
+        // add warning for invalidated emails
+        $account = User::load(Drupal::currentUser()->id());
+        var_dump($account->field_email_addresses);
+        if ($account->field_email_addresses) {
+            $addresses = $account->field_email_addresses->getValue();
+            foreach ($addresses as $address) {
+                if ($address['status'] === 'unverified') {
+                    $message = "You have an unverified email address, this may affect your ability to view some content.";
+                    $message = new TranslatableMarkup ('@message', ['@message' => Markup::create($message)]);
+                    \Drupal::messenger()->addWarning($message);
+                }
+            }
+        }
     }
     if ($form_id === 'user_register_form') {
         // hide email addresses form on registration
@@ -104,6 +119,26 @@ function dpc_user_management_entity_type_build(&$entity_types)
     // User Entity class override
     if (isset($entity_types['user'])) {
         $entity_types['user']->setClass('Drupal\dpc_user_management\UserEntity');
+    }
+}
+
+/**
+ * Set a warning for users with Invalidated emails
+ *
+ * @param \Drupal\user\Entity\User $account
+ */
+function dpc_user_management_user_login($account)
+{
+    $addresses = $account->field_email_addresses->getValue();
+    if ($addresses) {
+        foreach ($addresses as $address) {
+            if ($address['status'] === 'unverified') {
+                $user_profile_url = Url::fromRoute('entity.user.edit_form', ['user' => $account->id()])->toString();
+                $message          = "You have an unverified email address, this may affect your ability to view some content. Go to your <a href='$user_profile_url'>account settings</a> page to re-verify or remove the email address.";
+                $message          = new TranslatableMarkup ('@message', ['@message' => Markup::create($message)]);
+                \Drupal::messenger()->addWarning($message);
+            }
+        }
     }
 }
 
