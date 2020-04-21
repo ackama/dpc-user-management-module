@@ -1,0 +1,11 @@
+{
+    "name": "dpc-user-management",
+    "version": "1.0.0",
+    "scripts": {
+        "sass": "sass ./scss/main.scss:./css/main.css"
+    },
+    "devDependencies": {
+        "sass": "^1.26.3"
+    },
+    "dependencies": {}
+}
