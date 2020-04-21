@@ -65,20 +65,17 @@ class UserSpecialGroupsTest extends BrowserTestBase
     {
         $web_assert = $this->assertSession();
 
-        $web_assert->fieldExists('special_group');
+        $web_assert->fieldExists('edit-special-group-value');
     }
 
     public function testSpecialGroupSavesValue()
     {
-        $this->drupalGet('user' . $this->user->id() . '/edit');
-        $field_new_value = $this->getSession()->getPage()->findField('special_group')->getValue();
-        $this->getSession()->getPage()->fillField('special_group', $field_new_value);
+        $this->getSession()->getPage()->checkField('edit-special-group-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
         $web_assert = $this->assertSession();
 
-        $field = $web_assert->fieldExists('special_group');
-        $web_assert->fieldValueEquals('special_group', $field_new_value);
+        $web_assert->fieldValueEquals('edit-special-group-value', true);
     }
 
 }
