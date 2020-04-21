@@ -7,7 +7,7 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * Tests that the Rules UI pages are reachable.
  *
- * @group rules_ui
+ * @group dpc_user_management
  */
 class UserSpecialGroupsTest extends BrowserTestBase
 {
