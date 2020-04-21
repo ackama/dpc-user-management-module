@@ -33,13 +33,6 @@ class UserSpecialGroupsTest extends BrowserTestBase
     public static $modules = [
         'system',
         'user',
-        'node',
-        'file',
-        'field',
-        'field_ui',
-        'field_test',
-        'views',
-        'views_ui',
         'dpc_user_management'
     ];
 
