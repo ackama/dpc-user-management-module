@@ -43,6 +43,10 @@
     });
 
     $(document).on('change', primary_checkboxes, function (e) {
+      if ($(e.target).hasClass('password-field')) {
+        return;
+      }
+
       let primary = $(e.target);
       primary_checkboxes.each(function () {
         if ($(this).attr('id') === primary.attr('id')) {
