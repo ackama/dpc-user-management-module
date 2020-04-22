@@ -13,7 +13,7 @@
       $(this).addClass('disabled');
 
       let userId = $(this).attr('data-user-id'),
-        email = $(this).attr('data-value'),
+        email = encodeURIComponent($(this).attr('data-value')),
         button = $(this);
       $.ajax({
         url: `/send-verification/${userId}/?email=${email}`,
