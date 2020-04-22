@@ -71,6 +71,7 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
     if ($form_id === 'user_form') {
         // remove the default email field
         unset($form['account']['mail']);
+        $form['#attached']['library'][] = 'dpc_user_management/user_profile';
     }
     if ($form_id === 'user_register_form') {
         // hide email addresses form on registration
