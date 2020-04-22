@@ -5,13 +5,51 @@
  * Installation functions for DPC User Management Module
  */
 
-use Drupal\user\RoleInterface;
-
 /**
  * Implements hook_install().
  */
 function dpc_user_management_install()
 {
+    Drupal::logger('dpc_user_management')->notice('DPC User Management Installed');
+
+    /**
+     * Set visibility for field in views
+     */
+    if ($view_displays = Drupal::entityTypeManager()->getStorage('entity_view_display')->loadByProperties([
+        'targetEntityType' => 'user',
+        'bundle' => 'user'
+    ])) {
+        foreach ($view_displays as $view) {
+            // Prevents overwriting of configuration when disabling and enabling
+            if (!$view->getComponent('special_group')) {
+                /** @var Drupal\Core\Entity\Display\EntityDisplayInterface $view */
+                $view->setComponent('special_group', [
+                    'type' => 'boolean',
+                    'settings' => []
+                ])->save();
+            }
+        }
+    };
+
+    /**
+     * Set visibility for field in forms
+     */
+    if ($view_displays = Drupal::entityTypeManager()->getStorage('entity_form_display')->loadByProperties([
+        'targetEntityType' => 'user',
+        'bundle' => 'user'
+    ])) {
+        foreach ($view_displays as $view) {
+            // Prevents overwriting of configuration when disabling and enabling
+            if (!$view->getComponent('special_group')) {
+                /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
+                $view->setComponent('special_group', [
+                    'type' => 'boolean_checkbox',
+                    'settings' => []
+                ])->save();
+            }
+        }
+    };
+
     // add the profile widget to the user settings display
     $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
 
@@ -28,4 +66,18 @@ function dpc_user_management_install()
 
         $view_display->save();
     }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function dpc_user_management_uninstall() {
+    Drupal::logger('dpc_user_management')->notice('DPC User Management Uninstalled');
+}
+
+/**
+ * Implements hook_disable().
+ */
+function dpc_user_management_disable() {
+    Drupal::logger('dpc_user_management')->notice('DPC User Management Disabled');
 }

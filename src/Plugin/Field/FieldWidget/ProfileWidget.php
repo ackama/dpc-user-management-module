@@ -80,6 +80,7 @@ class ProfileWidget extends WidgetBase
     /**
      * @param $item
      *
+     * @param $user_id
      * @return string
      */
     private function getStatusMarkup($item, $user_id)
