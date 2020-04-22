@@ -71,10 +71,16 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
     if ($form_id === 'user_form') {
         // remove the default email field
         unset($form['account']['mail']);
+
+        if (!\Drupal\User\Entity\User::load(\Drupal::currentUser()->id())->hasRole('administrator')) {
+            unset($form['field_email_addresses']);
+        }
     }
+
     if ($form_id === 'user_register_form') {
         // hide email addresses form on registration
         unset($form['field_email_addresses']);
+        unset($form['jse_access']);
     }
 }
 

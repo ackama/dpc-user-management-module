@@ -28,6 +28,14 @@ function dpc_user_management_install()
                     'settings' => []
                 ])->save();
             }
+
+            if (!$view->getComponent('jse_access')) {
+                /** @var Drupal\Core\Entity\Display\EntityDisplayInterface $view */
+                $view->setComponent('jse_access', [
+                    'type' => 'boolean',
+                    'settings' => []
+                ])->save();
+            }
         }
     };
 
@@ -43,6 +51,13 @@ function dpc_user_management_install()
             if (!$view->getComponent('special_group')) {
                 /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
                 $view->setComponent('special_group', [
+                    'type' => 'boolean_checkbox',
+                    'settings' => []
+                ])->save();
+            }
+            if (!$view->getComponent('jse_access')) {
+                /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
+                $view->setComponent('jse_access', [
                     'type' => 'boolean_checkbox',
                     'settings' => []
                 ])->save();
