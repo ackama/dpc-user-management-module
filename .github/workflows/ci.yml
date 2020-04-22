@@ -1,0 +1,45 @@
+name: Test Suite
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # env:
+    #   EXAMPLE: example-value
+    steps:
+      - name: Checkout the Ackama Drupal Template
+        uses: actions/checkout@v2
+        with:
+          repository: ackama/drupal-default-theme
+          ref: re-organise
+          token: ${{ secrets.GH_PAT_TO_ACCESS_DRUPAL_TEMPLATE }}
+
+      - name: Checkout this module into the modules dir of the Ackama Drupal Template
+        uses: actions/checkout@v2
+        with:
+          path: src/modules/custom/dpc-user-management-module
+
+      # We don't start the 'frontend' container because we (currently) do not
+      # need it in CI
+      - name: Build and start containers (mysql and drupal)
+        run: docker-compose up -d --build mysql drupal
+
+      - name: Wait a fixed amount of time (mostly to give MySQL time to complete its startup)
+        run: sleep 30s
+
+      - name: Dump info about running containers (for future debugging)
+        run: docker ps -a
+
+      - name: Install Drupal
+        run: docker-compose exec -T drupal /root/install-drupal.sh
+
+      - name: Manually install our module's Drupal dependencies (bit hacky)
+        run: docker-compose exec -T drupal composer require drupal/group
+
+      - name: Run tests
+        run: docker-compose exec -T drupal /root/run-ci.sh
