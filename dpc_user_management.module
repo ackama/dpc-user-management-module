@@ -51,7 +51,6 @@ function dpc_user_management_user_prepare_form(
             if (empty($addresses->getValue())) {
                 $addresses->setValue([
                     [
-                        'label'      => 'Primary email',
                         'value'      => $entity->mail->value,
                         'status'     => 'verified',
                         'is_primary' => 1
@@ -80,18 +79,6 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
     if ($form_id === 'user_register_form') {
         // hide email addresses form on registration
         unset($form['field_email_addresses']);
-    }
-}
-
-/**
- * Implements hook_element_info_alter().
- *
- * Attach our styles
- */
-function dpc_user_management_element_info_alter(array &$types)
-{
-    if (isset($types['toolbar'])) {
-        $types['toolbar']['#attached']['library'][] = 'dpc_user_management/user_profile';
     }
 }
 

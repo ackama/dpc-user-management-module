@@ -91,16 +91,16 @@ class BulkInvalidateEmailsTest extends BrowserTestBase
         $this->user2->save();
     }
 
-    // public function testAdminCanSeeBulkInvalidateEmailsSetting()
-    // {
-    //     $this->drupalLogin($this->admin);
-    //     $this->drupalGet('admin/config');
-    //
-    //     $this->assertLink('Bulk invalidate user emails');
-    //     $this->clickLink('Bulk invalidate user emails');
-    //
-    //     $this->assertText('List the emails you want to invalidate (one per line)');
-    // }
+    public function testAdminCanSeeBulkInvalidateEmailsSetting()
+    {
+        $this->drupalLogin($this->admin);
+        $this->drupalGet('admin/config');
+
+        $this->assertLink('Bulk invalidate user emails');
+        $this->clickLink('Bulk invalidate user emails');
+
+        $this->assertText('List the emails you want to invalidate (one per line)');
+    }
 
     public function testAdminCanBulkInvalidateEmails()
     {
