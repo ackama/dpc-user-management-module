@@ -43,7 +43,8 @@
     });
 
     $(document).on('change', primary_checkboxes, function (e) {
-      if ($(e.target).hasClass('password-field')) {
+      console.log('CHANGE-- ', e.target);
+      if ($(e.target).hasClass('password-field') || $(e.target).hasClass('form-text') ) {
         return;
       }
 
