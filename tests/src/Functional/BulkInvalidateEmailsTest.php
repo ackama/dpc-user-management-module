@@ -109,7 +109,7 @@ class BulkInvalidateEmailsTest extends BrowserTestBase
             "bulk_invalidate_emails" => "user1_one@email.com\n user2_one@email.com"
         ];
 
-       $result = $this->drupalPostForm('admin/config/system/bulk-invalidate-emails', $form_data, 'Submit');
+        $this->drupalPostForm('admin/config/system/bulk-invalidate-emails', $form_data, 'Submit');
         $this->assertSession()->responseContains('The following users were updated:');
         $this->assertSession()->responseContains($this->user1->getDisplayName());
         $this->assertSession()->responseContains($this->user2->getDisplayName());
@@ -131,17 +131,13 @@ class BulkInvalidateEmailsTest extends BrowserTestBase
 
     public function testUserGetsNoticeAboutUnverifiedEmailAfterLogin()
     {
-        // $this->drupalLogin($this->admin);
-        // $form_data = [
-        //     "bulk_invalidate_emails" => "user1_one@email.com"
-        // ];
-        // $this->drupalPostForm('admin/config/system/bulk-invalidate-emails', $form_data, 'Submit');
+        $this->drupalLogin($this->admin);
+        $form_data = [
+            "bulk_invalidate_emails" => "user1_one@email.com"
+        ];
+        $this->drupalPostForm('admin/config/system/bulk-invalidate-emails', $form_data, 'Submit');
 
-        // $this->drupalLogin($this->user1);
-        // $this->assertText('You have an unverified email address, this may affect your ability to view some content. Go to your account settings page to re-verify or remove the email address.');
-        //
-        // $unverified_address = $this->user1->field_email_addresses->getValue()[0];
-        // var_dump($unverified_address);
-        // $this->assert($unverified_address['status'] === 'unverified', 'status: '. $unverified_address['status']);
+        $this->drupalLogin($this->user1);
+        $this->assertText('You have an unverified email address, this may affect your ability to view some content. Go to your account settings page to re-verify or remove the email address.');
     }
 }
