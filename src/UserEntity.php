@@ -16,7 +16,7 @@ class UserEntity extends User
         if (!$this->id()) {
             return parent::preSave($storage);
         }
-
+        $verification_sent = [];
         $user = User::load($this->id());
         // Check email addresses
         $addresses = $this->field_email_addresses->getValue();
@@ -28,6 +28,7 @@ class UserEntity extends User
                 $this->sendVerificationNotification($email, $token, $user);
                 $addresses[$key]['status']             = 'pending';
                 $addresses[$key]['verification_token'] = $token;
+                $verification_sent[] = $email;
             }
             // If a primary email flag has been set then override the mail setting
             if ($address['is_primary']) {
@@ -36,7 +37,9 @@ class UserEntity extends User
         }
 
         $this->field_email_addresses->setValue($addresses);
-
+        if (!empty($verification_sent)) {
+            \Drupal::messenger()->addMessage(t('A verification email was sent to ' . implode(',', $verification_sent)));
+        }
         parent::preSave($storage);
     }
 }

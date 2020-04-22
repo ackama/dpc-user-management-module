@@ -75,20 +75,7 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
     if ($form_id === 'user_form') {
         // remove the default email field
         unset($form['account']['mail']);
-        // add validation
-        $form['#validate'][] = 'dpc_user_management_email_validation';
-        // add warning for invalidated emails
-        $account = User::load(Drupal::currentUser()->id());
-        if ($account->field_email_addresses) {
-            $addresses = $account->field_email_addresses->getValue();
-            foreach ($addresses as $address) {
-                if ($address['status'] === 'unverified') {
-                    $message = "You have an unverified email address, this may affect your ability to view some content.";
-                    $message = new TranslatableMarkup ('@message', ['@message' => Markup::create($message)]);
-                    \Drupal::messenger()->addWarning($message);
-                }
-            }
-        }
+        $form['#attached']['library'][] = 'dpc_user_management/user_profile';
     }
     if ($form_id === 'user_register_form') {
         // hide email addresses form on registration

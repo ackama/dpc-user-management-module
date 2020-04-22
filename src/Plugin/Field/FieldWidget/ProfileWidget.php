@@ -80,6 +80,7 @@ class ProfileWidget extends WidgetBase
     /**
      * @param $item
      *
+     * @param $user_id
      * @return string
      */
     private function getStatusMarkup($item, $user_id)
@@ -89,8 +90,9 @@ class ProfileWidget extends WidgetBase
         $markup .= $item->value ? '' : ' new-item';
         $markup .= '">' . $item->status . '</span>';
 
-        if ($item->status != 'verified' && $item->value) {
-            $markup .= '<a class="button button--small dpc_resend_verification" data-user-id="' . $user_id . '" data-value="' . $item->value . '">Resend verification</a>';
+        if ($item->value) {
+            $markup .= '<a class="button button--small dpc_resend_verification '. $item->status . '" data-user-id="' . $user_id . '" data-value="' .
+                       $item->value . '">Resend verification</a>';
         }
 
         return $markup;

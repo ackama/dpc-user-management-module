@@ -1,6 +1,8 @@
 name: DPC User Management Module
 description: Adds extra functionality for managing drupal users and groups.
-package: Custom
+package: dpc_user_management
+dependencies:
+  - group
 type: module
 version: 1.0
 core: 8.x

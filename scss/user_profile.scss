@@ -1,8 +1,15 @@
 #edit-field-email-addresses-wrapper {
   .form-item .form-item {
     display: inline-block;
-    width: 350px;
+    width: 330px;
     margin-left: 15px;
+    &:first-of-type {
+      margin-left: 0;
+    }
+
+    &:nth-of-type(2) {
+      width: 200px;
+    }
   }
 
   tbody tr {
@@ -47,11 +54,19 @@
       &.new-item {
         visibility: hidden;
       }
+      &.disabled {
+        &:hover{
+          pointer-events: none;
+        }
+      }
     }
 
     .dpc_resend_verification.disabled {
       background: transparent;
       border: transparent;
+    }
+    .dpc_resend_verification.verified {
+      visibility: hidden;
     }
 
     .form-type-checkbox {
@@ -98,6 +113,27 @@
           position: absolute;
           top: 5px;
           left: 3px;
+        }
+      }
+    }
+  }
+}
+
+// frontend styles
+#main-wrapper {
+  #edit-field-email-addresses-wrapper {
+    tr{
+      td{
+        border: none;
+      }
+    }
+    .form-item {
+      .form-type-checkbox {
+        margin-top: 16px;
+        label {
+          &:after {
+            top: 3px;
+          }
         }
       }
     }
