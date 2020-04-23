@@ -1,0 +1,6 @@
+dpc_user_management.admin_settings_form:
+  title: 'Bulk invalidate user emails'
+  route_name: dpc_user_management.admin_settings_form
+  description: 'Invalidate emails of users in the system.'
+  parent: system.admin_config_system
+  weight: 99

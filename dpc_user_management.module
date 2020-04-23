@@ -6,7 +6,11 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
+use Drupal\user\Entity\User;
 
 /**
  * TODO: add helpful content or remove this hook
@@ -47,7 +51,6 @@ function dpc_user_management_user_prepare_form(
             if (empty($addresses->getValue())) {
                 $addresses->setValue([
                     [
-                        'label'      => 'Primary email',
                         'value'      => $entity->mail->value,
                         'status'     => 'verified',
                         'is_primary' => 1
@@ -80,18 +83,6 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
 }
 
 /**
- * Implements hook_element_info_alter().
- *
- * Attach our styles
- */
-function dpc_user_management_element_info_alter(array &$types)
-{
-    if (isset($types['toolbar'])) {
-        $types['toolbar']['#attached']['library'][] = 'dpc_user_management/user_profile';
-    }
-}
-
-/**
  * Implements hook_entity_type_build()
  *
  * @param EntityTypeInterface[] $entity_types
@@ -105,17 +96,37 @@ function dpc_user_management_entity_type_build(&$entity_types)
 }
 
 /**
+ * Set a warning for users with Invalidated emails
+ *
+ * @param \Drupal\user\Entity\User $account
+ */
+function dpc_user_management_user_login($account)
+{
+    $addresses = $account->field_email_addresses->getValue();
+    if ($addresses) {
+        foreach ($addresses as $address) {
+            if ($address['status'] === 'unverified') {
+                $user_profile_url = Url::fromRoute('entity.user.edit_form', ['user' => $account->id()])->toString();
+                $message          = "You have an unverified email address, this may affect your ability to view some content. Go to your <a href='$user_profile_url'>account settings</a> page to re-verify or remove the email address.";
+                $message          = new TranslatableMarkup ('@message', ['@message' => Markup::create($message)]);
+                \Drupal::messenger()->addWarning($message);
+            }
+        }
+    }
+}
+
+/**
  * Adds "is_primary" field to email addresses
  * Implements hook_update_N
  */
 function dpc_user_management_update_8001()
 {
     $database = \Drupal::database();
-    $schema = $database->schema();
+    $schema   = $database->schema();
     $schema->addField('user__field_email_addresses', 'field_email_addresses_is_primary', [
-        'type' => 'int',
-        'size' => 'tiny',
-        'default' => 0,
+        'type'     => 'int',
+        'size'     => 'tiny',
+        'default'  => 0,
         'not null' => true,
     ]);
 }
