@@ -12,6 +12,42 @@ function dpc_user_management_install()
 {
     Drupal::logger('dpc_user_management')->notice('DPC User Management Installed');
 
+    // Adds DPC Module Managed Group Type if it doesn't exist
+    if( is_null( \Drupal\group\Entity\GroupType::load('dpc_module_group_type') ) ) {
+        $group_type = \Drupal\group\Entity\GroupType::create([
+            'id' => 'dpc_module_group_type',
+            'label' => 'DPC User Management Module Type',
+            'description' => '',
+            'creator_membership' => false,
+            'creator_wizard' => true,
+            'creator_roles' => [],
+            'originalId' => 'dpc_module_group_type',
+            'status' => true,
+            'isUninstalling' => false,
+            'langcode' => 'en',
+            'trustedData' => false,
+            'enforceIsNew' => NULL,
+            'typedData' => NULL,
+            'cacheContexts' => [],
+            'cacheTags' => [],
+            'cacheMaxAge' => -1,
+            'isSyncing' => false
+        ]);
+
+        $group_type->save();
+    }
+
+    // Adds DPC Module Managed Group if it doesn't exist
+    if( is_null( \Drupal\group\Entity\Group::load('dpc_module_access_control') ) ) {
+        $group = \Drupal\group\Entity\Group::create([
+            'id' => 'dpc_module_access_control',
+            'label' => 'DPC User Management Access Control',
+            'bundle_entity_type' => 'dpc_module_group_type'
+        ]);
+
+        $group->save();
+    }
+
     /**
      * Set visibility for field in views
      */
