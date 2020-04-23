@@ -46,6 +46,11 @@
         color: #777777;
       }
 
+      &.status-unverified {
+        color: #e09600;
+        border-color: #e09600;
+      }
+
       &.new-item {
         visibility: hidden;
       }

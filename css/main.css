@@ -36,6 +36,10 @@
   border-color: #777777;
   color: #777777;
 }
+#edit-field-email-addresses-wrapper .form-item .button.status-unverified {
+  color: #e09600;
+  border-color: #e09600;
+}
 #edit-field-email-addresses-wrapper .form-item .button.new-item {
   visibility: hidden;
 }
