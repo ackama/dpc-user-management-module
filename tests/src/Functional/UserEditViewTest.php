@@ -72,7 +72,6 @@ class UserEditViewTest extends BrowserTestBase
     public function testMultipleEmailAddressFieldHasPrimaryEmail()
     {
         $this->assertFieldByXPath("//input[@name='field_email_addresses[0][value]']", $this->user->getEmail());
-        $this->assertFieldByXPath("//input[@name='field_email_addresses[0][label]']", 'Primary email');
         $this->assertFieldByXPath("//input[@name='field_email_addresses[0][is_primary]']", 1);
     }
 
