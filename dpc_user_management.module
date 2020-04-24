@@ -8,9 +8,10 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\user\Entity\User;
+use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\user\Entity\User;
 
 /**
  * TODO: add helpful content or remove this hook
@@ -96,12 +97,18 @@ function dpc_user_management_entity_type_build(&$entity_types)
 }
 
 /**
- * Set a warning for users with Invalidated emails
+ * Implements hook_user_login
  *
  * @param \Drupal\user\Entity\User $account
  */
 function dpc_user_management_user_login($account)
 {
+    // On users first login, add them to a group if they have a whitelisted domain
+    if ($account->getLastAccessedTime() == 0) {
+        HandlesEmailDomainGroupMembership::addUserToGroups(User::load($account->id()), $account->getEmail());
+    }
+
+    // Set a warning for users with Invalidated emails
     $addresses = $account->field_email_addresses->getValue();
     if ($addresses) {
         foreach ($addresses as $address) {

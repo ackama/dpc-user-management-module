@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.group.field_email_domain
+    - group.type.email_domain_group
+id: group.email_domain_group.field_email_domain
+field_name: field_email_domain
+entity_type: group
+bundle: email_domain_group
+label: 'Email domain'
+description: 'Email domains are used to automatically add users with matching email addresses to the group'
+required: false
+translatable: true
+default_value:
+  -
+    value: example.com
+default_value_callback: ''
+settings: {  }
+field_type: string
