@@ -9,8 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # env:
-    #   EXAMPLE: example-value
+    env:
+      # Show symfony deprecation warnings but don't fail on them. Many warnings
+      # come from plugins we depend on and don't control.
+      SYMFONY_DEPRECATIONS_HELPER: weak
     steps:
       - name: Checkout the Ackama Drupal Template
         uses: actions/checkout@v2
