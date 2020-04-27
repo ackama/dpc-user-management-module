@@ -9,10 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      # Show symfony deprecation warnings but don't fail on them. Many warnings
-      # come from plugins we depend on and don't control.
-      SYMFONY_DEPRECATIONS_HELPER: weak
     steps:
       - name: Checkout the Ackama Drupal Template
         uses: actions/checkout@v2
@@ -44,4 +40,6 @@ jobs:
         run: docker-compose exec -T drupal composer require drupal/group
 
       - name: Run tests
-        run: docker-compose exec -T drupal /root/run-ci.sh
+        # Show symfony deprecation warnings but don't fail on them. Many
+        # warnings come from plugins we depend on and don't control.
+        run: docker-compose exec -T --env SYMFONY_DEPRECATIONS_HELPER=weak drupal /root/run-ci.sh
