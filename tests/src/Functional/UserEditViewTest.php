@@ -80,11 +80,11 @@ class UserEditViewTest extends BrowserTestBase
         $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", null);
 
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@example.com'
+            "field_email_addresses[1][value]" => 'fghdfghdfgdgh@example.com'
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
 
-        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", 'newemail@example.com');
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", 'fghdfghdfgdgh@example.com');
     }
 
     public function testUserCanVerifyEmail()
@@ -124,7 +124,7 @@ class UserEditViewTest extends BrowserTestBase
     public function testUserCanResendEmailVerification()
     {
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@example.com'
+            "field_email_addresses[1][value]" => 'rtgertret@example.com'
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         // "click" the 'resend verification' button
@@ -137,10 +137,10 @@ class UserEditViewTest extends BrowserTestBase
     public function testEmailCanBeRemoved()
     {
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@example.com'
+            "field_email_addresses[1][value]" => 'uikuikuikuik@example.com'
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
-        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", 'newemail@example.com');
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", 'uikuikuikuik@example.com');
         $edit = [
             "field_email_addresses[1][value]" => ''
         ];
