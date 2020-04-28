@@ -14,42 +14,44 @@ trait HandlesEmailDomainGroupMembership
      */
     static function addUserToGroups(EntityInterface $user, $email)
     {
-        $domain = explode('@', $email)[1];
         $groups = self::getEmailDomainGroups();
 
         /** @var Group $group */
         foreach ($groups as $group) {
-            foreach ($group->field_email_domain->getValue() as $group_domain) {
-                if (trim(strtolower($domain)) === trim(strtolower($group_domain['value']))) {
-                    $group->addMember($user);
-                }
+            if (self::userHasGroupEmailDomains([$email], $group)) {
+                $group->addMember($user);
             }
         }
     }
 
     /**
      * @param UserInterface $user
-     * @param string        $email
+     * @param array         $removed_emails
      */
-    static function removeUsersFromGroups(UserInterface $user, $emails)
+    static function removeUsersFromGroups(UserInterface $user, $removed_emails)
     {
-        $user_emails = array_column($user->field_email_addresses->getValue(), 'value');
-        $user_emails = array_diff($user_emails, $emails);
+        // get all the verified users emails
+        $user_emails = array_filter($user->field_email_addresses->getValue(), function($email) {
+            return isset($email['status']) && $email['status'] == 'verified';
+        });
 
-        // $domain = explode('@', $email)[1];
-        // tODO what if the user has amny whitelisted emails
+        $user_emails = array_column($user_emails, 'value');
+        // filter the emails that are being removed
+        $user_emails = array_diff($user_emails, $removed_emails);
+
         $groups = self::getEmailDomainGroups();
-
-
         /** @var Group $group */
         foreach ($groups as $group) {
-            // check if any of the users other emails would let them stay in the group
-            self::userHasGroupEmailDomains($user_emails, $group);
-            foreach ($group->field_email_domain->getValue() as $group_domain) {
-                if (trim(strtolower($domain)) === trim(strtolower($group_domain['value']))) {
-                    $group->removeMember($user);
-                }
-            }
+            // check if any of the users other emails would allow them stay in the group
+            if (self::userHasGroupEmailDomains($user_emails, $group)) {
+                continue;
+            };
+
+            // check if the group domains match the removed email domains
+            if (self::userHasGroupEmailDomains($removed_emails, $group)) {
+                // remove the user from the group
+                $group->removeMember($user);
+            };
         }
     }
 
@@ -58,20 +60,27 @@ trait HandlesEmailDomainGroupMembership
      */
     static function getEmailDomainGroups()
     {
-        $groups = \Drupal::entityQuery('group')
+        $group_ids = \Drupal::entityQuery('group')
             ->condition('type', 'email_domain_group')
             ->accessCheck(false)
             ->execute();
 
-        return Group::loadMultiple($groups);
+        return Group::loadMultiple($group_ids);
     }
 
     /**
      * @param array $user_emails
      * @param Group $group
+     *
+     * @return bool
      */
     static function userHasGroupEmailDomains(array $user_emails, Group $group)
     {
-        $group_emails = array_column($group->field_email_domain->getValue(), 'value');
+        $user_email_domains = array_map(function ($email) {
+            return explode('@', $email)[1];
+        }, $user_emails);
+        $group_emails       = array_column($group->field_email_domain->getValue(), 'value');
+
+        return count(array_intersect($user_email_domains, $group_emails)) > 0;
     }
 }
