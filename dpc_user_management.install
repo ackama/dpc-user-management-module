@@ -21,7 +21,6 @@ function dpc_user_management_install()
             'creator_membership' => false,
             'creator_wizard' => true,
             'creator_roles' => [],
-            'originalId' => 'dpc_module_group_type',
             'status' => true,
             'isUninstalling' => false,
             'langcode' => 'en',
@@ -42,7 +41,7 @@ function dpc_user_management_install()
         $group = \Drupal\group\Entity\Group::create([
             'id' => 'dpc_module_access_control',
             'label' => 'DPC User Management Access Control',
-            'bundle_entity_type' => 'dpc_module_group_type'
+            'type' => 'dpc_module_group_type'
         ]);
 
         $group->save();
