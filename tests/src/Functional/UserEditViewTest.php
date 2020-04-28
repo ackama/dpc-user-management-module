@@ -78,13 +78,13 @@ class UserEditViewTest extends BrowserTestBase
     public function testUserCanAddANewEmail()
     {
         $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", null);
-
+        $random_string = $this->randomString(8);
         $edit = [
-            "field_email_addresses[1][value]" => 'fghdfghdfgdgh@example.com'
+            "field_email_addresses[1][value]" => "$random_string@example.com"
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
 
-        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", 'fghdfghdfgdgh@example.com');
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", "$random_string@example.com");
     }
 
     public function testUserCanVerifyEmail()
@@ -94,8 +94,9 @@ class UserEditViewTest extends BrowserTestBase
         $this->assertElementPresent('#field-email-addresses-values .dpc_resend_verification.verified');
 
         // add a new email address
+        $random_string = $this->randomString(8);
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@example.com'
+            "field_email_addresses[1][value]" =>"$random_string@example.com"
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
 
@@ -123,8 +124,9 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testUserCanResendEmailVerification()
     {
+        $randomString = $this->randomString(8);
         $edit = [
-            "field_email_addresses[1][value]" => 'rtgertret@example.com'
+            "field_email_addresses[1][value]" => "$randomString@example.com"
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         // "click" the 'resend verification' button
@@ -136,11 +138,12 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testEmailCanBeRemoved()
     {
+        $random_string = $this->randomString(8);
         $edit = [
-            "field_email_addresses[1][value]" => 'uikuikuikuik@example.com'
+            "field_email_addresses[1][value]" => "$random_string@example.com",
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
-        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", 'uikuikuikuik@example.com');
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", "$random_string@example.com",);
         $edit = [
             "field_email_addresses[1][value]" => ''
         ];
@@ -150,11 +153,12 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testPrimaryEmailCanBeSet()
     {
+        $random_string = $this->randomString(8);
         $edit = [
-            "field_email_addresses[1][value]" => 'newprimaryemail@example.com',
+            "field_email_addresses[1][value]" => "$random_string@example.com",
             "field_email_addresses[1][is_primary]" => 1,
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
-        $this->assert('newprimaryemail@example.com', $this->user->getEmail());
+        $this->assert("$random_string@example.com", $this->user->getEmail());
     }
 }
