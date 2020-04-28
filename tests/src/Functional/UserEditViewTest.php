@@ -128,7 +128,7 @@ class UserEditViewTest extends BrowserTestBase
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         // "click" the 'resend verification' button
-        $this->click('dpc_resend_verification');
+        $this->click('.dpc_resend_verification');
         $captured_emails = $this
             ->drupalGetMails();
         $this->assert(count($captured_emails), 2);
