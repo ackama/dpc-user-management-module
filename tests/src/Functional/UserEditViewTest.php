@@ -78,7 +78,7 @@ class UserEditViewTest extends BrowserTestBase
     public function testUserCanAddANewEmail()
     {
         $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", null);
-        $random_string = $this->randomString(8);
+        $random_string = $this->randomMachineName();
         $edit = [
             "field_email_addresses[1][value]" => "$random_string@example.com"
         ];
@@ -94,7 +94,7 @@ class UserEditViewTest extends BrowserTestBase
         $this->assertElementPresent('#field-email-addresses-values .dpc_resend_verification.verified');
 
         // add a new email address
-        $random_string = $this->randomString(8);
+        $random_string = $this->randomMachineName();
         $edit = [
             "field_email_addresses[1][value]" =>"$random_string@example.com"
         ];
@@ -124,7 +124,7 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testUserCanResendEmailVerification()
     {
-        $randomString = $this->randomString(8);
+        $randomString = $this->randomMachineName();
         $edit = [
             "field_email_addresses[1][value]" => "$randomString@example.com"
         ];
@@ -138,12 +138,12 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testEmailCanBeRemoved()
     {
-        $random_string = $this->randomString(8);
+        $random_string = $this->randomMachineName();
         $edit = [
             "field_email_addresses[1][value]" => "$random_string@example.com",
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
-        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", "$random_string@example.com",);
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", "$random_string@example.com");
         $edit = [
             "field_email_addresses[1][value]" => ''
         ];
@@ -153,7 +153,7 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testPrimaryEmailCanBeSet()
     {
-        $random_string = $this->randomString(8);
+        $random_string = $this->randomMachineName();
         $edit = [
             "field_email_addresses[1][value]" => "$random_string@example.com",
             "field_email_addresses[1][is_primary]" => 1,
