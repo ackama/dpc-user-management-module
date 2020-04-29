@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\DPC_User_Management\UserEntity;
+use Drupal\group\Entity\Group;
 
 /**
  * TODO: add helpful content or remove this hook
@@ -70,8 +71,24 @@ function dpc_user_management_user_presave(UserEntity $user) {
     $_original = $user->original->get('special_group')->getValue()[0]['value'];
     $_new = $user->get('special_group')->getValue()[0]['value'];
 
-    if ($_original !== $_new && $_new === 1) {
-        $user->set('jse_access', 1);
+    if ($_original !== $_new) {
+        // Set access flag to true only if
+        if($_new === 1) {
+            $user->set('jse_access', 1);
+        }
+
+        // Toggles user access to content group
+        /** @var Group $group */
+        $group =  \Drupal::entityQuery('group')
+            ->condition('type', 'dpc_module_group_type')
+            ->accessCheck(false)
+            ->execute();
+
+        if($user->get('jse_access')->getValue()[0]['value']) {
+            $group->addMember($user);
+        } else {
+            $group->removeMember($user);
+        }
     }
 }
 
@@ -143,3 +160,4 @@ function dpc_user_management_update_8001()
         'not null' => true,
     ]);
 }
+
