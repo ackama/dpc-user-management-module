@@ -18,6 +18,18 @@ class UserEntity extends User
         if ($this->isNew()) {
             return parent::preSave($storage);
         }
+
+        $this->verify_email_addresses();
+
+        parent::preSave($storage);
+    }
+
+    /**
+     * Verifies Email Addresses
+     *
+     * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
+     */
+    protected function verify_email_addresses() {
         $verification_sent = [];
         $user = User::load($this->id());
         // Check email addresses
@@ -42,7 +54,6 @@ class UserEntity extends User
         if (!empty($verification_sent)) {
             \Drupal::messenger()->addMessage(t('A verification email was sent to ' . implode(',', $verification_sent)));
         }
-        parent::preSave($storage);
     }
 
     protected function special_group() {
