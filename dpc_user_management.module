@@ -8,8 +8,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\DPC_User_Management\UserEntity;
-use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -61,37 +59,6 @@ function dpc_user_management_user_prepare_form(
                 ]);
             }
         } catch (\Exception $exception) {
-        }
-    }
-}
-
-/**
- * Implements hook_ENTITY_TYPE_presave().
- * @param UserEntity $user
- */
-function dpc_user_management_user_presave(UserEntity $user) {
-
-    // Adds JSE Access when Special Group flag is turned on
-    $_original = $user->original->get('special_group')->getValue()[0]['value'];
-    $_new = $user->get('special_group')->getValue()[0]['value'];
-
-    if ($_original !== $_new) {
-        // Set access flag to true only if
-        if($_new === 1) {
-            $user->set('jse_access', 1);
-        }
-
-        // Toggles user access to content group
-        /** @var Group $group */
-        $group =  \Drupal::entityQuery('group')
-            ->condition('type', 'dpc_module_group_type')
-            ->accessCheck(false)
-            ->execute();
-
-        if($user->get('jse_access')->getValue()[0]['value']) {
-            $group->addMember($user);
-        } else {
-            $group->removeMember($user);
         }
     }
 }
