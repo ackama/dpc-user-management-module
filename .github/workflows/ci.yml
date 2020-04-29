@@ -39,12 +39,6 @@ jobs:
       - name: Manually install our module's Drupal dependencies (bit hacky)
         run: docker-compose exec -T drupal composer require drupal/group
 
-      - name: store test output
-        uses: actions/upload-artifact@v1
-        with:
-          name: simpletest-output
-          path: sites/simpletest/browser_output
-
       - name: Run tests
         # Show symfony deprecation warnings but don't fail on them. Many
         # warnings come from plugins we depend on and don't control.
