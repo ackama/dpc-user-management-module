@@ -4,6 +4,8 @@ namespace Drupal\DPC_User_Management;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\group\Entity\Group;
+use Drupal\group\Entity\GroupType;
 use Drupal\user\Entity\User;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
 
@@ -13,7 +15,7 @@ class UserEntity extends User
 
     public function preSave(EntityStorageInterface $storage)
     {
-        if (!$this->id()) {
+        if ($this->isNew()) {
             return parent::preSave($storage);
         }
         $verification_sent = [];
