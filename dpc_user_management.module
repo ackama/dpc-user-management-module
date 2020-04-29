@@ -80,7 +80,10 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
     if ($form_id === 'user_register_form') {
         // hide email addresses form on registration
         unset($form['field_email_addresses']);
-        unset($form['jse_access']);
+
+        if (!in_array('administrator', \Drupal::currentUser()->getRoles())) {
+            unset($form['jse_access']);
+        }
     }
 }
 
