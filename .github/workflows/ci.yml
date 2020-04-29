@@ -39,7 +39,13 @@ jobs:
       - name: Manually install our module's Drupal dependencies (bit hacky)
         run: docker-compose exec -T drupal composer require drupal/group
 
+      - name: testoutput
+        uses: actions/upload-artifact@v1
+        with:
+          name: testoutput
+          path: /tests/output
+
       - name: Run tests
         # Show symfony deprecation warnings but don't fail on them. Many
         # warnings come from plugins we depend on and don't control.
-        run: docker-compose exec -T --env SYMFONY_DEPRECATIONS_HELPER=disabled drupal /root/run-ci.sh
+        run: docker-compose exec -T --env SYMFONY_DEPRECATIONS_HELPER=disabled BROWSERTEST_OUTPUT_DIRECTORY=/tests/output drupal /root/run-ci.sh
