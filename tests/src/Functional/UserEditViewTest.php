@@ -89,6 +89,9 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testUserCanVerifyEmail()
     {
+        $user = $this->drupalCreateUser(['administer users', 'administer node fields']);
+        $this->drupalLogin($user);
+
         // verification flag and button are not present
         $this->assertElementNotPresent('#field-email-addresses-values span.status-pending');
         $this->assertElementPresent('#field-email-addresses-values .dpc_resend_verification.verified');
@@ -98,7 +101,7 @@ class UserEditViewTest extends BrowserTestBase
         $edit = [
             "field_email_addresses[1][value]" =>"$random_string@example.com"
         ];
-        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+        $this->drupalPostForm('user/' . $user->id() . '/edit', $edit, 'Save');
 
         // check the verification email
         $captured_emails = $this->drupalGetMails();
@@ -115,7 +118,7 @@ class UserEditViewTest extends BrowserTestBase
         $this->drupalGet($verification_link[0]);
         $this->assertResponse(200);
         $this->assertText('Thank you for verifying your email address');
-        $this->drupalGet('user/' . $this->user->id() . '/edit');
+        $this->drupalGet('user/' . $user->id() . '/edit');
 
         // check that the email is verified
         $this->assertElementPresent('#field-email-addresses-values span.status-verified');
@@ -124,11 +127,13 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testUserCanResendEmailVerification()
     {
+        $user = $this->drupalCreateUser(['administer users', 'administer node fields']);
+        $this->drupalLogin($user);
         $randomString = $this->randomMachineName();
         $edit = [
             "field_email_addresses[1][value]" => "$randomString@example.com"
         ];
-        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+        $this->drupalPostForm('user/' . $user->id() . '/edit', $edit, 'Save');
         // "click" the 'resend verification' button
         $this->click('.dpc_resend_verification');
         $captured_emails = $this
