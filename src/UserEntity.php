@@ -20,6 +20,7 @@ class UserEntity extends User
         }
 
         $this->verify_email_addresses();
+        $this->toggle_special_group();
 
         parent::preSave($storage);
     }
@@ -56,7 +57,12 @@ class UserEntity extends User
         }
     }
 
-    protected function special_group() {
+    /**
+     * Adds or Removes membership of users into access group bases on profile checkboxes
+     *
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    protected function toggle_special_group() {
 
         // Adds JSE Access when Special Group flag is turned on
         $_original = $this->original->get('special_group')->getValue()[0]['value'];
