@@ -43,6 +43,7 @@ jobs:
         # Show symfony deprecation warnings but don't fail on them. Many
         # warnings come from plugins we depend on and don't control.
         run: docker-compose exec -T --env SYMFONY_DEPRECATIONS_HELPER=disabled drupal /root/run-ci.sh
+
       - name: get test output
         uses: actions/upload-artifact@v1
         with:
