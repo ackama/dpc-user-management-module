@@ -75,11 +75,13 @@ class UserEntity extends User
             }
 
             // Toggles user access to content group
-            /** @var Group $group */
-            $group =  \Drupal::entityQuery('group')
-                ->condition('type', 'dpc_module_group_type')
+            $group_ids =  array_pop(\Drupal::entityQuery('group')
+                ->condition('label', 'DPC User Management Access Control')
                 ->accessCheck(false)
-                ->execute();
+                ->execute());
+
+            /** @var Group $group */
+            $group = Group::load($group_ids[0]);
 
             if($this->get('jse_access')->getValue()[0]['value']) {
                 $group->addMember($this);
