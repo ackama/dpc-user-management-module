@@ -44,6 +44,6 @@ jobs:
         # warnings come from plugins we depend on and don't control.
         run: docker-compose exec -T --env SYMFONY_DEPRECATIONS_HELPER=disabled drupal /root/run-ci.sh
         uses: actions/upload-artifact@v1
-          with:
-            name: simpletest-output
-            path: sites/simpletest/browser_output/*
+        with:
+          name: simpletest-output
+          path: sites/simpletest/browser_output/*
