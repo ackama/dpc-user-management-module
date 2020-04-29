@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: testoutput
-          path: /tests/output
+          path: tests/output
 
       - name: Run tests
         # Show symfony deprecation warnings but don't fail on them. Many
