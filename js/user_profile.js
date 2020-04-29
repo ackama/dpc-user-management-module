@@ -13,7 +13,7 @@
       $(this).addClass('disabled');
 
       let userId = $(this).attr('data-user-id'),
-        email = $(this).attr('data-value'),
+        email = encodeURIComponent($(this).attr('data-value')),
         button = $(this);
       $.ajax({
         url: `/send-verification/${userId}/?email=${email}`,
@@ -43,6 +43,10 @@
     });
 
     $(document).on('change', primary_checkboxes, function (e) {
+      if ($(e.target).hasClass('password-field') || $(e.target).hasClass('form-text') ) {
+        return;
+      }
+
       let primary = $(e.target);
       primary_checkboxes.each(function () {
         if ($(this).attr('id') === primary.attr('id')) {

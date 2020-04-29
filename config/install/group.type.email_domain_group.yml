@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+id: email_domain_group
+label: 'Email domain group'
+description: ''
+creator_membership: true
+creator_wizard: false
+creator_roles: {  }

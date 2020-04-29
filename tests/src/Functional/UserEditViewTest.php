@@ -72,7 +72,6 @@ class UserEditViewTest extends BrowserTestBase
     public function testMultipleEmailAddressFieldHasPrimaryEmail()
     {
         $this->assertFieldByXPath("//input[@name='field_email_addresses[0][value]']", $this->user->getEmail());
-        $this->assertFieldByXPath("//input[@name='field_email_addresses[0][label]']", 'Primary email');
         $this->assertFieldByXPath("//input[@name='field_email_addresses[0][is_primary]']", 1);
     }
 
@@ -92,7 +91,7 @@ class UserEditViewTest extends BrowserTestBase
     {
         // verification flag and button are not present
         $this->assertElementNotPresent('#field-email-addresses-values span.status-pending');
-        $this->assertElementNotPresent('#field-email-addresses-values dpc_resend_verification');
+        $this->assertElementPresent('#field-email-addresses-values .dpc_resend_verification.verified');
 
         // add a new email address
         $edit = [
@@ -109,15 +108,17 @@ class UserEditViewTest extends BrowserTestBase
 
         // verification flag and resend button are present
         $this->assertElementPresent('#field-email-addresses-values span.status-pending');
-        $this->assertElementPresent('#field-email-addresses-values .dpc_resend_verification');
+        $this->assertElementPresent('#field-email-addresses-values .dpc_resend_verification.pending');
 
         // visit the verification link
         $this->drupalGet($verification_link[0]);
+        $this->assertResponse(200);
+        $this->assertText('Thank you for verifying your email address');
         $this->drupalGet('user/' . $this->user->id() . '/edit');
 
         // check that the email is verified
         $this->assertElementPresent('#field-email-addresses-values span.status-verified');
-        $this->assertElementNotPresent('#field-email-addresses-values .dpc_resend_verification');
+        $this->assertElementPresent('#field-email-addresses-values .dpc_resend_verification.verified');
     }
 
     public function testUserCanResendEmailVerification()
