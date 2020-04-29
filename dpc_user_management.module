@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\DPC_User_Management\UserEntity;
 
 /**
  * TODO: add helpful content or remove this hook
@@ -56,6 +57,21 @@ function dpc_user_management_user_prepare_form(
             }
         } catch (\Exception $exception) {
         }
+    }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ * @param UserEntity $user
+ */
+function dpc_user_management_user_presave(UserEntity $user) {
+
+    // Adds JSE Access when Special Group flag is turned on
+    $_original = $user->original->get('special_group')->getValue()[0]['value'];
+    $_new = $user->get('special_group')->getValue()[0]['value'];
+
+    if ($_original !== $_new && $_new === 1) {
+        $user->set('jse_access', 1);
     }
 }
 
