@@ -3,9 +3,6 @@ FROM php:7.3-fpm
 
 # vim: ft=docker
 
-# TODO set this buildarg
-# --build-arg BUILDKIT_INLINE_CACHE=1
-
 # Install packages (this is a development focused, luxury install with all the trimmings like tree, htop etc.)
 RUN apt-get update && apt-get install --no-install-recommends -y \
     curl \
