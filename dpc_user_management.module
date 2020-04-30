@@ -105,29 +105,29 @@ function dpc_user_management_entity_type_build(&$entity_types)
  */
 function dpc_user_management_email_validation($form, &$form_state)
 {
-    // if ($form_state->hasValue('field_email_addresses')) {
-    //     $addresses = $form_state->getValue('field_email_addresses');
-    //     foreach ($addresses as $address) {
-    //         // check if primary email is removed
-    //         if (is_array($address)) {
-    //             if ($address['is_primary'] && empty($address['value'])) {
-    //                 return $form_state->setErrorByName('field_email_addresses', "Set another address as Primary before removing your Primary address");
-    //             }
-    //
-    //             if (empty($address['status']) && !empty($address['value'])) {
-    //                 $email = $address['value'];
-    //                 $db = \Drupal::database();
-    //                 $address_exists = $db
-    //                     ->query("select * from user__field_email_addresses where field_email_addresses_value = '$email'")
-    //                     ->fetchAll();
-    //                 if (!empty($address_exists)) {
-    //
-    //                     return $form_state->setErrorByName('field_email_addresses', "The email $email is already in use.");
-    //                 };
-    //             }
-    //         }
-    //     }
-    // }
+    if ($form_state->hasValue('field_email_addresses')) {
+        $addresses = $form_state->getValue('field_email_addresses');
+        foreach ($addresses as $address) {
+            // check if primary email is removed
+            if (is_array($address)) {
+                if ($address['is_primary'] && empty($address['value'])) {
+                    return $form_state->setErrorByName('field_email_addresses', "Set another address as Primary before removing your Primary address");
+                }
+
+                if (empty($address['status']) && !empty($address['value'])) {
+                    $email = $address['value'];
+                    $db = \Drupal::database();
+                    $address_exists = $db
+                        ->query("select * from user__field_email_addresses where field_email_addresses_value = '$email'")
+                        ->fetchAll();
+                    if (!empty($address_exists)) {
+
+                        return $form_state->setErrorByName('field_email_addresses', "The email $email is already in use.");
+                    };
+                }
+            }
+        }
+    }
 }
 
 /**
