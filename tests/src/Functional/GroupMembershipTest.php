@@ -95,7 +95,8 @@ class GroupMembershipTest extends BrowserTestBase
      */
     public function testUserIsAddedToGroupAfterVerifyingNewEmail()
     {
-        $this->user->setEmail('test@randomdomain.com')->save();
+        $random_string = $this->randomMachineName();
+        $this->user->setEmail("$random_string@randomdomain.com")->save();
         $this->drupalLogin($this->user);
 
         $this->assertFalse($this->group->getMember($this->user));
@@ -103,7 +104,7 @@ class GroupMembershipTest extends BrowserTestBase
         // add a new email address
         $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@test.net'
+            "field_email_addresses[1][value]" => "$random_string@test.net"
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
 
@@ -121,6 +122,7 @@ class GroupMembershipTest extends BrowserTestBase
      */
     public function testUserIsRemovedFromGroupAfterRemovingEmail()
     {
+        $random_string = $this->randomMachineName();
         $this->drupalLogin($this->user);
         $this->assertNotFalse($this->group->getMember($this->user));
 
@@ -128,7 +130,7 @@ class GroupMembershipTest extends BrowserTestBase
         $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
             "field_email_addresses[0][value]" => '',
-            "field_email_addresses[1][value]" => 'newemail@otherdomain.net'
+            "field_email_addresses[1][value]" => "$random_string@otherdomain.net"
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         $this->assertFalse($this->group->getMember($this->user));
@@ -140,13 +142,14 @@ class GroupMembershipTest extends BrowserTestBase
      */
     public function testUserRemainsInGroupAfterRemovingEmail()
     {
+        $random_string = $this->randomMachineName();
         $this->drupalLogin($this->user);
         $this->assertNotFalse($this->group->getMember($this->user));
 
         // add a new email
         $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@test.net'
+            "field_email_addresses[1][value]" => "$random_string@test.net"
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         // verify the new email
@@ -169,13 +172,15 @@ class GroupMembershipTest extends BrowserTestBase
      */
     public function testUserIsRemovedFromGroupAfterRemovingEmailIfOtherEmailsAreNotVerified()
     {
+        $random_string = $this->randomMachineName();
+
         $this->drupalLogin($this->user);
         $this->assertNotFalse($this->group->getMember($this->user));
 
         // add a new email
         $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@test.net'
+            "field_email_addresses[1][value]" => "$random_string@test.net"
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
 
