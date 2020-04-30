@@ -1,10 +1,12 @@
 <?php
 namespace Drupal\DPC_User_management\Plugin\Field\FieldWidget;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -20,6 +22,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ProfileWidget extends WidgetBase
 {
+    use HandlesEmailDomainGroupMembership;
+
     public function __construct(
         $plugin_id,
         $plugin_definition,
@@ -55,7 +59,12 @@ class ProfileWidget extends WidgetBase
         ];
         $element['label']        = [
             '#title'         => $this->t('Label'),
-            '#type'          => 'textfield',
+            '#type'          => 'select',
+            '#options'       => [
+                'home' => 'Home',
+                'work' => 'Work',
+                'other' => 'Other',
+            ],
             '#default_value' => isset($items[$delta]->label) ? $items[$delta]->label : null,
         ];
         $element['is_primary'] = [
@@ -75,6 +84,30 @@ class ProfileWidget extends WidgetBase
         ];
 
         return $element;
+    }
+
+    /**
+     * @param FieldItemListInterface $items
+     * @param array                  $form
+     * @param FormStateInterface     $form_state
+     */
+    public function extractFormValues(FieldItemListInterface $items, array $form, FormStateInterface $form_state)
+    {
+        // get the old and new values for comparison
+        $path            = array_merge($form['#parents'], ['field_email_addresses']);
+        $key_exists      = null;
+        $values          = NestedArray::getValue($form_state->getValues(), $path);
+        $original_values = array_column($this->massageFormValues($values, $form, $form_state), 'value');
+        $updated_values  = array_column($items->getValue(), 'value');
+        $removed_emails  = array_diff($updated_values, $original_values);
+
+        // if emails have been removed, remove the user from related groups
+        if (!empty($removed_emails)) {
+            $user = \Drupal::routeMatch()->getParameter('user');
+            self::removeUsersFromGroups($user, $removed_emails);
+        }
+
+        return parent::extractFormValues($items, $form, $form_state);
     }
 
     /**

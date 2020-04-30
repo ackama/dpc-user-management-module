@@ -1,14 +1,15 @@
 #edit-field-email-addresses-wrapper {
   .form-item .form-item {
     display: inline-block;
-    width: 330px;
+    width: 350px;
     margin-left: 15px;
     &:first-of-type {
       margin-left: 0;
     }
 
     &:nth-of-type(2) {
-      width: 200px;
+      width: auto;
+      margin-right:10px;
     }
   }
 
