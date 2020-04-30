@@ -69,7 +69,7 @@ class GroupMembershipTest extends BrowserTestBase
             ['value' => 'domain.org'],
             ['value' => 'example.com']
         ];
-        $this->group   = Group::create(['type' => 'email_domain_group']);
+        $this->group   = Group::create(['type' => 'email_domain_group', 'label' => 'email domain group']);
         $this->group->set('field_email_domain', $group_domains);
         $this->group->save();
 
@@ -133,7 +133,23 @@ class GroupMembershipTest extends BrowserTestBase
             "field_email_addresses[1][value]" => "$random_string@otherdomain.net"
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+
+        // verify the new email
+        $captured_emails = $this->drupalGetMails();
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
+            $verification_link);
+        $this->drupalGet($verification_link[0]);
+
+        $edit = [
+            "field_email_addresses[0][value]" => ''
+        ];
+
+        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         $this->assertFalse($this->group->getMember($this->user));
+        $captured_emails = $this->drupalGetMails();
+        // check that the user received a notification after being removed
+        $site_name = \Drupal::config('system.site')->get('name');
+        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[1]['subject']);
     }
 
     /**

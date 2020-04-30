@@ -1,0 +1,72 @@
+{
+    "name": "ackama/drupal-template",
+    "description": "Ackama Project template for Drupal 8 projects",
+    "type": "project",
+    "license": "proprietary",
+    "homepage": "https://www.drupal.org/project/drupal",
+    "support": {
+        "docs": "https://www.drupal.org/docs/user_guide/en/index.html",
+        "chat": "https://www.drupal.org/node/314178"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "require": {
+        "php": "^7.3",
+        "composer/installers": "^1.2",
+        "drupal/console": "~1.0",
+        "drupal/core-composer-scaffold": "^8.8",
+        "drupal/core-recommended": "^8.8",
+        "drupal/devel": "^2.1",
+        "drupal/group": "^1.0@RC"
+    },
+    "require-dev": {
+        "behat/mink-goutte-driver": "^1.2",
+        "phpunit/phpunit": "^7",
+        "symfony/phpunit-bridge": "^5.0"
+    },
+    "conflict": {
+        "drupal/drupal": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "drupal-scaffold": {
+            "locations": {
+                "web-root": "./"
+            }
+        },
+        "installer-paths": {
+            "./core": [
+                "type:drupal-core"
+            ],
+            "./libraries/{$name}": [
+                "type:drupal-library"
+            ],
+            "./modules/contrib/{$name}": [
+                "type:drupal-module"
+            ],
+            "./profiles/contrib/{$name}": [
+                "type:drupal-profile"
+            ],
+            "./themes/contrib/{$name}": [
+                "type:drupal-theme"
+            ],
+            "drush/Commands/contrib/{$name}": [
+                "type:drupal-drush"
+            ],
+            "./modules/custom/{$name}": [
+                "type:drupal-custom-module"
+            ],
+            "./themes/custom/{$name}": [
+                "type:drupal-custom-theme"
+            ]
+        }
+    }
+}

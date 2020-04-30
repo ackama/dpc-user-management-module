@@ -1,0 +1,75 @@
+{
+    "name": "drupal-default-theme",
+    "version": "1.0.0",
+    "description": "Ackama starter template for drupal projects.",
+    "engines": {
+        "node": ">=12.0"
+    },
+    "repository": "git@bitbucket.org:ackama/drupal-default-theme",
+    "dependencies": {
+        "a11y": "^0.5.1",
+        "autoprefixer": "^9.6.1",
+        "bootstrap": "^4.3.1",
+        "browser-sync": "^2.26.7",
+        "colors": "^1.3.3",
+        "copyfiles": "^2.1.1",
+        "cross-var": "^1.1.0",
+        "cssnano": "^4.1.10",
+        "eslint": "^6.3.0",
+        "foundation-sites": "^6.5.3",
+        "imagemin-cli": "^5.0.0",
+        "jquery": "^3.4.1",
+        "jsonfile": "^5.0.0",
+        "motion-ui": "^2.0.3",
+        "node-sass": "^4.12.0",
+        "npm-run-all": "^4.1.5",
+        "onchange": "^6.0.0",
+        "owl.carousel": "^2.3.4",
+        "parcel-bundler": "^1.12.3",
+        "postcss": "^7.0.17",
+        "postcss-cli": "^6.1.3",
+        "postcss-pxtorem": "^4.0.1",
+        "prettyjson": "^1.2.1",
+        "rename": "^1.0.4",
+        "rimraf": "^3.0.0",
+        "semver": "^6.3.0",
+        "shortid": "^2.2.14",
+        "svg-sprite": "^1.5.0"
+    },
+    "browserslist": [
+        "last 2 versions",
+        "ie >= 11"
+    ],
+    "config": {
+        "theme": "/app/src/themes/custom/sqw/",
+        "src": "/app/src/themes/sqw/assets/src",
+        "dist": "/app/src/themes/sqw/assets/dist"
+    },
+    "scripts": {
+        "copy:fonts": "copyfiles -u 6 \"$npm_package_config_src/fonts/*.{eot,ttf,woff,woff2}\" $npm_package_config_dist",
+        "checkversion": "node config/check-version",
+        "svgsprite": "svg-sprite --config config/svgsprite.json $npm_package_config_src/svg-icons/*.svg",
+        "clean": "node config/clean",
+        "css": "node-sass $npm_package_config_src/scss/ --include-path node_modules --include-path node_modules/foundation-sites/scss -o $npm_package_config_dist/css/",
+        "postcss-run": "postcss $npm_package_config_dist/css/*.css --verbose --no-map --config ./config/postcss.config.js --dir $npm_package_config_dist/css",
+        "images": "imagemin $npm_package_config_src/img/* --out-dir=$npm_package_config_dist/img/ && imagemin $npm_package_config_src/img/device-icons/* --out-dir=$npm_package_config_dist/img/device-icons",
+        "browsersync": "browser-sync start --config \"config/browsersync.js\"",
+        "setup": "npm-run-all checkversion --parallel copy:* svgsprite images",
+        "watch:scss": "onchange \"$npm_package_config_src/scss/**/*.scss\" -p -- npm run css -- --source-map true",
+        "watch:images": "onchange \"$npm_package_config_src/img/**/*\" -p -- npm run images",
+        "watchifiers": "npm-run-all --parallel js:admin:watch js:sqw:watch",
+        "watch": "npm-run-all setup css --parallel watchifiers watch:scss watch:images browsersync",
+        "build": "",
+        "js:admin:watch": "NODE_ENV=development parcel watch $npm_package_config_src/js/admin.js --out-dir $npm_package_config_dist/js --out-file admin.min.js --no-hmr",
+        "js:admin:build": "NODE_ENV=production parcel build $npm_package_config_src/js/admin.js --out-dir $npm_package_config_dist/js --out-file admin.min.js",
+        "js:sqw:watch": "NODE_ENV=development parcel watch $npm_package_config_src/js/app.js --out-dir $npm_package_config_dist/js --out-file app.min.js --no-hmr",
+        "js:sqw:build": "NODE_ENV=production parcel build $npm_package_config_src/js/app.js --out-dir $npm_package_config_dist/js --out-file app.min.js"
+    },
+    "author": "Ackama <info@ackama.com>",
+    "license": "ISC",
+    "devDependencies": {
+        "@babel/core": "^7.5.5",
+        "@babel/preset-env": "7.5.5",
+        "@babel/preset-flow": "^7.0.0"
+    }
+}
