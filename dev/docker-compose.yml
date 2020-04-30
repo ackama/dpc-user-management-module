@@ -94,7 +94,7 @@ services:
 
             - ./src/phpunit.xml:/var/www/html/phpunit.xml
 
-            - ../:/var/www/html/modules/custom/dpc_user_management_module
+            - ../:/var/www/html/modules/custom/dpc_user_management
 
             - ./src/profiles:/var/www/html/profiles
 
