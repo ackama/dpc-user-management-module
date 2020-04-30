@@ -22,7 +22,7 @@ jobs:
 
       - name: Build and start containers
         working-directory: ./dev
-        run: docker-compose up drupal -d --build
+        run: docker-compose up -d --build drupal
 
       - name: Tag the built Drupal image for pushing to Github packages
         working-directory: ./dev
