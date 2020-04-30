@@ -43,18 +43,17 @@
     });
 
     $(document).on('change', primary_checkboxes, function (e) {
-      if ($(e.target).hasClass('password-field') || $(e.target).hasClass('form-text') ) {
-        return;
-      }
+      if ($(e.target).hasClass('set-primary-option') ) {
 
-      let primary = $(e.target);
-      primary_checkboxes.each(function () {
-        if ($(this).attr('id') === primary.attr('id')) {
-          $(this).prop('checked', true);
-          return;
-        }
-        $(this).prop('checked', false);
-      });
+        let primary = $(e.target);
+        primary_checkboxes.each(function () {
+          if ($(this).attr('id') === primary.attr('id')) {
+            $(this).prop('checked', true);
+            return;
+          }
+          $(this).prop('checked', false);
+        });
+      }
     });
   });
 })(jQuery);
