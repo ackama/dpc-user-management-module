@@ -10,17 +10,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the Ackama Drupal Template
+      # - name: Checkout the Ackama Drupal Template
+      #   uses: actions/checkout@v2
+      #   with:
+      #     repository: ackama/drupal-default-theme
+      #     ref: re-organise
+      #     token: ${{ secrets.GH_PAT_TO_ACCESS_DRUPAL_TEMPLATE }}
+      #
+      - name: Check out this repo
         uses: actions/checkout@v2
-        with:
-          repository: ackama/drupal-default-theme
-          ref: re-organise
-          token: ${{ secrets.GH_PAT_TO_ACCESS_DRUPAL_TEMPLATE }}
-
-      - name: Checkout this module into the modules dir of the Ackama Drupal Template
-        uses: actions/checkout@v2
-        with:
-          path: src/modules/custom/dpc-user-management-module
+        # with:
+        #   path: src/modules/custom/dpc-user-management-module
 
       # We don't start the 'frontend' container because we (currently) do not
       # need it in CI
