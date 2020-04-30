@@ -40,6 +40,7 @@ trait HandlesEmailDomainGroupMembership
         $user_emails = array_diff($user_emails, $removed_emails);
 
         $groups = self::getEmailDomainGroups();
+        $groups_removed_from = [];
         /** @var Group $group */
         foreach ($groups as $group) {
             // check if any of the users other emails would allow them stay in the group
@@ -48,10 +49,15 @@ trait HandlesEmailDomainGroupMembership
             };
 
             // check if the group domains match the removed email domains
-            if (self::userHasGroupEmailDomains($removed_emails, $group)) {
+            if (self::userHasGroupEmailDomains($removed_emails, $group) && $group->getMember($user)) {
                 // remove the user from the group
                 $group->removeMember($user);
+                array_push($groups_removed_from, $group->get('label')->getValue()[0]['value']);
             };
+        }
+
+        if (!empty($groups_removed_from)) {
+            self::sendNotificationUserIsRemovedFromGroup($user_emails, $groups_removed_from, $user->getPreferredLangcode());
         }
     }
 
@@ -82,5 +88,29 @@ trait HandlesEmailDomainGroupMembership
         $group_emails       = array_column($group->field_email_domain->getValue(), 'value');
 
         return count(array_intersect($user_email_domains, $group_emails)) > 0;
+    }
+
+    /**
+     * @param array $user
+     * @param Group[]|array $groups
+     */
+    static function sendNotificationUserIsRemovedFromGroup($user_emails, $groups, $langcode)
+    {
+        $config = \Drupal::config('system.site');
+        $site_name = $config->get('name');
+
+        $message = "Changes were made to you account which has affected your group membership. \n\r";
+        $message .= sprintf(
+            "You have been removed from the following %s: %s",
+            (count($groups) > 1 ? 'groups' : 'group'),
+            implode(', ', $groups)
+        );
+        $params['context']['subject'] = "$site_name: You have been removed from a group" ;
+        $params['context']['message'] = $message;
+
+        $mailManager = \Drupal::service('plugin.manager.mail');
+        foreach ($user_emails as $email) {
+            $mailManager->mail('system', 'mail', $email, $langcode, $params);
+        }
     }
 }
