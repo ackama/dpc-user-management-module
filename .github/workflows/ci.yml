@@ -29,7 +29,7 @@ jobs:
         env:
           EOIN_PAT: ${{secrets.EOIN_PAT}}
         run: |
-          echo $EOIN_GITHUB_PAT | docker login docker.pkg.github.com -u eoinkelly --password-stdin
+          echo $EOIN_PAT | docker login docker.pkg.github.com -u eoinkelly --password-stdin
           docker tag dev_drupal:latest docker.pkg.github.com/ackama/dpc-user-management-module/master:latest
           docker push docker.pkg.github.com/ackama/dpc-user-management-module/master:latest
 
