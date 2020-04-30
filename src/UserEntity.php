@@ -65,29 +65,38 @@ class UserEntity extends User
     protected function toggle_special_group() {
 
         // Adds JSE Access when Special Group flag is turned on
-        $_original = $this->original->get('special_group')->getValue()[0]['value'];
-        $_new = $this->get('special_group')->getValue()[0]['value'];
+        $_new = (int) $this->get('special_group')->getValue()[0]['value'];
+        $_original = (int) $this->original->get('special_group')->getValue()[0]['value'];
 
         if ($_original !== $_new) {
             // Set access flag to true only if
             if($_new === 1) {
                 $this->set('jse_access', 1);
             }
+        }
 
+        $_access_new = (int) $this->get('jse_access')->getValue()[0]['value'];
+        $_access_original = (int) $this->original->get('jse_access')->getValue()[0]['value'];
+
+        if($_access_original !== $_access_new) {
             // Toggles user access to content group
-            $group_ids =  array_pop(\Drupal::entityQuery('group')
+            $group_ids =  \Drupal::entityQuery('group')
                 ->condition('label', 'DPC User Management Access Control')
                 ->accessCheck(false)
-                ->execute());
+                ->execute();
 
             /** @var Group $group */
-            $group = Group::load($group_ids[0]);
+            $group = Group::load(array_pop($group_ids));
 
-            if($this->get('jse_access')->getValue()[0]['value']) {
+            if( (int) $this->get('jse_access')->getValue()[0]['value'] ) {
                 $group->addMember($this);
-            } else {
-                $group->removeMember($this);
+
+                return;
             }
+
+            $group->removeMember($this);
+
+            return;
         }
     }
 }
