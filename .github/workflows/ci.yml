@@ -36,9 +36,6 @@ jobs:
       - name: Install Drupal
         run: docker-compose exec -T drupal /root/install-drupal.sh
 
-      - name: Manually install our module's Drupal dependencies (bit hacky)
-        run: docker-compose exec -T drupal composer require drupal/group
-
       - name: Run tests
         # Show symfony deprecation warnings but don't fail on them. Many
         # warnings come from plugins we depend on and don't control.

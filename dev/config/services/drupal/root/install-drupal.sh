@@ -20,18 +20,17 @@ drush site:install -vvv \
 # sites/default/files to allow Apache+PHP to write them
 chown -R www-data.www-data /var/www/html/sites/default/files/
 
-# 2020-04-18: This is a workaround for a bug in current Drupal 8 that causes it
-# to fail after a drush `site:install`. If you are reading this and have a few
-# minutes, please try standing these containers up without this hack so we can
-# remove it.
-drush -r /var/www/html cache:rebuild || echo "First cache:rebuild failed as it sometimes does for unknown reasons"
-drush -r /var/www/html cache:rebuild
+# Rebuild drupal cache after install
+drush --yes cache:rebuild
 
 # Enable modules that make local development more pleasant
-drush pm:enable devel,devel_generate,kint
+drush --yes pm:enable devel,devel_generate,kint
 # webprofiler has to be enabled **after** devel - it fails when they are in the
 # same command for some reason.
-drush pm:enable webprofiler
+drush --yes pm:enable webprofiler
+
+# Enable our module's Drupal dependencies (they are installed via composer)
+drush --yes pm:enable group
 
 # Tell Drupal to load /var/www/html/sites/default/settings.local.php if it
 # exists by appending the appropriate snippet to the main settings.php file
