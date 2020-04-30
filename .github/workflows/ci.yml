@@ -10,25 +10,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # - name: Checkout the Ackama Drupal Template
-      #   uses: actions/checkout@v2
-      #   with:
-      #     repository: ackama/drupal-default-theme
-      #     ref: re-organise
-      #     token: ${{ secrets.GH_PAT_TO_ACCESS_DRUPAL_TEMPLATE }}
-      #
       - name: Check out this repo
         uses: actions/checkout@v2
-        # with:
-        #   path: src/modules/custom/dpc-user-management-module
 
-      # We don't start the 'frontend' container because we (currently) do not
-      # need it in CI
       - name: Build and start containers (mysql and drupal)
-        run: docker-compose up -d --build mysql drupal
+        run: docker-compose up -d --build
 
-      - name: Wait a fixed amount of time (mostly to give MySQL time to complete its startup)
-        run: sleep 30s
+      - name: Wait for MariaDB container to start
+        # MariaDB isn't fully ready until it has said "ready for connections"
+        # **twice**. This while loop gathers the log output from the MariaDB
+        # container and looks for that magic string. It will loop (sleeping 1
+        # second on each loop) while it waits to see the magic string twice.
+        run: "while [ $(docker-compose logs mysql |grep 'mysqld: ready for connections' | wc -l | tr -d ' ') -ne '2' ]; do echo 'sleeping...' && sleep 1; done"
 
       - name: Dump info about running containers (for future debugging)
         run: docker ps -a
