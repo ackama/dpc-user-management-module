@@ -19,13 +19,13 @@ jobs:
 
       - name: Tag the built Drupal image for pushing to Github packages
         working-directory: ./dev
-        run: docker tag dev_drupal:latest docker.pkg.github.com/ackama/dpc-user-management-module/${{GITHUB_REF}}:${{GITHUB_SHA}}
+        run: docker tag dev_drupal:latest docker.pkg.github.com/ackama/dpc-user-management-module/${GITHUB_REF}:${GITHUB_SHA}
 
       - name: Push Drupal image to Github packages
         working-directory: ./dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: docker push docker.pkg.github.com/ackama/dpc-user-management-module/${{GITHUB_REF}}:${{GITHUB_SHA}}
+        run: docker push docker.pkg.github.com/ackama/dpc-user-management-module/${GITHUB_REF}:${GITHUB_SHA}
 
       # - name: Wait for MariaDB container to start
       #   # MariaDB isn't fully ready until it has said "ready for connections"
