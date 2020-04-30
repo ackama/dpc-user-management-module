@@ -59,7 +59,12 @@ class ProfileWidget extends WidgetBase
         ];
         $element['label']        = [
             '#title'         => $this->t('Label'),
-            '#type'          => 'textfield',
+            '#type'          => 'select',
+            '#options'       => [
+                'home' => 'Home',
+                'work' => 'Work',
+                'other' => 'Other',
+            ],
             '#default_value' => isset($items[$delta]->label) ? $items[$delta]->label : null,
         ];
         $element['is_primary'] = [
