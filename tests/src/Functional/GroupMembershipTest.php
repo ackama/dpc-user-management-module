@@ -189,6 +189,6 @@ class GroupMembershipTest extends BrowserTestBase
         // check that the user received a notification after being removed
         $site_name = \Drupal::config('system.site')->get('name');
         $captured_emails = $this->drupalGetMails();
-        $this->assertMail('subject', "$site_name: You have been removed from a group", 'actual:' . $captured_emails[0]['subject']);
+        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[1]['subject']);
     }
 }
