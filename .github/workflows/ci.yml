@@ -13,19 +13,31 @@ jobs:
       - name: Check out this repo
         uses: actions/checkout@v2
 
+      - name: Try login
+        working-directory: ./dev
+        env:
+          EOIN_PAT: ${{secrets.EOIN_PAT}}
+        run: |
+          echo $EOIN_GITHUB_PAT | docker login docker.pkg.github.com -u eoinkelly --password-stdin
+
       - name: Build and start containers
         working-directory: ./dev
         run: docker-compose up drupal -d --build
 
       - name: Tag the built Drupal image for pushing to Github packages
         working-directory: ./dev
-        run: docker tag dev_drupal:latest docker.pkg.github.com/ackama/dpc-user-management-module/master:latest
-
-      - name: Push Drupal image to Github packages
-        working-directory: ./dev
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: docker push docker.pkg.github.com/ackama/dpc-user-management-module/master:latest
+          EOIN_PAT: ${{secrets.EOIN_PAT}}
+        run: |
+          echo $EOIN_GITHUB_PAT | docker login docker.pkg.github.com -u eoinkelly --password-stdin
+          docker tag dev_drupal:latest docker.pkg.github.com/ackama/dpc-user-management-module/master:latest
+          docker push docker.pkg.github.com/ackama/dpc-user-management-module/master:latest
+
+      # - name: Push Drupal image to Github packages
+      #   working-directory: ./dev
+      #   # env:
+      #   #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: docker push docker.pkg.github.com/ackama/dpc-user-management-module/master:latest
 
       # - name: Wait for MariaDB container to start
       #   # MariaDB isn't fully ready until it has said "ready for connections"
