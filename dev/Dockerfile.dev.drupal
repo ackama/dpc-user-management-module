@@ -1,0 +1,114 @@
+# https://hub.docker.com/_/php
+FROM php:7.3-fpm
+
+# Install packages (this is a development focused, luxury install with all the trimmings like tree, htop etc.)
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    curl \
+    wget \
+    vim \
+    git \
+    unzip \
+    nginx \
+    telnet \
+    procps \
+    psmisc \
+    htop \
+    sudo \
+    less \
+    nano \
+    jq \
+    ripgrep \
+    tree \
+    default-mysql-client
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php && \
+    mv composer.phar /usr/local/bin/composer && \
+    ln -s /root/.composer/vendor/bin/drush /usr/local/bin/drush
+
+# Install Drush
+RUN composer global require drush/drush && \
+    composer global update
+
+# # Install PHP extension: gd (PHP 7.4 version)
+# #  * PHP changed how gd is configured in 7.4 so you need to use this invocation
+# #    instead when you upgrade to 7.4
+# RUN apt-get update && apt-get install -y \
+#     libfreetype6-dev \
+#     libjpeg62-turbo-dev \
+#     libpng-dev \
+#     && docker-php-ext-configure gd --with-freetype --with-jpeg \
+#     && docker-php-ext-install -j$(nproc) gd
+
+# Install PHP extension: gd (PHP 7.3 version)
+RUN apt-get update && apt-get install -y \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr --with-jpeg-dir=/usr --with-png-dir=/usr \
+    && docker-php-ext-install -j$(nproc) gd
+
+# # Install PHP extension: redis
+# RUN pecl install redis-5.1.1 \
+#     && pecl install xdebug-2.8.1 \
+#     && docker-php-ext-enable redis xdebug
+
+# # Install PHP extension: memcached
+# RUN apt-get update && apt-get install -y libmemcached-dev zlib1g-dev \
+#     && pecl install memcached-2.2.0 \
+#     && docker-php-ext-enable memcached
+
+# Optional: Clean repository (we are skipping this because a mildly bigger
+# image in development is not a big deal)
+# RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install support for MySQL access via PDO
+RUN docker-php-ext-install pdo pdo_mysql
+
+# Install and setup opcache
+RUN docker-php-ext-install opcache
+COPY config/services/drupal/usr/local/etc/php/conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+# Clean up a file which could cause confusion in the context of our app
+RUN rm /var/www/html/index.nginx-debian.html
+
+# Install Drupal
+
+# Copy the composer files in so they are available for the 'composer install'
+# command later in this file
+COPY src/composer.json /var/www/html/composer.json
+COPY src/composer.lock /var/www/html/composer.lock
+
+# Install Drupal & associated modules
+RUN composer install
+
+# Remove the composer files from the image because we will mount our own copies
+# when we start the container. Removing the files should help avoid confusing
+# situations where the old files are still around because we made an error with
+# the volume mount.
+RUN rm composer.json composer.lock
+
+# Copy the script that will be used as CMD below
+COPY config/services/drupal/root/start.sh /root/start.sh
+
+# Explicitly set the WORKDIR so that when we run drush commands via
+# `docker-compose exec` they will work because the default working dir is the
+# Drupal root dir.
+WORKDIR /var/www/html
+
+# Add the directory that composer will put tools such as phpunit, drupal
+# console in to PATH so they are avaiable wihtout having to type the
+# 'vendor/bin/' prefix
+ENV PATH=$PATH:/var/www/html/vendor/bin
+
+RUN echo 'export LS_OPTIONS="--color=auto"' >> /root/.bashrc
+RUN echo 'alias ls="ls $LS_OPTIONS"' >> /root/.bashrc
+
+# Give the www-data user a shell so that we can 'su' and 'sudo' to that user
+RUN chsh -s /bin/bash www-data
+
+# Create some directories that phpunit will expect to exist
+RUN mkdir -p sites/simpletest/browser_output
+RUN chmod -R 777 sites/simpletest
+
+CMD [ "/root/start.sh" ]

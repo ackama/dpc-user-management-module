@@ -1,0 +1,130 @@
+##
+# https://docs.docker.com/compose/compose-file/
+#
+version: "3.7"
+
+services:
+    ##
+    # As of 2020-04-18, Pantheon installs MariaDB the following database:
+    #
+    #       Server version: 5.5.5-10.0.23-MariaDB-log MariaDB Server
+    #
+    #       collation_database	utf8_general_ci
+    #       collation_server	utf8_general_ci
+    #
+    # so we mimic that setup here.
+    #
+    mysql:
+        ##
+        # * https://hub.docker.com/_/mariadb
+        # * Pantheon uses MariaDB so we do too. As of 2020-04-18, Pantheon
+        #   installs MariaDB:
+        #
+        #       Server version: 5.5.5-10.0.23-MariaDB-log MariaDB
+        #
+        #   so we try to match that as closely as we can.
+        #
+        image: "mariadb:10"
+        ports:
+            # host:container
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: drupal
+            MYSQL_DATABASE: drupal
+        volumes:
+            ##
+            # The database image creates and mounts (at /var/lib/mysql) an
+            # anonymous volume by default. We override this with a named volume
+            # because a volume with a sensible name is easier to manage and
+            # clean up later on.
+            #
+            - "mysql_data:/var/lib/mysql"
+
+            ##
+            # * The MySQL container will execute files with extensions .sh,
+            #   .sql and .sql.gz that are found in `/docker-entrypoint-initdb.d`.
+            # * Files will be executed in alphabetical order.
+            # * SQL files will be imported by default to the database specified
+            #   by the MYSQL_DATABASE variable.
+            # * You can easily populate your mysql services by mounting a SQL
+            #   dump into that directory and provide custom images with
+            #   contributed data.
+            #
+            # path-on-host:absolute-path-on-container
+            # - "./drupal-db-dump.sql:/docker-entrypoint-initdb.d/dump.sql"
+    drupal:
+        build:
+            context: ./
+            dockerfile: Dockerfile.dev.drupal
+            cache_from:
+              - docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
+
+        ports:
+            # host:container
+            - "8080:80"
+        depends_on:
+            - mysql
+        environment:
+            ##
+            # Give composer all the memory we have to stop it dying annoyingly sometimes
+            #
+            COMPOSER_MEMORY_LIMIT: "-1"
+
+            ##
+            # These are the credentials for the Drupal admin user which
+            # will be created during site installation.
+            #
+            DRUPAL_ADMIN_USERNAME: admin
+            DRUPAL_ADMIN_PASSWORD: admin
+
+            ##
+            # These variables are used to generate a ~/.my.cnf configuration
+            # file for the MySQL client installed in this container so you can
+            # connect to the DB by just running `mysql` without any args.
+            #
+            MYSQL_CLIENT_HOST: mysql
+            MYSQL_CLIENT_USER: root
+            MYSQL_CLIENT_PASSWORD: drupal
+            MYSQL_CLIENT_DATABASE: drupal
+        volumes:
+            ##
+            # We mount only the files and folders we will want to edit on the
+            # host. We assume that all commands will be run within the
+            # container.
+            #
+            - ./src/composer.json:/var/www/html/composer.json
+            - ./src/composer.lock:/var/www/html/composer.lock
+
+            - ./src/phpunit.xml:/var/www/html/phpunit.xml
+
+            - ../:/var/www/html/modules/custom/dpc_user_management
+
+            - ./src/profiles:/var/www/html/profiles
+
+            - ./src/themes/contrib:/var/www/html/themes/contrib
+            - ./src/themes/custom:/var/www/html/themes/custom
+
+            - ./src/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php
+
+            - ./config/services/drupal/root/install-drupal.sh:/root/install-drupal.sh
+            - ./config/services/drupal/root/run-ci.sh:/root/run-ci.sh
+
+            - ./config/services/drupal/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+    ##
+    # The 'frontend' container runs all our JS/CSS/image pipelines
+    #
+    frontend:
+        build:
+            context: ./
+            dockerfile: Dockerfile.dev.frontend
+            cache_from:
+              - docker.pkg.github.com/ackama/dpc-user-management-module/frontend-dev:latest
+        ports:
+            - "3001:3001"
+        volumes:
+            - "./src/themes/custom:/app/src/themes"
+            - "./config/services/frontend/app/config:/app/config/"
+            - "./config/services/frontend/app/package.json:/app/package.json"
+            - "./config/services/frontend/app/package-lock.json:/app/package-lock.json"
+volumes:
+    mysql_data:
