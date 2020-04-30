@@ -1,0 +1,21 @@
+{
+    "dest": "public/wp-content/themes/sqw/templates/partials/svg",
+    "log": "info",
+    "svg": {
+      "rootAttributes": {
+        "width": 0,
+        "height": 0,
+        "class": "svg-sprite"
+      }
+    },
+    "mode": {
+        "symbol": {
+            "sprite": "svg-sprite.twig"
+        }
+    },
+    "shape": {
+        "id": {
+            "generator": "svg-%s"
+        }
+    }
+}
