@@ -91,6 +91,7 @@ class UserEditViewTest extends BrowserTestBase
     {
         $user = $this->drupalCreateUser(['administer users', 'administer node fields']);
         $this->drupalLogin($user);
+        $this->drupalGet('user/' . $user->id() . '/edit');
 
         // verification flag and button are not present
         $this->assertElementNotPresent('#field-email-addresses-values span.status-pending');

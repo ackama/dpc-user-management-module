@@ -110,7 +110,7 @@ class GroupMembershipTest extends BrowserTestBase
 
         // get the verification email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
@@ -149,7 +149,9 @@ class GroupMembershipTest extends BrowserTestBase
         // add a new email
         $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
-            "field_email_addresses[1][value]" => "$random_string@test.net"
+            "field_email_addresses[1][value]" => "$random_string@test.net",
+            "field_email_addresses[1][is_primary]" => true,
+            "field_email_addresses[0][is_primary]" => false
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         // verify the new email
@@ -180,7 +182,8 @@ class GroupMembershipTest extends BrowserTestBase
         // add a new email
         $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
-            "field_email_addresses[1][value]" => "$random_string@test.net"
+            "field_email_addresses[1][value]" => "$random_string@test.net",
+            "field_email_addresses[1][is_primary]" => true
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
 
