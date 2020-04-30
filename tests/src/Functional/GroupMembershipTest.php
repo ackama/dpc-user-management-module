@@ -69,7 +69,7 @@ class GroupMembershipTest extends BrowserTestBase
             ['value' => 'domain.org'],
             ['value' => 'example.com']
         ];
-        $this->group   = Group::create(['type' => 'email_domain_group']);
+        $this->group   = Group::create(['type' => 'email_domain_group', 'label' => 'email domain group']);
         $this->group->set('field_email_domain', $group_domains);
         $this->group->save();
 
