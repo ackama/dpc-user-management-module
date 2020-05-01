@@ -110,7 +110,7 @@ class GroupMembershipTest extends BrowserTestBase
 
         // get the verification email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
@@ -129,27 +129,31 @@ class GroupMembershipTest extends BrowserTestBase
         // remove default email from user (@example.com)
         $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
-            "field_email_addresses[0][value]" => '',
-            "field_email_addresses[1][value]" => "$random_string@otherdomain.net"
+            "field_email_addresses[1][value]" => "$random_string@otherdomain.net",
+            "field_email_addresses[1][is_primary]" => true,
+            "field_email_addresses[0][is_primary]" => false,
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
 
         // verify the new email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
+        $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
             "field_email_addresses[0][value]" => ''
         ];
-
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+
+        // check that the user was removed from the group
         $this->assertFalse($this->group->getMember($this->user));
-        $captured_emails = $this->drupalGetMails();
+
         // check that the user received a notification after being removed
         $site_name = \Drupal::config('system.site')->get('name');
-        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[1]['subject']);
+
+        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[2]['subject']);
     }
 
     /**
