@@ -32,7 +32,7 @@ drush --yes pm:enable webprofiler
 # Enable our module's Drupal dependencies (they are installed via composer)
 drush --yes pm:enable group
 
-npm install --prefix /var/www/html/modules/custom/dpc_user_management
+npm ci --prefix /var/www/html/modules/custom/dpc_user_management
 
 # Tell Drupal to load /var/www/html/sites/default/settings.local.php if it
 # exists by appending the appropriate snippet to the main settings.php file
