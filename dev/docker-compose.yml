@@ -110,21 +110,5 @@ services:
             - ./config/services/drupal/root/run-ci.sh:/root/run-ci.sh
 
             - ./config/services/drupal/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
-    ##
-    # The 'frontend' container runs all our JS/CSS/image pipelines
-    #
-    frontend:
-        build:
-            context: ./
-            dockerfile: Dockerfile.dev.frontend
-            cache_from:
-              - docker.pkg.github.com/ackama/dpc-user-management-module/frontend-dev:latest
-        ports:
-            - "3001:3001"
-        volumes:
-            - "./src/themes/custom:/app/src/themes"
-            - "./config/services/frontend/app/config:/app/config/"
-            - "./config/services/frontend/app/package.json:/app/package.json"
-            - "./config/services/frontend/app/package-lock.json:/app/package-lock.json"
 volumes:
     mysql_data:

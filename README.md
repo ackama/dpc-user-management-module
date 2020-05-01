@@ -65,6 +65,14 @@ drupal-container$ tail -f /var/log/nginx/access.log
 ## ... connect to mysql
 drupal-container$ mysql
 
+## ... working with JS
+drupal-container$ cd modules/custom/dpc_user_management
+drupal-container$ npm run sass # or whatever commands you have defined in npm
+```
+
+If you prefer you can run commands directly via docker-compose without having to open the bash shell first e.g.
+
+```sh
 ## Alternatively you can pass the command you want to run directly to
 ## `docker-compose exec` e.g. run mysql CLI client
 you@your-computer$ docker-compose exec drupal mysql
