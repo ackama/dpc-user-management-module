@@ -152,8 +152,9 @@ class GroupMembershipTest extends BrowserTestBase
 
         // check that the user received a notification after being removed
         $site_name = \Drupal::config('system.site')->get('name');
+        $captured_emails = $this->drupalGetMails();
 
-        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[1]['subject']);
+        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[2]['subject']);
     }
 
     /**
@@ -178,11 +179,11 @@ class GroupMembershipTest extends BrowserTestBase
         $captured_emails = $this->drupalGetMails();
         preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
             $verification_link);
-        $this->drupalGet($verification_link[0]);
+        $this->drupalGet($verification_link[1]);
 
         // remove default email from user (@example.com)
         $edit = [
-            "field_email_addresses[0][value]" => null,
+            "field_email_addresses[0][value]" => '',
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         $this->assertNotFalse($this->group->getMember($this->user));
