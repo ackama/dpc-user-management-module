@@ -16,9 +16,9 @@ refer to your computer as the "host" to distinguish it from the containers):
 This template has a separate (single command) step to install Drupal which
 you must run after you have started the containers (see below).
 
-We did this to avoid baking things like DB credentials into the
-images. If you decide you do want to bake some of those steps into the image
-then you can move commands from `config/drupal/root/install-drupal.sh` into
+We did this to avoid baking things like DB credentials into the images. If you
+decide you do want to bake some of those steps into the image then you can move
+commands from `config/services/drupal/root/setup.sh` into
 `Dockerfile.drupal.dev`.
 
 The `config/` dir is organised first by service (see `docker-compose.yml` for
@@ -47,9 +47,9 @@ you@your-computer$ docker-compose up --build
 
 ## Terminal 2 ########
 
-## install Drupal (edit config/drupal/install-drupal.sh if you want to change
-## how Drupal is installed e.g. download and enable modules etc.)
-you@your-computer$ docker-compose  exec drupal /root/install-drupal.sh
+## install Drupal (edit config/services/drupal/root/setup.sh if you want to
+change ## how Drupal is installed e.g. download and enable modules etc.)
+you@your-computer$ docker-compose  exec drupal /root/setup.sh
 
 ## Now your drupal site should be available.
 

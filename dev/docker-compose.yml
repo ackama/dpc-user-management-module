@@ -106,7 +106,7 @@ services:
 
             - ./src/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php
 
-            - ./config/services/drupal/root/install-drupal.sh:/root/install-drupal.sh
+            - ./config/services/drupal/root/setup.sh:/root/setup.sh
             - ./config/services/drupal/root/run-ci.sh:/root/run-ci.sh
 
             - ./config/services/drupal/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
