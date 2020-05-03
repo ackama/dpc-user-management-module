@@ -1,0 +1,4 @@
+src/themes/custom/sqw/assets/dist
+
+# this gets autocreated when we run the tests
+src/profiles/README.txt

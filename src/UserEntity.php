@@ -4,6 +4,7 @@ namespace Drupal\DPC_User_Management;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\group\Entity\Group;
 use Drupal\group\Entity\GroupType;
 use Drupal\user\Entity\User;
@@ -11,7 +12,7 @@ use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
 
 class UserEntity extends User
 {
-    use SendsEmailVerificationEmail;
+    use SendsEmailVerificationEmail, HandlesEmailDomainGroupMembership;
 
     public function preSave(EntityStorageInterface $storage)
     {
@@ -48,6 +49,11 @@ class UserEntity extends User
             // If a primary email flag has been set then override the mail setting
             if ($address['is_primary']) {
                 $this->setEmail($address['value']);
+            }
+
+            // If a users email is unverified maybe remove the user from groups
+            if ($address['status'] == 'unverified') {
+                self::removeUsersFromGroups($this, [$address['value']]);
             }
         }
 
