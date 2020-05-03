@@ -18,15 +18,15 @@ you must run after you have started the containers (see below).
 
 We did this to avoid baking things like DB credentials into the
 images. If you decide you do want to bake some of those steps into the image
-then you can move commands from `config/drupal/root/install-drupal.sh` into
+then you can move commands from `dev/config/drupal/root/install-drupal.sh` into
 `Dockerfile.drupal.dev`.
 
-The `config/` dir is organised first by service (see `docker-compose.yml` for
+The `dev/config/` dir is organised first by service (see `docker-compose.yml` for
 the list of services) and then by the path within the container that the
 file/folder will be copied/mounted i.e.
 
 ```
-config/services/{NAME_OF_DOCKER_COMPOSE_SERVICE}/{PATH_THAT_FILE_IS_COPIED_OR_MOUNTED_IN_THE_SERVICE}
+dev/config/services/{NAME_OF_DOCKER_COMPOSE_SERVICE}/{PATH_THAT_FILE_IS_COPIED_OR_MOUNTED_IN_THE_SERVICE}
 ```
 
 ### Getting started
