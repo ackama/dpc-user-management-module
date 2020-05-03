@@ -40,28 +40,24 @@ jobs:
       # In practice (as of 2020-05-01) we could not get that working in this
       # environment.
       #
-      - name: Pull the base Drupal & Frontend images (so we can use it as a source of layers via cache_from)
+      - name: Pull the base Drupal image (so we can use it as a source of layers via cache_from)
         working-directory: ./dev
         env:
           EOIN_PAT: ${{secrets.EOIN_PAT}}
         run: |
           docker pull docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest || true
-          docker pull docker.pkg.github.com/ackama/dpc-user-management-module/frontend-dev:latest || true
 
       - name: Build and start all containers
         working-directory: ./dev
         run: docker-compose up -d --build
 
-      - name: Tag and push the Drupal & Frontend images to the Github packages registry (so we can use them as a source of layers on future builds)
+      - name: Tag and push the Drupal image to the Github packages registry (so we can use it as a source of layers on future builds)
         working-directory: ./dev
         env:
           EOIN_PAT: ${{secrets.EOIN_PAT}}
         run: |
           docker tag dev_drupal:latest docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
           docker push docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
-
-          docker tag dev_frontend:latest docker.pkg.github.com/ackama/dpc-user-management-module/frontend-dev:latest
-          docker push docker.pkg.github.com/ackama/dpc-user-management-module/frontend-dev:latest
 
       - name: Wait for MariaDB container to start
         # MariaDB isn't fully ready until it has said "ready for connections"
@@ -77,7 +73,7 @@ jobs:
 
       - name: Install Drupal
         working-directory: ./dev
-        run: docker-compose exec -T drupal /root/install-drupal.sh
+        run: docker-compose exec -T drupal /root/setup.sh
 
       - name: Run tests
         working-directory: ./dev
