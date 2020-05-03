@@ -57,6 +57,7 @@ services:
             context: ./
             dockerfile: Dockerfile.dev.drupal
             cache_from:
+              - dev_drupal:latest
               - docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
 
         ports:
