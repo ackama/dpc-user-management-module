@@ -70,6 +70,7 @@ class ProfileWidget extends WidgetBase
         $element['is_primary'] = [
             '#title'         => $this->t('Set as Primary'),
             '#type'          => 'checkbox',
+            '#attributes' => ['class' => ['set-primary-option']],
             '#default_value' => $this->isPrimaryAddress($items[$delta]->value, $user->mail->value)
         ];
 
