@@ -98,7 +98,12 @@ services:
             - ./src/phpunit.xml:/var/www/html/phpunit.xml
 
             - ../:/var/www/html/modules/custom/dpc_user_management
-            - /var/www/html/modules/custom/dpc_user_management/dev
+
+            ##
+            # Adds a named volume under to mount where ./dev/ should be placed
+            # in order to prevent recursion happening when discovering paths:
+            # ./dev/ is a child of ./ and ./ is mounted under ./dev/src/modules/custom/
+            - prevent-recursion-hack:/var/www/html/modules/custom/dpc_user_management/dev
 
             - ./src/profiles:/var/www/html/profiles
 
