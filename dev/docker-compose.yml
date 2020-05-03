@@ -100,7 +100,7 @@ services:
             - ../:/var/www/html/modules/custom/dpc_user_management
 
             ##
-            # Adds a named volume under to mount where ./dev/ should be placed
+            # Adds a named volume under the module's root where ./dev/ should be placed
             # in order to prevent recursion happening when discovering paths:
             # ./dev/ is a child of ./ and ./ is mounted under ./dev/src/modules/custom/
             - prevent-recursion-hack:/var/www/html/modules/custom/dpc_user_management/dev
