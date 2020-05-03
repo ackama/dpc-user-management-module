@@ -9,7 +9,7 @@
     "minimum-stability": "dev",
     "require": {
         "drupal/core": "^8.0",
-        "drupal/group": "1.x-dev"
+        "drupal/group": "^1.0@RC"
     },
     "repositories": {
         "drupal": {
