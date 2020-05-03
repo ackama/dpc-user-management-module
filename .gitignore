@@ -1,3 +1,5 @@
 .idea/*
 dpc-user-management-module.iml
 node_modules
+vendor
+dev/vendor
