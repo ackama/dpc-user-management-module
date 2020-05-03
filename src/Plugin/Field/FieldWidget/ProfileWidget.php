@@ -97,14 +97,16 @@ class ProfileWidget extends WidgetBase
         $path            = array_merge($form['#parents'], ['field_email_addresses']);
         $key_exists      = null;
         $values          = NestedArray::getValue($form_state->getValues(), $path);
-        $original_values = array_column($this->massageFormValues($values, $form, $form_state), 'value');
-        $updated_values  = array_column($items->getValue(), 'value');
-        $removed_emails  = array_diff($updated_values, $original_values);
+        if ($values) {
+            $original_values = array_column($this->massageFormValues($values, $form, $form_state), 'value');
+            $updated_values  = array_column($items->getValue(), 'value');
+            $removed_emails  = array_diff($updated_values, $original_values);
 
-        // if emails have been removed, remove the user from related groups
-        if (!empty($removed_emails)) {
-            $user = \Drupal::routeMatch()->getParameter('user');
-            self::removeUsersFromGroups($user, $removed_emails);
+            // if emails have been removed, remove the user from related groups
+            if (!empty($removed_emails)) {
+                $user = \Drupal::routeMatch()->getParameter('user');
+                self::removeUsersFromGroups($user, $removed_emails);
+            }
         }
 
         return parent::extractFormValues($items, $form, $form_state);

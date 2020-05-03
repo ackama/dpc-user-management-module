@@ -95,25 +95,26 @@ class GroupMembershipTest extends BrowserTestBase
      */
     public function testUserIsAddedToGroupAfterVerifyingNewEmail()
     {
-        $this->user->setEmail('test@randomdomain.com')->save();
-        $this->drupalLogin($this->user);
+        $user = $this->drupalCreateUser(['administer users', 'administer node fields'], null, false, ['mail' => 'user1234@randomdomain.com']);
 
-        $this->assertFalse($this->group->getMember($this->user));
+        $this->drupalLogin($user);
+
+        $this->assertFalse($this->group->getMember($user));
 
         // add a new email address
-        $this->drupalGet('user/' . $this->user->id() . '/edit');
+        $this->drupalGet('user/' . $user->id() . '/edit');
         $edit = [
             "field_email_addresses[1][value]" => 'newemail@test.net'
         ];
-        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+        $this->drupalPostForm('user/' . $user->id() . '/edit', $edit, 'Save');
 
         // get the verification email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
-        $this->assertNotFalse($this->group->getMember($this->user));
+        $this->assertNotFalse($this->group->getMember($user));
     }
 
     /**
@@ -121,33 +122,39 @@ class GroupMembershipTest extends BrowserTestBase
      */
     public function testUserIsRemovedFromGroupAfterRemovingEmail()
     {
+        $random_string = $this->randomMachineName();
         $this->drupalLogin($this->user);
         $this->assertNotFalse($this->group->getMember($this->user));
 
         // remove default email from user (@example.com)
         $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@otherdomain.net',
+            "field_email_addresses[1][value]" => "$random_string@otherdomain.net",
             "field_email_addresses[1][is_primary]" => true,
+            "field_email_addresses[0][is_primary]" => false,
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
 
         // verify the new email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
+        $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
             "field_email_addresses[0][value]" => ''
         ];
-
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+
+        // check that the user was removed from the group
         $this->assertFalse($this->group->getMember($this->user));
-        $captured_emails = $this->drupalGetMails();
+
         // check that the user received a notification after being removed
         $site_name = \Drupal::config('system.site')->get('name');
-        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[1]['subject']);
+        $captured_emails = $this->drupalGetMails();
+
+        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[2]['subject']);
     }
 
     /**
@@ -156,24 +163,27 @@ class GroupMembershipTest extends BrowserTestBase
      */
     public function testUserRemainsInGroupAfterRemovingEmail()
     {
+        $random_string = $this->randomMachineName();
         $this->drupalLogin($this->user);
         $this->assertNotFalse($this->group->getMember($this->user));
 
         // add a new email
         $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@test.net'
+            "field_email_addresses[1][value]" => "$random_string@test.net",
+            "field_email_addresses[1][is_primary]" => true,
+            "field_email_addresses[0][is_primary]" => false
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         // verify the new email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
         // remove default email from user (@example.com)
         $edit = [
-            "field_email_addresses[0][value]" => null,
+            "field_email_addresses[0][value]" => '',
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         $this->assertNotFalse($this->group->getMember($this->user));
@@ -185,13 +195,16 @@ class GroupMembershipTest extends BrowserTestBase
      */
     public function testUserIsRemovedFromGroupAfterRemovingEmailIfOtherEmailsAreNotVerified()
     {
+        $random_string = $this->randomMachineName();
+
         $this->drupalLogin($this->user);
         $this->assertNotFalse($this->group->getMember($this->user));
 
         // add a new email
         $this->drupalGet('user/' . $this->user->id() . '/edit');
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@test.net'
+            "field_email_addresses[1][value]" => "$random_string@test.net",
+            "field_email_addresses[1][is_primary]" => true
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
 

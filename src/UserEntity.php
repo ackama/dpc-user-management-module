@@ -22,10 +22,10 @@ class UserEntity extends User
         $verification_sent = [];
         $user = User::load($this->id());
         // Check email addresses
-        $addresses = $this->field_email_addresses->getValue();
+        $addresses = $this->getDirtyAddresses();
         foreach ($addresses as $key => $address) {
             // If there is no status assume this is new, send a verification email
-            if (empty($address['status'])) {
+            if (empty($address['status']) || $address['status'] === 'new') {
                 $token      = Crypt::randomBytesBase64(55);
                 $email      = $address['value'];
                 $this->sendVerificationNotification($email, $token, $user);
@@ -50,5 +50,26 @@ class UserEntity extends User
         }
 
         parent::preSave($storage);
+    }
+
+    /**
+     * @return mixed
+     * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+     * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+     */
+    private function getDirtyAddresses()
+    {
+        $user = \Drupal::entityManager()
+            ->getStorage('user')
+            ->loadUnchanged($this->id());
+        $addresses = $user->field_email_addresses->getValue();
+        $new_addresses = $this->field_email_addresses->getValue();
+        foreach($new_addresses as $key => $address) {
+            if (array_search($address['value'], array_column($addresses, 'value')) === false) {
+                $new_addresses[$key]['status'] = 'new';
+            };
+        }
+
+        return $new_addresses;
     }
 }

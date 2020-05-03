@@ -91,8 +91,9 @@ trait HandlesEmailDomainGroupMembership
     }
 
     /**
-     * @param array $user
+     * @param               $user_emails
      * @param Group[]|array $groups
+     * @param               $langcode
      */
     static function sendNotificationUserIsRemovedFromGroup($user_emails, $groups, $langcode)
     {
