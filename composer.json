@@ -8,6 +8,7 @@
     },
     "minimum-stability": "dev",
     "require": {
+        "php": "^7.3",
         "drupal/core": "^8.0",
         "drupal/group": "^1.0@RC"
     },
