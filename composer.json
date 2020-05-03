@@ -12,6 +12,12 @@
         "drupal/core": "^8.0",
         "drupal/group": "^1.0@RC"
     },
+    "require-dev": {
+        "drupal/devel": "^2.1",
+        "behat/mink-goutte-driver": "^1.2",
+        "phpunit/phpunit": "^7",
+        "symfony/phpunit-bridge": "^5.0"
+    },
     "repositories": {
         "drupal": {
             "type": "composer",
