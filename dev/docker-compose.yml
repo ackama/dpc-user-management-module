@@ -103,7 +103,7 @@ services:
             # Adds a named volume under the module's root where ./dev/ should be placed
             # in order to prevent recursion happening when discovering paths:
             # ./dev/ is a child of ./ and ./ is mounted under ./dev/src/modules/custom/
-            - prevent-recursion-hack:/var/www/html/modules/custom/dpc_user_management/dev
+            - prevent_recursion_hack:/var/www/html/modules/custom/dpc_user_management/dev
 
             - ./src/profiles:/var/www/html/profiles
 
@@ -134,3 +134,4 @@ services:
             - "./config/services/frontend/app/package-lock.json:/app/package-lock.json"
 volumes:
     mysql_data:
+    prevent_recursion_hack:
