@@ -105,6 +105,8 @@ services:
             # in order to prevent recursion happening when discovering paths:
             # ./dev/ is a child of ./ and ./ is mounted under ./dev/src/modules/custom/
             - prevent_recursion_hack:/var/www/html/modules/custom/dpc_user_management/dev
+            - prevent_recursion_hack_2:/var/www/html/modules/custom/dpc_user_management/vendor
+            - prevent_recursion_hack_3:/var/www/html/modules/custom/dpc_user_management/node_modules
 
             # - ./dev/src/profiles:/var/www/html/profiles
             #
@@ -120,3 +122,5 @@ services:
 volumes:
     mysql_data:
     prevent_recursion_hack:
+    prevent_recursion_hack_2:
+    prevent_recursion_hack_3:
