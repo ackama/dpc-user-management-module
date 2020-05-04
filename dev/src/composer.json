@@ -21,7 +21,7 @@
         "drupal/core-composer-scaffold": "^8.8",
         "drupal/core-recommended": "^8.8",
         "drupal/devel": "^2.1",
-        "drupal/group": "^1.0@RC"
+        "drupal/group": "dev-1.x"
     },
     "require-dev": {
         "behat/mink-goutte-driver": "^1.2",
