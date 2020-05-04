@@ -14,6 +14,39 @@ class UserEntity extends User
 {
     use SendsEmailVerificationEmail, HandlesEmailDomainGroupMembership;
 
+    /**
+     * Defines the Group Id
+     *
+     * @var string
+     */
+    public static $group_id = 'dpc_access_group';
+
+    /**
+     * Defines the Group Label
+     *
+     * @var string
+     */
+    public static $group_label = 'DPC User Management Access Group';
+
+    /**
+     * Defines the Group Type ID
+     *
+     * @var string
+     */
+    public static $group_type_id = 'dpc_group_type';
+
+    /**
+     * Defines the Group Type Label
+     *
+     * @var string
+     */
+    public static $group_type_label = 'DPC User Management Managed Type';
+
+    /**
+     * @param EntityStorageInterface $storage
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
+     */
     public function preSave(EntityStorageInterface $storage)
     {
         if ($this->isNew()) {
@@ -29,6 +62,8 @@ class UserEntity extends User
     /**
      * Verifies Email Addresses
      *
+     * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+     * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
      */
     protected function verify_email_addresses() {
@@ -87,7 +122,7 @@ class UserEntity extends User
         if($_access_original !== $_access_new) {
             // Toggles user access to content group
             $group_ids =  \Drupal::entityQuery('group')
-                ->condition('label', 'DPC User Management Access Control')
+                ->condition('label', UserEntity::$group_label)
                 ->accessCheck(false)
                 ->execute();
 

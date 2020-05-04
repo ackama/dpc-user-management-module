@@ -5,6 +5,8 @@
  * Installation functions for DPC User Management Module
  */
 
+use Drupal\DPC_User_Management\UserEntity;
+
 /**
  * Implements hook_install().
  */
@@ -13,10 +15,10 @@ function dpc_user_management_install()
     Drupal::logger('dpc_user_management')->notice('DPC User Management Installed');
 
     // Adds DPC Module Managed Group Type if it doesn't exist
-    if( is_null( \Drupal\group\Entity\GroupType::load('dpc_module_group_type') ) ) {
+    if( is_null( \Drupal\group\Entity\GroupType::load(\Drupal\DPC_User_Management\UserEntity::$group_type_id) ) ) {
         $group_type = \Drupal\group\Entity\GroupType::create([
-            'id' => 'dpc_module_group_type',
-            'label' => 'DPC User Management Module Type',
+            'id' => \Drupal\DPC_User_Management\UserEntity::$group_type_id,
+            'label' => \Drupal\DPC_User_Management\UserEntity::$group_type_label,
             'description' => '',
             'creator_membership' => false,
             'creator_wizard' => true,
@@ -37,11 +39,16 @@ function dpc_user_management_install()
     }
 
     // Adds DPC Module Managed Group if it doesn't exist
-    if( is_null( \Drupal\group\Entity\Group::load('dpc_module_access_control') ) ) {
+    $group_ids =  \Drupal::entityQuery('group')
+        ->condition('label', UserEntity::$group_label)
+        ->accessCheck(false)
+        ->execute();
+
+    if( !count($group_ids) ) {
         $group = \Drupal\group\Entity\Group::create([
-            'id' => 'dpc_module_access_control',
-            'label' => 'DPC User Management Access Control',
-            'type' => 'dpc_module_group_type'
+            'id' => UserEntity::$group_id,
+            'label' => UserEntity::$group_label,
+            'type' => UserEntity::$group_type_id
         ]);
 
         $group->save();
