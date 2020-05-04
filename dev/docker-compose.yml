@@ -99,7 +99,6 @@ services:
             - ./src/phpunit.xml:/var/www/html/phpunit.xml
 
             - ../:/var/www/html/modules/custom/dpc_user_management
-            - /var/www/html/modules/custom/dpc_user_management/dev
 
             ##
             # Adds a named volume under the module's root where ./dev/ should be placed
