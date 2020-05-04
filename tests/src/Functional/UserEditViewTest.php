@@ -78,26 +78,31 @@ class UserEditViewTest extends BrowserTestBase
     public function testUserCanAddANewEmail()
     {
         $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", null);
-
+        $random_string = $this->randomMachineName();
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@example.com'
+            "field_email_addresses[1][value]" => "$random_string@example.com"
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
 
-        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", 'newemail@example.com');
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", "$random_string@example.com");
     }
 
     public function testUserCanVerifyEmail()
     {
+        $user = $this->drupalCreateUser(['administer users', 'administer node fields']);
+        $this->drupalLogin($user);
+        $this->drupalGet('user/' . $user->id() . '/edit');
+
         // verification flag and button are not present
         $this->assertElementNotPresent('#field-email-addresses-values span.status-pending');
         $this->assertElementPresent('#field-email-addresses-values .dpc_resend_verification.verified');
 
         // add a new email address
+        $random_string = $this->randomMachineName();
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@example.com'
+            "field_email_addresses[1][value]" =>"$random_string@example.com"
         ];
-        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+        $this->drupalPostForm('user/' . $user->id() . '/edit', $edit, 'Save');
 
         // check the verification email
         $captured_emails = $this->drupalGetMails();
@@ -114,7 +119,7 @@ class UserEditViewTest extends BrowserTestBase
         $this->drupalGet($verification_link[0]);
         $this->assertResponse(200);
         $this->assertText('Thank you for verifying your email address');
-        $this->drupalGet('user/' . $this->user->id() . '/edit');
+        $this->drupalGet('user/' . $user->id() . '/edit');
 
         // check that the email is verified
         $this->assertElementPresent('#field-email-addresses-values span.status-verified');
@@ -123,10 +128,13 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testUserCanResendEmailVerification()
     {
+        $user = $this->drupalCreateUser(['administer users', 'administer node fields']);
+        $this->drupalLogin($user);
+        $randomString = $this->randomMachineName();
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@example.com'
+            "field_email_addresses[1][value]" => "$randomString@example.com"
         ];
-        $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
+        $this->drupalPostForm('user/' . $user->id() . '/edit', $edit, 'Save');
         // "click" the 'resend verification' button
         $this->click('.dpc_resend_verification');
         $captured_emails = $this
@@ -136,11 +144,12 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testEmailCanBeRemoved()
     {
+        $random_string = $this->randomMachineName();
         $edit = [
-            "field_email_addresses[1][value]" => 'newemail@example.com'
+            "field_email_addresses[1][value]" => "$random_string@example.com",
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
-        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", 'newemail@example.com');
+        $this->assertFieldByXPath("//input[@name='field_email_addresses[1][value]']", "$random_string@example.com");
         $edit = [
             "field_email_addresses[1][value]" => ''
         ];
@@ -150,11 +159,12 @@ class UserEditViewTest extends BrowserTestBase
 
     public function testPrimaryEmailCanBeSet()
     {
+        $random_string = $this->randomMachineName();
         $edit = [
-            "field_email_addresses[1][value]" => 'newprimaryemail@example.com',
+            "field_email_addresses[1][value]" => "$random_string@example.com",
             "field_email_addresses[1][is_primary]" => 1,
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
-        $this->assert('newprimaryemail@example.com', $this->user->getEmail());
+        $this->assert("$random_string@example.com", $this->user->getEmail());
     }
 }
