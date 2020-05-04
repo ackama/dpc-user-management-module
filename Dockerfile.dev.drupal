@@ -72,7 +72,7 @@ RUN docker-php-ext-install pdo pdo_mysql
 
 # Install and setup opcache
 RUN docker-php-ext-install opcache
-COPY config/services/drupal/usr/local/etc/php/conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY dev/config/services/drupal/usr/local/etc/php/conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 # Clean up a file which could cause confusion in the context of our app
 RUN rm /var/www/html/index.nginx-debian.html
@@ -81,8 +81,8 @@ RUN rm /var/www/html/index.nginx-debian.html
 
 # Copy the composer files in so they are available for the 'composer install'
 # command later in this file
-COPY src/composer.json /var/www/html/composer.json
-COPY src/composer.lock /var/www/html/composer.lock
+COPY ./composer.json /var/www/html/composer.json
+COPY ./composer.lock /var/www/html/composer.lock
 
 # Install Drupal & associated modules
 RUN composer install
@@ -94,7 +94,7 @@ RUN composer install
 RUN rm composer.json composer.lock
 
 # Copy the script that will be used as CMD below
-COPY config/services/drupal/root/start.sh /root/start.sh
+COPY dev/config/services/drupal/root/start.sh /root/start.sh
 
 # Explicitly set the WORKDIR so that when we run drush commands via
 # `docker-compose exec` they will work because the default working dir is the
