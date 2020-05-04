@@ -93,12 +93,12 @@ services:
             # host. We assume that all commands will be run within the
             # container.
             #
-            - ./src/composer.json:/var/www/html/composer.json
-            - ./src/composer.lock:/var/www/html/composer.lock
+            - ./composer.json:/var/www/html/composer.json
+            - ./composer.lock:/var/www/html/composer.lock
 
-            - ./src/phpunit.xml:/var/www/html/phpunit.xml
+            - ./dev/src/phpunit.xml:/var/www/html/phpunit.xml
 
-            - ../:/var/www/html/modules/custom/dpc_user_management
+            - ./:/var/www/html/modules/custom/dpc_user_management
 
             ##
             # Adds a named volume under the module's root where ./dev/ should be placed
@@ -106,17 +106,17 @@ services:
             # ./dev/ is a child of ./ and ./ is mounted under ./dev/src/modules/custom/
             - prevent_recursion_hack:/var/www/html/modules/custom/dpc_user_management/dev
 
-            - ./src/profiles:/var/www/html/profiles
+            # - ./dev/src/profiles:/var/www/html/profiles
+            #
+            # - ./dev/src/themes/contrib:/var/www/html/themes/contrib
+            # - ./dev/src/themes/custom:/var/www/html/themes/custom
 
-            - ./src/themes/contrib:/var/www/html/themes/contrib
-            - ./src/themes/custom:/var/www/html/themes/custom
+            - ./dev/src/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php
 
-            - ./src/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php
+            - ./dev/config/services/drupal/root/setup.sh:/root/setup.sh
+            - ./dev/config/services/drupal/root/run-ci.sh:/root/run-ci.sh
 
-            - ./config/services/drupal/root/setup.sh:/root/setup.sh
-            - ./config/services/drupal/root/run-ci.sh:/root/run-ci.sh
-
-            - ./config/services/drupal/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./dev/config/services/drupal/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
 volumes:
     mysql_data:
     prevent_recursion_hack:

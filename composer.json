@@ -2,18 +2,71 @@
     "name": "ackama/dpc-user-management",
     "type": "drupal-module",
     "description": "This module allows you to group users, content and other entities",
+    "license": "proprietary",
+    "homepage": "https://github.com/ackama/dpc-user-management-module",
     "support": {
         "issues": "https://github.com/ackama/dpc-user-management-module/issues",
         "source": "https://github.com/ackama/dpc-user-management-module.git"
     },
-    "minimum-stability": "dev",
-    "require": {
-        "drupal/core": "^8.0"
-    },
-    "repositories": {
-        "drupal": {
+    "repositories": [
+        {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "require": {
+        "php": "^7.3",
+        "composer/installers": "^1.2",
+        "drupal/console": "~1.0",
+        "drupal/core-composer-scaffold": "^8.8",
+        "drupal/core-recommended": "^8.8",
+        "drupal/devel": "^2.1",
+        "drupal/group": "^1.0@RC"
+    },
+    "require-dev": {
+        "behat/mink-goutte-driver": "^1.2",
+        "phpunit/phpunit": "^7",
+        "symfony/phpunit-bridge": "^5.0"
+    },
+    "conflict": {
+        "drupal/drupal": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "drupal-scaffold": {
+            "locations": {
+                "web-root": "./"
+            }
+        },
+        "installer-paths": {
+            "./core": [
+                "type:drupal-core"
+            ],
+            "./libraries/{$name}": [
+                "type:drupal-library"
+            ],
+            "./modules/contrib/{$name}": [
+                "type:drupal-module"
+            ],
+            "./profiles/contrib/{$name}": [
+                "type:drupal-profile"
+            ],
+            "./themes/contrib/{$name}": [
+                "type:drupal-theme"
+            ],
+            "drush/Commands/contrib/{$name}": [
+                "type:drupal-drush"
+            ],
+            "./modules/custom/{$name}": [
+                "type:drupal-custom-module"
+            ],
+            "./themes/custom/{$name}": [
+                "type:drupal-custom-theme"
+            ]
         }
     }
 }
