@@ -57,6 +57,7 @@ services:
             context: ./
             dockerfile: Dockerfile.dev.drupal
             cache_from:
+              - dev_drupal:latest
               - docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
 
         ports:
@@ -100,6 +101,12 @@ services:
             - ../:/var/www/html/modules/custom/dpc_user_management
             - /var/www/html/modules/custom/dpc_user_management/dev
 
+            ##
+            # Adds a named volume under the module's root where ./dev/ should be placed
+            # in order to prevent recursion happening when discovering paths:
+            # ./dev/ is a child of ./ and ./ is mounted under ./dev/src/modules/custom/
+            - prevent_recursion_hack:/var/www/html/modules/custom/dpc_user_management/dev
+
             - ./src/profiles:/var/www/html/profiles
 
             - ./src/themes/contrib:/var/www/html/themes/contrib
@@ -107,25 +114,10 @@ services:
 
             - ./src/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php
 
-            - ./config/services/drupal/root/install-drupal.sh:/root/install-drupal.sh
+            - ./config/services/drupal/root/setup.sh:/root/setup.sh
             - ./config/services/drupal/root/run-ci.sh:/root/run-ci.sh
 
             - ./config/services/drupal/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
-    ##
-    # The 'frontend' container runs all our JS/CSS/image pipelines
-    #
-    frontend:
-        build:
-            context: ./
-            dockerfile: Dockerfile.dev.frontend
-            cache_from:
-              - docker.pkg.github.com/ackama/dpc-user-management-module/frontend-dev:latest
-        ports:
-            - "3001:3001"
-        volumes:
-            - "./src/themes/custom:/app/src/themes"
-            - "./config/services/frontend/app/config:/app/config/"
-            - "./config/services/frontend/app/package.json:/app/package.json"
-            - "./config/services/frontend/app/package-lock.json:/app/package-lock.json"
 volumes:
     mysql_data:
+    prevent_recursion_hack:
