@@ -20,17 +20,30 @@ drush site:install -vvv \
 # sites/default/files to allow Apache+PHP to write them
 chown -R www-data.www-data /var/www/html/sites/default/files/
 
-# Rebuild drupal cache after install
-drush --yes cache:rebuild
-
 # Enable modules that make local development more pleasant
 drush --yes pm:enable devel,devel_generate,kint
+
 # webprofiler has to be enabled **after** devel - it fails when they are in the
 # same command for some reason.
-drush --yes pm:enable webprofiler
+#
+# As of 2020-05-04 having Webprofiler enabled prevents us from activating
+# modules which depend on 'Group' i.e. our module. For this reason we do not
+# activate Webprofiler. If you are reading this then this issue may have been
+# fixed - if so, you can re-enabled Webprofiler. Details are in:
+#
+# * https://www.drupal.org/project/group/issues/3103716
+# * https://www.drupal.org/project/group/issues/3103884
+#
+# drush --yes pm:enable webprofiler
 
 # Enable our module's Drupal dependencies (they are installed via composer)
 drush --yes pm:enable group
+
+# Rebuild drupal cache after installing Drupal and enabling plugins. Cache
+# rebuilds sometimes fail the first time for no apparent reason so we run with
+# `|| true` to swallow that failure
+drush --yes cache:rebuild || true
+drush --yes cache:rebuild || true
 
 npm ci --prefix /var/www/html/modules/custom/dpc_user_management
 
