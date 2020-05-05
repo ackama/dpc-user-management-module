@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\DPC_User_Management\Functional;
 
+use Drupal\DPC_User_Management\UserEntity;
+use Drupal\group\Entity\Group;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -44,6 +46,12 @@ class UserSpecialGroupsTest extends BrowserTestBase
     protected $user;
 
     /**
+     * @var Group $group
+     */
+    protected $group;
+
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -52,6 +60,14 @@ class UserSpecialGroupsTest extends BrowserTestBase
         $this->user = $this->drupalCreateUser();
         $this->drupalLogin($this->user);
         $this->drupalGet('user/' . $this->user->id() . '/edit');
+
+        $group_ids =  \Drupal::entityQuery('group')
+            ->condition('label', UserEntity::$group_label)
+            ->accessCheck(false)
+            ->execute();
+
+        /** @var Group $group */
+        $this->group = Group::load(array_pop($group_ids));
     }
 
     public function testSpecialGroupFieldExists()
@@ -70,5 +86,16 @@ class UserSpecialGroupsTest extends BrowserTestBase
 
         $web_assert->fieldValueEquals('edit-special-group-value', true);
     }
+
+    public function testSpecialGroupValueControlsGroup()
+    {
+        $this->assertFalse($this->group->getMember($this->user));
+
+        $this->getSession()->getPage()->checkField('edit-special-group-value');
+        $this->getSession()->getPage()->pressButton('edit-submit');
+
+        $this->assertTrue($this->group->getMember($this->user));
+    }
+
 
 }
