@@ -99,6 +99,22 @@ class UserEntity extends User
     }
 
     /**
+     * Because drupal can't handle adding default values to old records (ie existing users)
+     * when creating these fields, we need to check for unset values first
+     * We use this helper function to keep things DRY
+     *
+     * @param string $field_name
+     * @param bool $original
+     * @return bool
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    protected function _get_clean_boolean($field_name, $original = false) {
+        $value = !$original ? $this->get($field_name)->getValue() : $this->original->get($field_name)->getValue();
+
+        return empty($value) ? false : (bool) $value[0]['value'];
+    }
+
+    /**
      * Adds or Removes membership of users into access group bases on profile checkboxes
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
@@ -106,18 +122,18 @@ class UserEntity extends User
     protected function toggle_special_group() {
 
         // Adds JSE Access when Special Group flag is turned on
-        $_new = (int) $this->get('special_group')->getValue()[0]['value'];
-        $_original = (int) $this->original->get('special_group')->getValue()[0]['value'];
+        $_new = $this->_get_clean_boolean('special_group');
+        $_original = $this->_get_clean_boolean('special_group', true);
 
         if ($_original !== $_new) {
-            // Set access flag to true only if
-            if($_new === 1) {
-                $this->set('jse_access', 1);
+            // Set access flag to true only if setting has changed
+            if($_new) {
+                $this->set('jse_access', true);
             }
         }
 
-        $_access_new = (int) $this->get('jse_access')->getValue()[0]['value'];
-        $_access_original = (int) $this->original->get('jse_access')->getValue()[0]['value'];
+        $_access_new = $this->_get_clean_boolean('jse_access');
+        $_access_original = $this->_get_clean_boolean('jse_access', true);
 
         if($_access_original !== $_access_new) {
             // Toggles user access to content group
@@ -129,7 +145,7 @@ class UserEntity extends User
             /** @var Group $group */
             $group = Group::load(array_pop($group_ids));
 
-            if( (int) $this->get('jse_access')->getValue()[0]['value'] ) {
+            if( $this->_get_clean_boolean('jse_access') ) {
                 $group->addMember($this);
 
                 return;
