@@ -11,13 +11,14 @@
     "require": {
         "php": "^7.3",
         "drupal/core": "^8.0",
-        "drupal/group": "dev-1.x"
+        "drupal/group": "^1.0@RC"
     },
     "require-dev": {
         "drupal/devel": "^2.1",
         "behat/mink-goutte-driver": "^1.2",
         "phpunit/phpunit": "^7",
-        "symfony/phpunit-bridge": "^5.0"
+        "symfony/phpunit-bridge": "^5.0",
+        "drupal/group": "dev-1.x"
     },
     "repositories": {
         "drupal": {
