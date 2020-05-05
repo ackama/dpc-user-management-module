@@ -57,7 +57,7 @@ class UserSpecialGroupsTest extends BrowserTestBase
     protected function setUp()
     {
         parent::setUp();
-        $this->user = $this->drupalCreateUser();
+        $this->user = $this->drupalCreateUser(['administer group fields'], null, true);
         $this->drupalLogin($this->user);
         $this->drupalGet('user/' . $this->user->id() . '/edit');
 
@@ -91,10 +91,15 @@ class UserSpecialGroupsTest extends BrowserTestBase
     {
         $this->assertFalse($this->group->getMember($this->user));
 
-        $this->getSession()->getPage()->checkField('edit-special-group-value');
+        $this->getSession()->getPage()->checkField('edit-jse-access-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
         $this->assertTrue($this->group->getMember($this->user));
+
+        $this->getSession()->getPage()->uncheckField('edit-jse-access-value');
+        $this->getSession()->getPage()->pressButton('edit-submit');
+
+        $this->assertFalse($this->group->getMember($this->user));
     }
 
 

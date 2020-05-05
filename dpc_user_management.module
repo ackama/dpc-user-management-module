@@ -81,7 +81,7 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
         // add validation
         $form['#validate'][] = 'dpc_user_management_email_validation';
 
-        if (!in_array('administrator', \Drupal::currentUser()->getRoles())) {
+        if (!\Drupal::currentUser()->hasPermission('administer group fields')) {
             unset($form['jse_access']);
         }
 
@@ -91,7 +91,7 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
         // hide email addresses form on registration
         unset($form['field_email_addresses']);
 
-        if (!in_array('administrator', \Drupal::currentUser()->getRoles())) {
+        if (!\Drupal::currentUser()->hasPermission('administer group fields')) {
             unset($form['jse_access']);
         }
     }
