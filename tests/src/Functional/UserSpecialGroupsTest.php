@@ -89,6 +89,20 @@ class UserSpecialGroupsTest extends BrowserTestBase
 
     public function testSpecialGroupValueControlsGroup()
     {
+        // Verify checkbox is unchecked and save profile
+        $this->getSession()->getPage()->uncheckField('edit-special-group-value');
+        $this->getSession()->getPage()->pressButton('edit-submit');
+
+        // User checks special group field and saves
+        $this->getSession()->getPage()->checkField('edit-special-group-value');
+        $this->getSession()->getPage()->pressButton('edit-submit');
+
+        // User should be in Group
+        $this->assertTrue($this->group->getMember($this->user));
+    }
+
+    public function testJSEAccessValueControlsGroup()
+    {
         // User should not be in Group upon creation
         $this->assertFalse($this->group->getMember($this->user));
 
@@ -106,6 +120,4 @@ class UserSpecialGroupsTest extends BrowserTestBase
         // User should not be in Group
         $this->assertFalse($this->group->getMember($this->user));
     }
-
-
 }
