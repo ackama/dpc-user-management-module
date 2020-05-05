@@ -17,5 +17,6 @@ translatable: false
 settings: {  }
 field_type: boolean
 entity_type: user
-default_value: {  }
-default_value_callback: ''
+default_value:
+  -
+    value: 0
