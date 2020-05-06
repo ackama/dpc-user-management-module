@@ -14,11 +14,59 @@ class UserEntity extends User
 {
     use SendsEmailVerificationEmail, HandlesEmailDomainGroupMembership;
 
+    /**
+     * Defines the Group Id
+     *
+     * @var string
+     */
+    public static $group_id = 'dpc_access_group';
+
+    /**
+     * Defines the Group Label
+     *
+     * @var string
+     */
+    public static $group_label = 'DPC User Management Access Group';
+
+    /**
+     * Defines the Group Type ID
+     *
+     * @var string
+     */
+    public static $group_type_id = 'dpc_group_type';
+
+    /**
+     * Defines the Group Type Label
+     *
+     * @var string
+     */
+    public static $group_type_label = 'DPC User Management Managed Type';
+
+    /**
+     * @param EntityStorageInterface $storage
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
+     */
     public function preSave(EntityStorageInterface $storage)
     {
         if ($this->isNew()) {
             return parent::preSave($storage);
         }
+
+        $this->verify_email_addresses();
+        $this->toggle_special_group();
+
+        parent::preSave($storage);
+    }
+
+    /**
+     * Verifies Email Addresses
+     *
+     * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+     * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+     * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
+     */
+    protected function verify_email_addresses() {
         $verification_sent = [];
         $user = User::load($this->id());
         // Check email addresses
@@ -48,8 +96,65 @@ class UserEntity extends User
         if (!empty($verification_sent)) {
             \Drupal::messenger()->addMessage(t('A verification email was sent to ' . implode(',', $verification_sent)));
         }
+    }
 
-        parent::preSave($storage);
+    /**
+     * Because drupal can't handle adding default values to old records (ie existing users)
+     * when creating these fields, we need to check for unset values first
+     * We use this helper function to keep things DRY
+     *
+     * @param string $field_name
+     * @param bool $original
+     * @return bool
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    protected function _get_clean_boolean($field_name, $original = false) {
+        $value = !$original ? $this->get($field_name)->getValue() : $this->original->get($field_name)->getValue();
+
+        return empty($value) ? false : (bool) $value[0]['value'];
+    }
+
+    /**
+     * Adds or Removes membership of users into access group bases on profile checkboxes
+     *
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    protected function toggle_special_group() {
+
+        // Adds JSE Access when Special Group flag is turned on
+        $_new = $this->_get_clean_boolean('special_group');
+        $_original = $this->_get_clean_boolean('special_group', true);
+
+        if ($_original !== $_new) {
+            // Set access flag to true only if setting has changed
+            if($_new) {
+                $this->set('jse_access', true);
+            }
+        }
+
+        $_access_new = $this->_get_clean_boolean('jse_access');
+        $_access_original = $this->_get_clean_boolean('jse_access', true);
+
+        if($_access_original !== $_access_new) {
+            // Toggles user access to content group
+            $group_ids =  \Drupal::entityQuery('group')
+                ->condition('label', UserEntity::$group_label)
+                ->accessCheck(false)
+                ->execute();
+
+            /** @var Group $group */
+            $group = Group::load(array_pop($group_ids));
+
+            if( $this->_get_clean_boolean('jse_access') ) {
+                $group->addMember($this);
+
+                return;
+            }
+
+            $group->removeMember($this);
+
+            return;
+        }
     }
 
     /**

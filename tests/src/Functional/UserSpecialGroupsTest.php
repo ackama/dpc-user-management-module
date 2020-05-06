@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\DPC_User_Management\Functional;
 
+use Drupal\DPC_User_Management\UserEntity;
+use Drupal\group\Entity\Group;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -44,14 +46,28 @@ class UserSpecialGroupsTest extends BrowserTestBase
     protected $user;
 
     /**
+     * @var Group $group
+     */
+    protected $group;
+
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         parent::setUp();
-        $this->user = $this->drupalCreateUser();
+        $this->user = $this->drupalCreateUser(['administer group fields'], null, true);
         $this->drupalLogin($this->user);
         $this->drupalGet('user/' . $this->user->id() . '/edit');
+
+        $group_ids =  \Drupal::entityQuery('group')
+            ->condition('label', UserEntity::$group_label)
+            ->accessCheck(false)
+            ->execute();
+
+        /** @var Group $group */
+        $this->group = Group::load(array_pop($group_ids));
     }
 
     public function testSpecialGroupFieldExists()
@@ -71,4 +87,37 @@ class UserSpecialGroupsTest extends BrowserTestBase
         $web_assert->fieldValueEquals('edit-special-group-value', true);
     }
 
+    public function testSpecialGroupValueControlsGroup()
+    {
+        // Verify checkbox is unchecked and save profile
+        $this->getSession()->getPage()->uncheckField('edit-special-group-value');
+        $this->getSession()->getPage()->pressButton('edit-submit');
+
+        // User checks special group field and saves
+        $this->getSession()->getPage()->checkField('edit-special-group-value');
+        $this->getSession()->getPage()->pressButton('edit-submit');
+
+        // User should be in Group
+        $this->assertTrue($this->group->getMember($this->user));
+    }
+
+    public function testJSEAccessValueControlsGroup()
+    {
+        // User should not be in Group upon creation
+        $this->assertFalse($this->group->getMember($this->user));
+
+        // We check the field in profile and Save
+        $this->getSession()->getPage()->checkField('edit-jse-access-value');
+        $this->getSession()->getPage()->pressButton('edit-submit');
+
+        // User should be in Group
+        $this->assertTrue($this->group->getMember($this->user));
+
+        // We uncheck the field in profile and Save
+        $this->getSession()->getPage()->uncheckField('edit-jse-access-value');
+        $this->getSession()->getPage()->pressButton('edit-submit');
+
+        // User should not be in Group
+        $this->assertFalse($this->group->getMember($this->user));
+    }
 }

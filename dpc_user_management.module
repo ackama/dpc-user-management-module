@@ -75,14 +75,25 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
     if ($form_id === 'user_form') {
         // remove the default email field
         unset($form['account']['mail']);
+
         // add asset library
         $form['#attached']['library'][] = 'dpc_user_management/user_profile';
         // add validation
         $form['#validate'][] = 'dpc_user_management_email_validation';
+
+        if (!\Drupal::currentUser()->hasPermission('administer group fields')) {
+            unset($form['jse_access']);
+        }
+
     }
+
     if ($form_id === 'user_register_form') {
         // hide email addresses form on registration
         unset($form['field_email_addresses']);
+
+        if (!\Drupal::currentUser()->hasPermission('administer group fields')) {
+            unset($form['jse_access']);
+        }
     }
 }
 

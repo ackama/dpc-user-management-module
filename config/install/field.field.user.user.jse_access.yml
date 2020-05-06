@@ -1,16 +1,17 @@
-# field.field.user.user.special_group.yml
+# field.field.user.user.jse_access.yml
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.user.special_group
+    - field.storage.user.jse_access
   module:
     - user
-id: user.user.special_group
-field_name: special_group
+    - group
+id: user.user.jse_access
+field_name: jse_access
 bundle: user
-label: 'Special Group'
-description: 'User belongs to Special Group'
+label: 'JSE Access'
+description: 'User has access to JSE Access'
 required: false
 translatable: false
 settings: {  }
