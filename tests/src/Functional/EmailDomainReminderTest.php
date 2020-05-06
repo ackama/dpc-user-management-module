@@ -1,6 +1,8 @@
 <?php
 namespace Drupal\Tests\DPC_User_Management\Functional;
 
+use Drupal\Core\Entity\EntityManager;
+use Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock;
 use Drupal\group\Entity\Group;
 use Drupal\Tests\BrowserTestBase;
 
@@ -47,10 +49,14 @@ class EmailDomainReminderTest extends BrowserTestBase
     protected $group;
 
     /**
+     * @var
+     */
+    protected $block;
+
+    /**
      * @var string
      */
-    protected $testString = "Add a VPS e-mail address to";
-
+    protected $selector;
 
     /**
      * {@inheritdoc}
@@ -62,13 +68,15 @@ class EmailDomainReminderTest extends BrowserTestBase
         // Creates test group
         $this->group   = Group::create(['type' => 'email_domain_group', 'label' => 'email domain group']);
 
-        // @TODO Add Block to header
+        // Sets up ID Selector for Banner
+        $this->selector = '#' . EmailDomainReminderBlock::$_div_id;
     }
 
     /**
      * Tests if message is hidden for Anonymous Users
      *
      * @throws \Behat\Mink\Exception\ResponseTextException
+     * @throws \Behat\Mink\Exception\ExpectationException
      */
     public function testAnonymousUser()
     {
@@ -78,7 +86,7 @@ class EmailDomainReminderTest extends BrowserTestBase
         $this->drupalGet('/');
 
         // Check banner is not visible
-        $web_assert->pageTextNotContains($this->testString);
+        $web_assert->elementNotExists('css', $this->selector);
     }
 
     public function testKnownValidUser()
@@ -97,7 +105,7 @@ class EmailDomainReminderTest extends BrowserTestBase
         $this->drupalGet('/');
 
         // Banner should not be visible
-        $web_assert->pageTextNotContains($this->testString);
+        $web_assert->elementNotExists('css', $this->selector);
     }
 
     public function testKnownInvalidUser()
@@ -116,7 +124,7 @@ class EmailDomainReminderTest extends BrowserTestBase
         $this->drupalGet('/');
 
         // Banner should be visible
-        $web_assert->pageTextNotContains($this->testString);
+        $web_assert->elementExists('css', $this->selector);
     }
 
 }
