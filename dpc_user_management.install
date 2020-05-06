@@ -132,7 +132,7 @@ function dpc_user_management_install()
         'id' => \Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock::$_id,
         'plugin' => \Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock::$_id,
         'theme' => $theme->getName(),
-        'region' => 'header'
+        'region' => 'highlighted'
     ]);
     $block->save();
 
