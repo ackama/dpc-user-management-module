@@ -19,18 +19,32 @@ use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
  */
 class EmailDomainReminderBlock extends BlockBase {
 
+    use HandlesEmailDomainGroupMembership;
+
+    /**
+     * @var string
+     */
     public static $_id = 'dpc_emaildomain_reminder_block';
 
-    use HandlesEmailDomainGroupMembership;
+    /**
+     * @var string
+     */
+    public static $_default_text = 'Add a VPS e-mail address to <a href="%s">your profile</a> in order to have access to the site\'s content';
+
+    /**
+     * @var string
+     */
+    public static $_div_class = 'dpc-user-email-reminder';
 
     /**
      * {@inheritdoc}
      */
     public function build() {
-        $edit_profile_link = '/user/' . \Drupal::currentUser()->id() . '/edit';
+        // Formats text to include user edit link
+        $text = $this->t(sprintf(self::$_default_text, '/user/' . \Drupal::currentUser()->id() . '/edit'));
 
         return [
-            '#markup' => '<div class="user-email-reminder">' . $this->t('Add a VPS e-mail address to <a href="' . $edit_profile_link . '">your profile</a> in order to have access to the site\'s content') . '</div>',
+            '#markup' => sprintf('<div class"%s">%s</div>', self::$_div_class, $text)
         ];
     }
 
