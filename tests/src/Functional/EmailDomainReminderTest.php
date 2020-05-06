@@ -88,6 +88,10 @@ class EmailDomainReminderTest extends BrowserTestBase
         $web_assert->elementNotExists('css', $this->selector);
     }
 
+    /**
+     * @throws \Behat\Mink\Exception\ExpectationException
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
     public function testKnownValidUser()
     {
         // Create a valid group that will match the domain of the user
@@ -107,6 +111,10 @@ class EmailDomainReminderTest extends BrowserTestBase
         $web_assert->elementNotExists('css', $this->selector);
     }
 
+    /**
+     * @throws \Behat\Mink\Exception\ElementNotFoundException
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
     public function testKnownInvalidUser()
     {
         // Sets mail domains that will be invalid
