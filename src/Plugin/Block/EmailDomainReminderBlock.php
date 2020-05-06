@@ -19,7 +19,7 @@ use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
  */
 class EmailDomainReminderBlock extends BlockBase {
 
-    protected static $_id = 'dpc_emaildomain_reminder_block';
+    public static $_id = 'dpc_emaildomain_reminder_block';
 
     use HandlesEmailDomainGroupMembership;
 

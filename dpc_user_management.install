@@ -123,6 +123,19 @@ function dpc_user_management_install()
 
         $view_display->save();
     }
+
+    /** @var \Drupal\Core\Theme\ActiveTheme $theme */
+    $theme = \Drupal::service('theme.manager')->getActiveTheme();
+
+    /** @var \Drupal\block\Entity\Block $block */
+    $block = \Drupal\block\Entity\Block::create([
+        'id' => \Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock::$_id,
+        'plugin' => \Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock::$_id,
+        'theme' => $theme->getName(),
+        'region' => 'header'
+    ]);
+    $block->save();
+
 }
 
 /**
