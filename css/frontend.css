@@ -1,7 +1,8 @@
-.user-email-reminder {
+.dpc-user-email-reminder {
   width: 100%;
-  background: #CACACA;
-  padding: 30px 100px;
+  background: #F6F6F6;
+  padding: 20px 0;
+  margin: 20px 0 10px 0;
   clear: both;
   display: block;
   text-align: center;
