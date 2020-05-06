@@ -49,7 +49,12 @@ class EmailDomainReminderBlock extends BlockBase {
         $text = $this->t(sprintf(self::$_default_text, '/user/' . \Drupal::currentUser()->id() . '/edit'));
 
         return [
-            '#markup' => sprintf('<div id="%s" class="%s">%s</div>', self::$_div_id, self::$_div_class, $text)
+            '#markup' => sprintf('<div id="%s" class="%s">%s</div>', self::$_div_id, self::$_div_class, $text),
+            '#attached' => [
+                'library' => [
+                    'dpc_user_management/user_frontend',
+                ],
+            ],
         ];
     }
 
