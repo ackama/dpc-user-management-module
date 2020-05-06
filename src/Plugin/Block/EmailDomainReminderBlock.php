@@ -34,6 +34,11 @@ class EmailDomainReminderBlock extends BlockBase {
     /**
      * @var string
      */
+    public static $_div_id = 'dpc-user-email-reminder';
+
+    /**
+     * @var string
+     */
     public static $_div_class = 'dpc-user-email-reminder';
 
     /**
@@ -44,7 +49,7 @@ class EmailDomainReminderBlock extends BlockBase {
         $text = $this->t(sprintf(self::$_default_text, '/user/' . \Drupal::currentUser()->id() . '/edit'));
 
         return [
-            '#markup' => sprintf('<div class"%s">%s</div>', self::$_div_class, $text)
+            '#markup' => sprintf('<div id="%s" class="%s">%s</div>', self::$_div_id, self::$_div_class, $text)
         ];
     }
 
