@@ -27,8 +27,10 @@ class EmailDomainReminderBlock extends BlockBase {
      * {@inheritdoc}
      */
     public function build() {
+        $edit_profile_link = '/user/' . \Drupal::currentUser()->id() . '/edit';
+
         return [
-            '#markup' => $this->t('Remind this!'),
+            '#markup' => '<div class="user-email-reminder">' . $this->t('Add a VPS e-mail address to <a href="' . $edit_profile_link . '">your profile</a> in order to have access to the site\'s content') . '</div>',
         ];
     }
 
