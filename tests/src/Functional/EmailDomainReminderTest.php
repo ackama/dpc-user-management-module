@@ -1,7 +1,6 @@
 <?php
 namespace Drupal\Tests\DPC_User_Management\Functional;
 
-use Drupal\Core\Entity\EntityManager;
 use Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock;
 use Drupal\group\Entity\Group;
 use Drupal\Tests\BrowserTestBase;
