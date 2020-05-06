@@ -82,7 +82,7 @@ class EmailDomainReminderTest extends BrowserTestBase
         $web_assert = $this->assertSession();
 
         // Check home URL with an anonymous
-        $this->drupalGet('/');
+        $this->drupalGet('');
 
         // Check banner is not visible
         $web_assert->elementNotExists('css', $this->selector);
@@ -105,7 +105,7 @@ class EmailDomainReminderTest extends BrowserTestBase
         $web_assert = $this->assertSession();
 
         // Check home URL with an anonymous
-        $this->drupalGet('/');
+        $this->drupalGet('');
 
         // Banner should not be visible
         $web_assert->elementNotExists('css', $this->selector);
@@ -128,7 +128,7 @@ class EmailDomainReminderTest extends BrowserTestBase
         $web_assert = $this->assertSession();
 
         // Check home URL with an anonymous
-        $this->drupalGet('/');
+        $this->drupalGet('');
 
         // Banner should be visible
         $web_assert->elementExists('css', $this->selector);
