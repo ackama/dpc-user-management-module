@@ -46,6 +46,11 @@ class EmailDomainReminderTest extends BrowserTestBase
      */
     protected $group;
 
+    /**
+     * @var string
+     */
+    protected $testString = "Add a VPS e-mail address to";
+
 
     /**
      * {@inheritdoc}
@@ -53,6 +58,9 @@ class EmailDomainReminderTest extends BrowserTestBase
     protected function setUp()
     {
         parent::setUp();
+
+        // Creates test group
+        $this->group   = Group::create(['type' => 'email_domain_group', 'label' => 'email domain group']);
 
         // @TODO Add Block to header
     }
@@ -70,17 +78,13 @@ class EmailDomainReminderTest extends BrowserTestBase
         $this->drupalGet('/');
 
         // Check banner is not visible
-        $web_assert->pageTextNotContains("Add a VPS e-mail address to");
+        $web_assert->pageTextNotContains($this->testString);
     }
 
     public function testKnownValidUser()
     {
         // Create a valid group that will match the domain of the user
-        $group_domains = [
-            ['value' => '@example.com']
-        ];
-        $this->group   = Group::create(['type' => 'email_domain_group', 'label' => 'email domain group']);
-        $this->group->set('field_email_domain', $group_domains);
+        $this->group->set('field_email_domain', [['value' => '@example.com']]);
         $this->group->save();
 
         // Create User
@@ -93,17 +97,13 @@ class EmailDomainReminderTest extends BrowserTestBase
         $this->drupalGet('/');
 
         // Banner should not be visible
-        $web_assert->pageTextNotContains("Add a VPS e-mail address to");
+        $web_assert->pageTextNotContains($this->testString);
     }
 
     public function testKnownInvalidUser()
     {
-        // Create a valid group that won't match the domain
-        $group_domains = [
-            ['value' => '@invalidusers.com']
-        ];
-        $this->group   = Group::create(['type' => 'email_domain_group', 'label' => 'email domain group']);
-        $this->group->set('field_email_domain', $group_domains);
+        // Sets mail domains that will be invalid
+        $this->group->set('field_email_domain', [['value' => '@invalidusers.com']]);
         $this->group->save();
 
         // Create User
@@ -116,7 +116,7 @@ class EmailDomainReminderTest extends BrowserTestBase
         $this->drupalGet('/');
 
         // Banner should be visible
-        $web_assert->pageTextNotContains("Add a VPS e-mail address to");
+        $web_assert->pageTextNotContains($this->testString);
     }
 
 }
