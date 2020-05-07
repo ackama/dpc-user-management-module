@@ -3,6 +3,7 @@
 namespace Drupal\dpc_user_management\Traits;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\Group;
 use Drupal\user\UserInterface;
 
@@ -22,6 +23,25 @@ trait HandlesEmailDomainGroupMembership
                 $group->addMember($user);
             }
         }
+    }
+
+    /**
+     * @param AccountInterface $user
+     * @return bool
+     */
+    static function isUserInGroups(AccountInterface $user)
+    {
+        $groups = self::getEmailDomainGroups();
+
+        // Test if current user is part of valid email groups
+        /** @var Group $group */
+        foreach (self::getEmailDomainGroups() as $group) {
+            if ($group->getMember($user)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
