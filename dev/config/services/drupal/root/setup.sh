@@ -36,6 +36,11 @@ drush --yes pm:enable devel,devel_generate,kint
 #
 # drush --yes pm:enable webprofiler
 
+# Enable Admin Toolbar goodies
+drush --yes pm:enable admin_toolbar
+drush --yes pm:enable admin_toolbar_tools
+drush --yes pm:enable admin_toolbar_search
+
 # Enable our module's Drupal dependencies (they are installed via composer)
 drush --yes pm:enable group
 
