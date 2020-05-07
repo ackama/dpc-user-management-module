@@ -93,10 +93,11 @@ function dpc_user_management_install()
             if (!$view->getComponent('special_group')) {
                 /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
                 $view->setComponent('special_group', [
-                    'type' => 'boolean_checkbox',
+                    'type' => 'options_buttons',
                     'settings' => []
                 ])->save();
             }
+
             if (!$view->getComponent('jse_access')) {
                 /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
                 $view->setComponent('jse_access', [
