@@ -1,0 +1,4 @@
+dpc_mailchimp.audience:
+  title: 'Audience'
+  route_name: dpc_mailchimp.audience
+  base_route: dpc_mailchimp.admin

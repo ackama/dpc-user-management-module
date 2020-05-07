@@ -44,6 +44,7 @@ class UserEntity extends User
 
     /**
      * @param EntityStorageInterface $storage
+     *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
      */
@@ -66,20 +67,21 @@ class UserEntity extends User
      * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
      */
-    protected function verify_email_addresses() {
+    protected function verify_email_addresses()
+    {
         $verification_sent = [];
-        $user = User::load($this->id());
+        $user              = User::load($this->id());
         // Check email addresses
         $addresses = $this->getDirtyAddresses();
         foreach ($addresses as $key => $address) {
             // If there is no status assume this is new, send a verification email
             if (empty($address['status']) || $address['status'] === 'new') {
-                $token      = Crypt::randomBytesBase64(55);
-                $email      = $address['value'];
+                $token = Crypt::randomBytesBase64(55);
+                $email = $address['value'];
                 $this->sendVerificationNotification($email, $token, $user);
                 $addresses[$key]['status']             = 'pending';
                 $addresses[$key]['verification_token'] = $token;
-                $verification_sent[] = $email;
+                $verification_sent[]                   = $email;
             }
             // If a primary email flag has been set then override the mail setting
             if ($address['is_primary']) {
@@ -104,14 +106,16 @@ class UserEntity extends User
      * We use this helper function to keep things DRY
      *
      * @param string $field_name
-     * @param bool $original
+     * @param bool   $original
+     *
      * @return bool
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
-    protected function _get_clean_boolean($field_name, $original = false) {
+    protected function _get_clean_boolean($field_name, $original = false)
+    {
         $value = !$original ? $this->get($field_name)->getValue() : $this->original->get($field_name)->getValue();
 
-        return empty($value) ? false : (bool) $value[0]['value'];
+        return empty($value) ? false : (bool)$value[0]['value'];
     }
 
     /**
@@ -119,25 +123,26 @@ class UserEntity extends User
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
-    protected function toggle_special_group() {
+    protected function toggle_special_group()
+    {
 
         // Adds JSE Access when Special Group flag is turned on
-        $_new = $this->_get_clean_boolean('special_group');
+        $_new      = $this->_get_clean_boolean('special_group');
         $_original = $this->_get_clean_boolean('special_group', true);
 
         if ($_original !== $_new) {
             // Set access flag to true only if setting has changed
-            if($_new) {
+            if ($_new) {
                 $this->set('jse_access', true);
             }
         }
 
-        $_access_new = $this->_get_clean_boolean('jse_access');
+        $_access_new      = $this->_get_clean_boolean('jse_access');
         $_access_original = $this->_get_clean_boolean('jse_access', true);
 
-        if($_access_original !== $_access_new) {
+        if ($_access_original !== $_access_new) {
             // Toggles user access to content group
-            $group_ids =  \Drupal::entityQuery('group')
+            $group_ids = \Drupal::entityQuery('group')
                 ->condition('label', UserEntity::$group_label)
                 ->accessCheck(false)
                 ->execute();
@@ -145,7 +150,7 @@ class UserEntity extends User
             /** @var Group $group */
             $group = Group::load(array_pop($group_ids));
 
-            if( $this->_get_clean_boolean('jse_access') ) {
+            if ($this->_get_clean_boolean('jse_access')) {
                 $group->addMember($this);
 
                 return;
@@ -164,13 +169,15 @@ class UserEntity extends User
      */
     private function getDirtyAddresses()
     {
-        $user = \Drupal::entityManager()
+        $user          = \Drupal::entityManager()
             ->getStorage('user')
             ->loadUnchanged($this->id());
-        $addresses = $user->field_email_addresses->getValue();
+
+        $addresses     = $user->field_email_addresses->getValue();
         $new_addresses = $this->field_email_addresses->getValue();
-        foreach($new_addresses as $key => $address) {
-            if (array_search($address['value'], array_column($addresses, 'value')) === false) {
+        foreach ($new_addresses as $key => $address) {
+            if (array_search($address['value'], array_column($addresses, 'value')) === false
+                && $user->getEmail() !== $address['value']) {
                 $new_addresses[$key]['status'] = 'new';
             };
         }

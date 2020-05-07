@@ -4,3 +4,8 @@ dpc_user_management.admin_settings_form:
   description: 'Invalidate emails of users in the system.'
   parent: system.admin_config_system
   weight: 99
+dpc_mailchimp.admin:
+  route_name: dpc_mailchimp.admin
+  title: 'Mailchimp'
+  description: 'Manage Mailchimp Settings.'
+  parent: system.admin_config_services

@@ -5,9 +5,9 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\custom_events\Event\PrimaryEmailUpdated;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
-use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,8 +42,16 @@ class UserEntityController extends ControllerBase
                     $addresses[$key]['status']             = 'verified';
                     $addresses[$key]['verification_token'] = null;
                     $message                               = 'Thank you for verifying your email address';
+
                     // Add user to groups based on email domain
                     self::addUserToGroups($user, $address['value']);
+
+                    //
+                    if ($address['is_primary']) {
+                        $event_dispatcher = \Drupal::service('event_dispatcher');
+                        $event = new PrimaryEmailUpdated($user);
+                        $event_dispatcher->dispatch('primaryEmailUpdated', $event);
+                    }
                 }
             }
 
