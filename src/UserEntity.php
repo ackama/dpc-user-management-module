@@ -46,6 +46,7 @@ class UserEntity extends User
      * @param EntityStorageInterface $storage
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
+     * @throws \Exception
      */
     public function preSave(EntityStorageInterface $storage)
     {
@@ -54,7 +55,7 @@ class UserEntity extends User
         }
 
         $this->verify_email_addresses();
-        $this->toggle_special_group();
+        $this->toggle_special_groups();
 
         parent::preSave($storage);
     }
@@ -119,7 +120,7 @@ class UserEntity extends User
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
-    protected function toggle_special_group() {
+    protected function toggle_special_groups() {
 
         // Adds JSE Access when Special Group flag is turned on
         $_new = $this->_get_clean_boolean('special_group');
