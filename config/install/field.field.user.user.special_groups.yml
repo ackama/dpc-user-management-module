@@ -1,0 +1,30 @@
+# field.field.user.user.special_groups.yml
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.special_groups
+    - group.type.dpc_managed_special
+  module:
+    - user
+    - group
+id: user.user.special_groups
+field_name: special_groups
+entity_type: user
+bundle: user
+label: 'Special Groups'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:group'
+  handler_settings:
+    target_bundles:
+      dpc_managed_special: dpc_managed_special
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
