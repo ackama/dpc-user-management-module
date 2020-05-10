@@ -13,7 +13,7 @@ field_name: special_groups
 entity_type: user
 bundle: user
 label: 'Special Groups'
-description: ''
+description: 'Select all the groups you are part of'
 required: false
 translatable: false
 default_value: {  }
