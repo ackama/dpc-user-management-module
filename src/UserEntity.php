@@ -19,28 +19,28 @@ class UserEntity extends User
      *
      * @var string
      */
-    public static $group_id = 'dpc_access_group';
+    public static $group_id = 'dpc_group_grant_acces';
 
     /**
      * Defines the Group Label
      *
      * @var string
      */
-    public static $group_label = 'DPC User Management Access Group';
+    public static $group_label = 'DPC Managed - Grant Access Group';
 
     /**
      * Defines the Group Type ID
      *
      * @var string
      */
-    public static $group_type_id = 'dpc_group_type';
+    public static $group_type_id = 'dpc_managed_group_type';
 
     /**
      * Defines the Group Type Label
      *
      * @var string
      */
-    public static $group_type_label = 'DPC User Management Managed Type';
+    public static $group_type_label = 'DPC Managed Group Type';
 
     /**
      * @param EntityStorageInterface $storage
