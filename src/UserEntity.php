@@ -19,7 +19,7 @@ class UserEntity extends User
      *
      * @var string
      */
-    public static $group_id = 'dpc_group_grant_acces';
+    public static $group_id = 'dpc_group_grant_access';
 
     /**
      * Defines the Group Label
