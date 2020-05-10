@@ -65,7 +65,7 @@ function dpc_user_management_install()
             // Prevents overwriting of configuration when disabling and enabling
             if (!$view->getComponent('special_group')) {
                 /** @var Drupal\Core\Entity\Display\EntityDisplayInterface $view */
-                $view->setComponent('special_group', [
+                $view->setComponent('special_groups', [
                     'type' => 'boolean',
                     'settings' => []
                 ])->save();
@@ -92,7 +92,7 @@ function dpc_user_management_install()
             // Prevents overwriting of configuration when disabling and enabling
             if (!$view->getComponent('special_group')) {
                 /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
-                $view->setComponent('special_group', [
+                $view->setComponent('special_groups', [
                     'type' => 'options_buttons',
                     'settings' => []
                 ])->save();
