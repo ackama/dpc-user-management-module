@@ -95,7 +95,7 @@ class EmailDomainReminderTest extends BrowserTestBase
     public function testKnownValidUser()
     {
         // Create a valid group that will match the domain of the user
-        $this->group->set('field_email_domain', [['value' => '@example.com']]);
+        $this->group->set('field_email_domain', [['value' => 'example.com']]);
         $this->group->save();
 
         // Create User
@@ -118,7 +118,7 @@ class EmailDomainReminderTest extends BrowserTestBase
     public function testKnownInvalidUser()
     {
         // Sets mail domains that will be invalid
-        $this->group->set('field_email_domain', [['value' => '@invalidusers.com']]);
+        $this->group->set('field_email_domain', [['value' => 'invalidusers.com']]);
         $this->group->save();
 
         // Create User
