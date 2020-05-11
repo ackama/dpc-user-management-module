@@ -4,6 +4,7 @@ namespace Drupal\Tests\DPC_User_Management\Functional;
 
 use Drupal\DPC_User_Management\UserEntity;
 use Drupal\group\Entity\Group;
+use Drupal\group\Entity\GroupRole;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -55,6 +56,17 @@ class UserSpecialGroupsTest extends BrowserTestBase
      */
     protected $special_groups = [];
 
+    /**
+     * @var GroupRole[]
+     */
+    protected $group_roles;
+
+    /**
+     * The group role synchronizer service.
+     *
+     * @var \Drupal\group\GroupRoleSynchronizer
+     */
+    protected $roleSynchronizer;
 
     /**
      * {@inheritdoc}
@@ -62,9 +74,6 @@ class UserSpecialGroupsTest extends BrowserTestBase
     protected function setUp()
     {
         parent::setUp();
-        $this->user = $this->drupalCreateUser(['administer group fields'], null, true);
-        $this->drupalLogin($this->user);
-        $this->drupalGet('user/' . $this->user->id() . '/edit');
 
         // Get Access Group
         $group_ids =  \Drupal::entityQuery('group')
@@ -76,15 +85,47 @@ class UserSpecialGroupsTest extends BrowserTestBase
         $this->group = Group::load(array_pop($group_ids));
 
         // Create 2 Special Groups
+        /** @var Group[] $special_groups */
         $this->special_groups = array_map(function ($id) {
             $group = \Drupal\group\Entity\Group::create([
-                     'label' => $id,
-                     'type' => UserEntity::$group_special_type_id
-                 ]);
+                'label' => $id,
+                'type' => UserEntity::$group_special_type_id
+            ]);
             $group->save();
 
             return $group;
         }, ['group-1', 'group-2']);
+
+        // Gets Role Synchroniser
+        $this->roleSynchronizer = $this->container->get('group_role.synchronizer');
+
+        // Get Role Ids that need permissions reassigning
+        $role_ids = array_merge(
+            $this->roleSynchronizer->getGroupRoleIdsByGroupType('dpc_gtype_special'),
+            ['dpc_gtype_special-anonymous', 'dpc_gtype_special-outsider']
+        );
+
+        // Grant Necessary Permissions to Group Roles using ids from $role_ids
+        $this->group_roles = array_filter(
+            array_map(function ($id) {
+                /** @var GroupRole $group_role */
+                $group_role = GroupRole::load($id);
+
+                if (empty($group_role)) {
+                    return null;
+                }
+
+                $group_role->grantPermissions(['view group', 'join group']);
+                $group_role->save();
+
+                return $group_role;
+            }, $role_ids),
+            function($value) { return $value; });
+
+        // Creates Authenticated User for tests
+        $this->user = $this->drupalCreateUser(['access content']);
+        $this->drupalLogin($this->user);
+        $this->drupalGet('user/' . $this->user->id() . '/edit');
 
     }
 
