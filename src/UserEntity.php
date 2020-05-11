@@ -33,14 +33,14 @@ class UserEntity extends User
      *
      * @var string
      */
-    public static $group_type_id = 'dpc_managed_group_type';
+    public static $group_type_id = 'dpc_gtype_grant_access';
 
     /**
      * Defines the Group Type Label
      *
      * @var string
      */
-    public static $group_type_label = 'DPC Managed Group Type';
+    public static $group_type_label = 'DPC Managed - Grant Access Group Type';
 
     /**
      * Special Group Type ID.
