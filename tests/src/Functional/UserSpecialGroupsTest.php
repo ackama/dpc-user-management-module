@@ -77,10 +77,13 @@ class UserSpecialGroupsTest extends BrowserTestBase
 
         // Create 2 Special Groups
         $this->special_groups = array_map(function ($id) {
-            return \Drupal\group\Entity\Group::create([
+            $group = \Drupal\group\Entity\Group::create([
                      'label' => $id,
                      'type' => UserEntity::$group_special_type_id
-                 ])->save();
+                 ]);
+            $group->save();
+
+            return $group;
         }, ['group-1', 'group-2']);
 
     }
@@ -89,33 +92,40 @@ class UserSpecialGroupsTest extends BrowserTestBase
     {
         $web_assert = $this->assertSession();
 
-        // @ToDo check for fields named `edit-special-groups-{ID}` for each special_groups
-        // $web_assert->fieldExists('edit-special-group-value');
+        // Checks for checkbox for group[0] to exist
+        $element_id = sprintf('edit-special-groups-%s', $this->special_groups[0]->id());
+
+        $web_assert->fieldExists($element_id);
     }
 
     public function testSpecialGroupSavesValue()
     {
-        // @ToDo check field for special_group[0]
-        $this->getSession()->getPage()->checkField('edit-special-group-value');
+        // Sets checkbox ID (special_group[0]) to test with
+        $element_id = sprintf('edit-special-groups-%s', $this->special_groups[0]->id());
+
+        // Checks checkbox
+        $this->getSession()->getPage()->checkField($element_id);
         $this->getSession()->getPage()->pressButton('edit-submit');
 
         $web_assert = $this->assertSession();
 
-        // @ToDo check that field for special_group[0] is checked
-        $web_assert->fieldValueEquals('edit-special-group-value', true);
+        // Checks that field is persisted
+        $web_assert->fieldValueEquals($element_id, true);
     }
 
     public function testSpecialGroupControlsAccessGroup()
     {
-        // @ToDo Verify checkbox for special_group[1] is unchecked and save profile
+        $element_id = sprintf('edit-special-groups-%s', $this->special_groups[1]->id());
+
+        // Verify checkbox for special_group[1] is unchecked and save profile
         $this->getSession()->getPage()->uncheckField('edit-special-group-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
-        // @ToDo Check checkbox for special_group[1] and save profile
+        // Check checkbox for special_group[1] and save profile
         $this->getSession()->getPage()->checkField('edit-special-group-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
-        // User should be in Access Group
+        // User should be in Access Group now
         $this->assertTrue($this->group->getMember($this->user));
     }
 
