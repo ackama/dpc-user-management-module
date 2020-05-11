@@ -1,0 +1,15 @@
+# group.role.dpc_gtype_special-member.yml
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.dpc_gtype_special
+id: dpc_gtype_special-anonymous
+label: Anonymous
+weight: -102
+internal: true
+audience: anonymous
+group_type: dpc_gtype_special
+permissions_ui: true
+permissions:
+  - 'view group'
