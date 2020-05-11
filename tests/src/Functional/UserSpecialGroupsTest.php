@@ -89,30 +89,33 @@ class UserSpecialGroupsTest extends BrowserTestBase
     {
         $web_assert = $this->assertSession();
 
-        $web_assert->fieldExists('edit-special-group-value');
+        // @ToDo check for fields named `edit-special-groups-{ID}` for each special_groups
+        // $web_assert->fieldExists('edit-special-group-value');
     }
 
     public function testSpecialGroupSavesValue()
     {
+        // @ToDo check field for special_group[0]
         $this->getSession()->getPage()->checkField('edit-special-group-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
         $web_assert = $this->assertSession();
 
+        // @ToDo check that field for special_group[0] is checked
         $web_assert->fieldValueEquals('edit-special-group-value', true);
     }
 
-    public function testSpecialGroupValueControlsGroup()
+    public function testSpecialGroupControlsAccessGroup()
     {
-        // Verify checkbox is unchecked and save profile
+        // @ToDo Verify checkbox for special_group[1] is unchecked and save profile
         $this->getSession()->getPage()->uncheckField('edit-special-group-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
-        // User checks special group field and saves
+        // @ToDo Check checkbox for special_group[1] and save profile
         $this->getSession()->getPage()->checkField('edit-special-group-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
-        // User should be in Group
+        // User should be in Access Group
         $this->assertTrue($this->group->getMember($this->user));
     }
 
