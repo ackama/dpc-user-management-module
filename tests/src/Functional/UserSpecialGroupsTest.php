@@ -128,24 +128,4 @@ class UserSpecialGroupsTest extends BrowserTestBase
         // User should be in Access Group now
         $this->assertTrue($this->group->getMember($this->user));
     }
-
-    public function testJSEAccessValueControlsGroup()
-    {
-        // User should not be in Group upon creation
-        $this->assertFalse($this->group->getMember($this->user));
-
-        // We check the field in profile and Save
-        $this->getSession()->getPage()->checkField('edit-jse-access-value');
-        $this->getSession()->getPage()->pressButton('edit-submit');
-
-        // User should be in Group
-        $this->assertTrue($this->group->getMember($this->user));
-
-        // We uncheck the field in profile and Save
-        $this->getSession()->getPage()->uncheckField('edit-jse-access-value');
-        $this->getSession()->getPage()->pressButton('edit-submit');
-
-        // User should not be in Group
-        $this->assertFalse($this->group->getMember($this->user));
-    }
 }
