@@ -117,7 +117,14 @@ class UserEntity extends User
         return empty($value) ? false : (bool) $value[0]['value'];
     }
 
-
+    /**
+     * Returns arrays with id's from multiple checkboxes field type in drupal forms
+     *
+     * @param $field_name
+     * @param bool $original
+     * @return array
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
     protected function _get_target_ids($field_name, $original = false)
     {
         $values = !$original ? $this->get($field_name)->getValue() : $this->original->get($field_name)->getValue();
