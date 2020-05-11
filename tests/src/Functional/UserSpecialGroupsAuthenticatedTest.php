@@ -151,7 +151,7 @@ class UserSpecialGroupsAuthenticatedTest extends BrowserTestBase
         $web_assert = $this->assertSession();
 
         // Checks that field is persisted
-        $web_assert->fieldValueEquals($element_id, true);
+        $web_assert->checkboxChecked($element_id);
     }
 
     public function testSpecialGroupControlsAccessGroup()
