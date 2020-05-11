@@ -1,0 +1,16 @@
+# group.role.dpc_gtype_special-outsider.yml
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.dpc_gtype_special
+id: dpc_gtype_special-outsider
+label: Outsider
+weight: -101
+internal: true
+audience: outsider
+group_type: dpc_gtype_special
+permissions_ui: true
+permissions:
+  - 'join group'
+  - 'view group'
