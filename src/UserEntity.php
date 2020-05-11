@@ -67,7 +67,8 @@ class UserEntity extends User
      * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
      */
-    protected function verify_email_addresses() {
+    protected function verify_email_addresses()
+    {
         $verification_sent = [];
         $user = User::load($this->id());
         // Check email addresses
@@ -109,7 +110,8 @@ class UserEntity extends User
      * @return bool
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
-    protected function _get_clean_boolean($field_name, $original = false) {
+    protected function _get_clean_boolean($field_name, $original = false)
+    {
         $value = !$original ? $this->get($field_name)->getValue() : $this->original->get($field_name)->getValue();
 
         return empty($value) ? false : (bool) $value[0]['value'];
@@ -180,7 +182,7 @@ class UserEntity extends User
             ->loadUnchanged($this->id());
         $addresses = $user->field_email_addresses->getValue();
         $new_addresses = $this->field_email_addresses->getValue();
-        foreach($new_addresses as $key => $address) {
+        foreach ($new_addresses as $key => $address) {
             if (array_search($address['value'], array_column($addresses, 'value')) === false) {
                 $new_addresses[$key]['status'] = 'new';
             };
