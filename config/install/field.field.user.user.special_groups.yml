@@ -4,7 +4,7 @@ status: true
 dependencies:
   config:
     - field.storage.user.special_groups
-    - group.type.dpc_managed_special
+    - group.type.dpc_gtype_special
   module:
     - user
     - group
@@ -22,7 +22,7 @@ settings:
   handler: 'default:group'
   handler_settings:
     target_bundles:
-      dpc_managed_special: dpc_managed_special
+      dpc_gtype_special: dpc_gtype_special
     sort:
       field: _none
     auto_create: false

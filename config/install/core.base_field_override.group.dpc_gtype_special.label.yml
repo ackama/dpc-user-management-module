@@ -2,11 +2,11 @@ langcode: en
 status: true
 dependencies:
   config:
-    - group.type.dpc_managed_special
-id: group.dpc_managed_special.label
+    - group.type.dpc_gtype_special
+id: group.dpc_gtype_special.label
 field_name: label
 entity_type: group
-bundle: dpc_managed_special
+bundle: dpc_gtype_special
 label: 'Special Group Name'
 description: 'The name that will be displayed in the user profile'
 required: true

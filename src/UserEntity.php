@@ -44,15 +44,15 @@ class UserEntity extends User
 
     /**
      * Special Group Type ID.
-     * Initialised in ./config/install/group.type.dpc_managed_special.yml
+     * Initialised in ./config/install/group.type.dpc_gtype_special.yml
      *
      * @var string
      */
-    public static $group_special_type_id = 'dpc_managed_special';
+    public static $group_special_type_id = 'dpc_gtype_special';
 
     /**
      * Special Group Type Label.
-     * Initialised in ./config/install/group.type.dpc_managed_special.yml
+     * Initialised in ./config/install/group.type.dpc_gtype_special.yml
      *
      * @var string
      */
