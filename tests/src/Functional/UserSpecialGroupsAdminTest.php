@@ -62,7 +62,7 @@ class UserSpecialGroupsAdminTest extends BrowserTestBase
     protected function setUp()
     {
         parent::setUp();
-        $this->user = $this->drupalCreateUser(['administer group fields'], null, false);
+        $this->user = $this->drupalCreateUser(['administer group fields', 'access content'], null, false);
         $this->drupalLogin($this->user);
         $this->drupalGet('user/' . $this->user->id() . '/edit');
 
