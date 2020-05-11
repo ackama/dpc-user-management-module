@@ -118,11 +118,11 @@ class UserSpecialGroupsTest extends BrowserTestBase
         $element_id = sprintf('edit-special-groups-%s', $this->special_groups[1]->id());
 
         // Verify checkbox for special_group[1] is unchecked and save profile
-        $this->getSession()->getPage()->uncheckField('edit-special-group-value');
+        $this->getSession()->getPage()->uncheckField($element_id);
         $this->getSession()->getPage()->pressButton('edit-submit');
 
         // Check checkbox for special_group[1] and save profile
-        $this->getSession()->getPage()->checkField('edit-special-group-value');
+        $this->getSession()->getPage()->checkField($element_id);
         $this->getSession()->getPage()->pressButton('edit-submit');
 
         // User should be in Access Group now
