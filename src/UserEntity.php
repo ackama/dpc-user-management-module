@@ -43,6 +43,22 @@ class UserEntity extends User
     public static $group_type_label = 'DPC Managed Group Type';
 
     /**
+     * Special Group Type ID.
+     * Initialised in ./config/install/group.type.dpc_managed_special.yml
+     *
+     * @var string
+     */
+    public static $group_special_type_id = 'dpc_managed_special';
+
+    /**
+     * Special Group Type Label.
+     * Initialised in ./config/install/group.type.dpc_managed_special.yml
+     *
+     * @var string
+     */
+    public static $group_special_type_label = 'DPC Managed - Special Groups';
+
+    /**
      * @param EntityStorageInterface $storage
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
