@@ -161,7 +161,7 @@ class UserEntity extends User
         $_new = $this->_get_target_ids('special_groups');
         $_original = $this->_get_target_ids('special_groups', true);
 
-        if (!empty(array_diff($_original, $_new))) {
+        if ( $_original != $_new ) {
             // Set access flag to true only if setting has changed
             if(!empty($_new)) {
                 $this->set('jse_access', true);
