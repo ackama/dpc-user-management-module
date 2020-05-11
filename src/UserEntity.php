@@ -115,20 +115,30 @@ class UserEntity extends User
         return empty($value) ? false : (bool) $value[0]['value'];
     }
 
+
+    protected function _get_target_ids($field_name, $original = false)
+    {
+        $values = !$original ? $this->get($field_name)->getValue() : $this->original->get($field_name)->getValue();
+
+        return array_map(function ($v) {
+            return $v['target_id'];
+        }, $values);
+    }
+
     /**
      * Adds or Removes membership of users into access group bases on profile checkboxes
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
-    protected function toggle_special_groups() {
+    protected function toggle_special_groups()
+    {
+        // Adds JSE Access when Special Groups selections are changed and a group is selected
+        $_new = $this->_get_target_ids('special_groups');
+        $_original = $this->_get_target_ids('special_groups', true);
 
-        // Adds JSE Access when Special Group flag is turned on
-        $_new = $this->_get_clean_boolean('special_group');
-        $_original = $this->_get_clean_boolean('special_group', true);
-
-        if ($_original !== $_new) {
+        if (!empty(array_diff($_original, $_new))) {
             // Set access flag to true only if setting has changed
-            if($_new) {
+            if(!empty($_new)) {
                 $this->set('jse_access', true);
             }
         }
