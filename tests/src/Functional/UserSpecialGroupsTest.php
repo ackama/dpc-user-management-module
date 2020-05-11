@@ -50,6 +50,11 @@ class UserSpecialGroupsTest extends BrowserTestBase
      */
     protected $group;
 
+    /**
+     * @var $special_groups Group[]
+     */
+    protected $special_groups = [];
+
 
     /**
      * {@inheritdoc}
@@ -61,6 +66,7 @@ class UserSpecialGroupsTest extends BrowserTestBase
         $this->drupalLogin($this->user);
         $this->drupalGet('user/' . $this->user->id() . '/edit');
 
+        // Get Access Group
         $group_ids =  \Drupal::entityQuery('group')
             ->condition('label', UserEntity::$group_label)
             ->accessCheck(false)
@@ -68,6 +74,15 @@ class UserSpecialGroupsTest extends BrowserTestBase
 
         /** @var Group $group */
         $this->group = Group::load(array_pop($group_ids));
+
+        // Create 2 Special Groups
+        $this->special_groups = array_map(function ($id) {
+            return \Drupal\group\Entity\Group::create([
+                     'label' => $id,
+                     'type' => UserEntity::$group_special_type_id
+                 ])->save();
+        }, ['group-1', 'group-2']);
+
     }
 
     public function testSpecialGroupFieldExists()
