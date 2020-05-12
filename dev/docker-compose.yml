@@ -52,6 +52,13 @@ services:
             #
             # path-on-host:absolute-path-on-container
             # - "./drupal-db-dump.sql:/docker-entrypoint-initdb.d/dump.sql"
+
+    ##
+    # Mailhog is a service that captures email sent over STMP and
+    # displays it to the developer and keeps it from going out.
+    # Use the browser at http://localhost:8025
+    # You application must send email over SMTP over localhost:1025
+    ##
     mailhog:
         image: "mailhog/mailhog"
         ports:
