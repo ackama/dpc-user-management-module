@@ -52,6 +52,12 @@ services:
             #
             # path-on-host:absolute-path-on-container
             # - "./drupal-db-dump.sql:/docker-entrypoint-initdb.d/dump.sql"
+    mailhog:
+        image: "mailhog/mailhog"
+        ports:
+            # host:container
+            - "1025:1025"
+            - "8025:8025"
     drupal:
         build:
             context: ./
