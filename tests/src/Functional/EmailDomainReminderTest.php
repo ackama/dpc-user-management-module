@@ -2,6 +2,7 @@
 namespace Drupal\Tests\DPC_User_Management\Functional;
 
 use Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock;
+use Drupal\DPC_User_Management\UserEntity;
 use Drupal\group\Entity\Group;
 use Drupal\Tests\BrowserTestBase;
 
@@ -65,7 +66,7 @@ class EmailDomainReminderTest extends BrowserTestBase
         parent::setUp();
 
         // Creates test group
-        $this->group   = Group::create(['type' => 'dpc_gtype_email_domain', 'label' => 'email domain group']);
+        $this->group   = Group::create(['type' =>  UserEntity::$group_type_email_domain_id, 'label' => 'email domain group']);
 
         // Sets up ID Selector for Banner
         $this->selector = '#' . EmailDomainReminderBlock::$_div_id;
