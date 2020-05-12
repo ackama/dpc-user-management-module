@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Contains \Drupal\DPC_User_Management\Plugin\field\formatter\ProfileWidgetFormatter.
+ * Contains \Drupal\dpc_user_management\Plugin\field\formatter\ProfileWidgetFormatter.
  */
 
-namespace Drupal\DPC_User_Management\Plugin\Field\FieldFormatter;
+namespace Drupal\dpc_user_management\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;

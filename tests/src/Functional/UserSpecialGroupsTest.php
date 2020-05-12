@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\Tests\DPC_User_Management\Functional;
+namespace Drupal\Tests\dpc_user_management\Functional;
 
-use Drupal\DPC_User_Management\UserEntity;
+use Drupal\dpc_user_management\UserEntity;
 use Drupal\group\Entity\Group;
 use Drupal\Tests\BrowserTestBase;
 
