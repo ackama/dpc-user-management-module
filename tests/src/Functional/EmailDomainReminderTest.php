@@ -65,7 +65,7 @@ class EmailDomainReminderTest extends BrowserTestBase
         parent::setUp();
 
         // Creates test group
-        $this->group   = Group::create(['type' => 'email_domain_group', 'label' => 'email domain group']);
+        $this->group   = Group::create(['type' => 'dpc_gtype_email_domain', 'label' => 'email domain group']);
 
         // Sets up ID Selector for Banner
         $this->selector = '#' . EmailDomainReminderBlock::$_div_id;

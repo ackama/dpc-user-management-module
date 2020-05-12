@@ -2,13 +2,13 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.group.email_domain_group.field_email_domain
-    - group.type.email_domain_group
+    - field.field.group.dpc_gtype_email_domain.field_email_domain
+    - group.type.dpc_gtype_email_domain
   module:
     - path
-id: group.email_domain_group.default
+id: group.dpc_gtype_email_domain.default
 targetEntityType: group
-bundle: email_domain_group
+bundle: dpc_gtype_email_domain
 mode: default
 content:
   field_email_domain:

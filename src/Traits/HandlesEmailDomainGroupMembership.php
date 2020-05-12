@@ -87,7 +87,7 @@ trait HandlesEmailDomainGroupMembership
     static function getEmailDomainGroups()
     {
         $group_ids = \Drupal::entityQuery('group')
-            ->condition('type', 'email_domain_group')
+            ->condition('type', 'dpc_gtype_email_domain')
             ->accessCheck(false)
             ->execute();
 
