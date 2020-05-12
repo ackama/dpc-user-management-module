@@ -2,6 +2,7 @@
 namespace Drupal\Tests\dpc_user_management\Functional;
 
 use Drupal\Core\Test\AssertMailTrait;
+use Drupal\dpc_user_management\UserEntity;
 use Drupal\group\Entity\Group;
 use Drupal\Tests\BrowserTestBase;
 
@@ -69,7 +70,7 @@ class GroupMembershipTest extends BrowserTestBase
             ['value' => 'domain.org'],
             ['value' => 'example.com']
         ];
-        $this->group   = Group::create(['type' => 'email_domain_group', 'label' => 'email domain group']);
+        $this->group   = Group::create(['type' =>  UserEntity::$group_type_email_domain_id, 'label' => 'email domain group']);
         $this->group->set('field_email_domain', $group_domains);
         $this->group->save();
 

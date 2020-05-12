@@ -4,6 +4,7 @@ namespace Drupal\dpc_user_management\Traits;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\dpc_user_management\UserEntity;
 use Drupal\group\Entity\Group;
 use Drupal\user\UserInterface;
 
@@ -87,7 +88,7 @@ trait HandlesEmailDomainGroupMembership
     static function getEmailDomainGroups()
     {
         $group_ids = \Drupal::entityQuery('group')
-            ->condition('type', 'email_domain_group')
+            ->condition('type', UserEntity::$group_type_email_domain_id)
             ->accessCheck(false)
             ->execute();
 
