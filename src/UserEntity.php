@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\DPC_User_Management;
+namespace Drupal\dpc_user_management;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -57,6 +57,20 @@ class UserEntity extends User
      * @var string
      */
     public static $group_special_type_label = 'DPC Managed - Special Groups';
+
+    /**
+     * Defines the Email Domain based group type ID
+     *
+     * @var string
+     */
+    public static $group_type_email_domain_id = 'dpc_gtype_email_domain';
+
+    /**
+     * Defines the Email Domain based group type label
+     *
+     * @var string
+     */
+    public static $group_type_email_domain_label = 'DPC Managed - Email Domain Groups';
 
     /**
      * @param EntityStorageInterface $storage
