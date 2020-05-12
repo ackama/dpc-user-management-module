@@ -52,12 +52,12 @@ class MailchimpAudienceForm extends ConfigFormBase
             '#type'          => 'select',
             '#options'       => $this->getMailchimpListOptions(),
             '#required'      => true,
+            '#disabled'      => !$this->mailchimp,
             '#default_value' => $this->mailchimpConfig()->get('audience_id'),
             '#description'   => $this->t('Choose the audience you wish to use for user subcriptions')
         ];
 
         $form['refresh_audience'] = [
-
             '#title'  => $this->t('refresh audience'),
             '#markup' => $this->getResyncMarkup(),
         ];
@@ -115,8 +115,8 @@ class MailchimpAudienceForm extends ConfigFormBase
      */
     private function getResyncMarkup()
     {
-        $markup = '<div class="form-item"><span class="button">Re-sync audience with users</span> <br/>';
-        $markup .= $this->t('Syncing the Mailchimp Audience with the drupal users ensures that eligible users are part of the audience.');
+        $markup = '<div class="form-item"><span class="button ' . ( !$this->mailchimp ? 'is-disabled' : '' ) . '" id="dpc_resync_mc">Re-sync audience with users</span> <br/>';
+        $markup .= $this->t('Syncing the Mailchimp Audience with the drupal users ensures that eligible users are part of the MailChimp audience.');
         $markup .= '</div>';
 
         return $markup;

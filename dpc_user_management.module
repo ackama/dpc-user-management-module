@@ -33,6 +33,14 @@ function dpc_user_management_help($route_name, RouteMatchInterface $route_match)
 }
 
 /**
+ * Implements hook_cron()
+ */
+function dpc_user_management_cron()
+{
+
+}
+
+/**
  * Implements hook_entity_prepare_form().
  *
  * @param EntityInterface                      $entity
@@ -94,6 +102,10 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
         if (!\Drupal::currentUser()->hasPermission('administer group fields')) {
             unset($form['jse_access']);
         }
+    }
+
+    if ($form_id === 'mailchimp_audience_settings') {
+        $form['#attached']['library'][] = 'dpc_user_management/mailchimp';
     }
 }
 

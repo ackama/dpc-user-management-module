@@ -1,4 +1,9 @@
-dpc_mailchimp.audience:
+dpc_user_management.mailchimp.admin:
+  route_name: dpc_user_management.mailchimp.admin
+  base_route: dpc_user_management.mailchimp.admin
+  title: 'Mailchimp'
+dpc_user_management.mailchimp.audience:
   title: 'Audience'
-  route_name: dpc_mailchimp.audience
-  base_route: dpc_mailchimp.admin
+  route_name: dpc_user_management.mailchimp.audience
+  base_route: dpc_user_management.mailchimp.admin
+  weight: 10

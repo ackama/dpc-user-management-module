@@ -46,7 +46,7 @@ class UserEntityController extends ControllerBase
                     // Add user to groups based on email domain
                     self::addUserToGroups($user, $address['value']);
 
-                    //
+                    // dispatch primary email changed event
                     if ($address['is_primary']) {
                         $event_dispatcher = \Drupal::service('event_dispatcher');
                         $event = new PrimaryEmailUpdated($user);

@@ -2,6 +2,7 @@
 
 namespace Drupal\dpc_user_management\Events;
 
+use Drupal\custom_events\Event\PrimaryEmailUpdated;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use DrewM\MailChimp\MailChimp;
@@ -63,13 +64,15 @@ class UserAccountEventsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Event $event
+     * @param PrimaryEmailUpdated $event
      */
-    public function updateMailchimpEmailAddress(Event $event)
+    public function updateMailchimpEmailAddress(PrimaryEmailUpdated $event)
     {
         if (!$this->mailchimp || !$this->audience_id) {
             return;
         }
+
+        // TODO: check if user is eligible to receive newsletter
 
         $new_email = $event->account->getEmail();
 

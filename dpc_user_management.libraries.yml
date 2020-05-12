@@ -7,3 +7,9 @@ user_profile:
     js/user_profile.js: {}
   dependencies:
     - 'core/jquery'
+mailchimp:
+  version: 'VERSION'
+  js:
+    js/mailchimp.js: {}
+  dependencies:
+    - 'core/jquery'

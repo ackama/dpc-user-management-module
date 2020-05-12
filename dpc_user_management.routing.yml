@@ -29,14 +29,14 @@ dpc_user_management.admin_settings_form:
     _permission: 'access administration pages'
   options:
     _admin_route: TRUE
-dpc_mailchimp.admin:
+dpc_user_management.mailchimp.admin:
   path: 'admin/config/services/mailchimp'
   defaults:
     _form: '\Drupal\dpc_user_management\Form\MailchimpAdminSettingsForm'
     _title: 'Mailchimp'
   requirements:
     _permission: 'access administration pages'
-dpc_mailchimp.audience:
+dpc_user_management.mailchimp.audience:
   path: 'admin/config/services/mailchimp/audience'
   defaults:
     _form: '\Drupal\dpc_user_management\Form\MailchimpAudienceForm'
@@ -44,7 +44,7 @@ dpc_mailchimp.audience:
   requirements:
     _permission: 'access administration pages'
 dpc_mailchimp_sync:
-  path: '/maillist/sync'
+  path: '/dpc_mailchimp/sync'
   defaults:
     _controller: '\Drupal\dpc_user_management\Controller\MailchimpController::syncAudience'
     _title: 'Sync Audience'

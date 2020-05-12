@@ -6,7 +6,6 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\group\Entity\Group;
-use Drupal\group\Entity\GroupType;
 use Drupal\user\Entity\User;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
 

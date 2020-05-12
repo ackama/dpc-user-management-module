@@ -6,6 +6,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use DrewM\MailChimp\MailChimp;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MailchimpController extends ControllerBase
 {
@@ -25,11 +27,16 @@ class MailchimpController extends ControllerBase
      * @var \DrewM\MailChimp\Batch
      */
     protected $batch;
+    /**
+     * @var string|null
+     */
+    protected $context;
 
-    public function __construct()
+    public function __construct($context = null)
     {
         $this->config      = \Drupal::config('dpc_mailchimp.settings');
         $this->audience_id = $this->config->get('audience_id');
+        $this->context     = $context;
         try {
             $this->mailchimp = new MailChimp($this->config->get('api_key'));
             $this->batch     = $this->mailchimp->new_batch();
@@ -38,10 +45,17 @@ class MailchimpController extends ControllerBase
     }
 
     /**
+     * @param Request $request
+     *
      * @return JsonResponse
+     * @throws HttpException
      */
-    public function syncAudience()
+    public function syncAudience(Request $request)
     {
+        if (!$request->isXmlHttpRequest() && $this->context !== 'cron') {
+            throw new HttpException(400, 'Invalid request');
+        }
+
         if (!$this->mailchimp || !$this->audience_id) {
             return new JsonResponse('Unable to Sync users: Mailchimp configuration is missing', 400);
         }
@@ -69,6 +83,10 @@ class MailchimpController extends ControllerBase
             $query->Condition('field_email_addresses', $email, '=');
             $user_id = $query->execute();
             /** @var EntityInterface $user */
+            if (empty($user_id)) {
+                continue;
+            }
+
             $user = User::load(array_shift($user_id));
 
             // check if user is unsubscribed
@@ -107,5 +125,18 @@ class MailchimpController extends ControllerBase
                 'email_address' => $primary['value'],
             ]);
         };
+    }
+
+    private function addMissingUsersToList()
+    {
+        $query = \Drupal::entityQuery('user');
+        $query->Condition('status', 1, '=');
+        $user_ids = $query->execute();
+        foreach ($user_ids as $id) {
+            $mc_address = \Drupal::service('user.data')->get('dpc_user_management', $id, 'mc_subscribed_email');
+            if (!$mc_address) {
+                $user = User::load($id);
+            }
+        }
     }
 }
