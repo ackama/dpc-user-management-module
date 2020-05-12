@@ -34,7 +34,7 @@ drush --yes pm:enable devel,devel_generate,kint
 # * https://www.drupal.org/project/group/issues/3103716
 # * https://www.drupal.org/project/group/issues/3103884
 #
-drush --yes pm:enable webprofiler
+# drush --yes pm:enable webprofiler
 
 # Enable Admin Toolbar goodies
 drush --yes pm:enable admin_toolbar
