@@ -58,6 +58,7 @@ services:
     # displays it to the developer and keeps it from going out.
     # Use the browser at http://localhost:8025
     # You application must send email over SMTP over localhost:1025
+    # Further necessary configuration is commented out in `/root/setup.sh`
     ##
     mailhog:
         image: "mailhog/mailhog"

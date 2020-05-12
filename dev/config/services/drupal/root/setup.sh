@@ -44,7 +44,7 @@ drush --yes pm:enable admin_toolbar_search
 # Enable our module's Drupal dependencies (they are installed via composer)
 drush --yes pm:enable group
 
-# Enbale phpmail smtp and mailsystem
+# Enable phpmailer smtp and mailsystem
 # Configures both to route emails to mailhog docker service
 drush --yes pm:enable phpmailer_smtp mailsystem
 drush config:set --yes mailsystem.settings defaults.sender phpmailer_smtp
