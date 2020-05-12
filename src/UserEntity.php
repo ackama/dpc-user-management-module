@@ -43,6 +43,20 @@ class UserEntity extends User
     public static $group_type_label = 'DPC User Management Managed Type';
 
     /**
+     * Defines the Email Domain based group type ID
+     *
+     * @var string
+     */
+    public static $group_type_email_domain_id = 'dpc_gtype_email_domain';
+
+    /**
+     * Defines the Email Domain based group type label
+     *
+     * @var string
+     */
+    public static $group_type_email_domain_label = 'DPC Managed - Email Domain Groups';
+
+    /**
      * @param EntityStorageInterface $storage
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
