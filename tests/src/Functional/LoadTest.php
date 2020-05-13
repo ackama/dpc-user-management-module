@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\DPC_User_Management\Functional;
+namespace Drupal\Tests\dpc_user_management\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
