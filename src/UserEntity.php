@@ -86,6 +86,8 @@ class UserEntity extends User
         $this->verify_email_addresses();
         $this->toggle_special_groups();
 
+        $this->synthesizeMemberships();
+
         parent::preSave($storage);
     }
 
@@ -175,6 +177,7 @@ class UserEntity extends User
         $_original = $this->_get_target_ids('special_groups', true);
 
         if ( $_original != $_new ) {
+            // Settings changed => Reprocess memberships
 
             array_map(function($_id) {
                 Group::load($_id)->removeMember($this);
@@ -184,11 +187,42 @@ class UserEntity extends User
                 Group::load($_id)->addMember($this);
             }, array_diff($_new, $_original));
 
-            // Set access flag to true only if setting has changed
+            // Set access flag to true only if settings have changed and there are groups selected
+            // @ToDo move this elsewhere
             if(!empty($_new)) {
                 $this->set('jse_access', true);
             }
         }
+    }
+
+    /**
+     * @return mixed
+     * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+     * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+     */
+    private function getDirtyAddresses()
+    {
+        $user = \Drupal::entityManager()
+            ->getStorage('user')
+            ->loadUnchanged($this->id());
+        $addresses = $user->field_email_addresses->getValue();
+        $new_addresses = $this->field_email_addresses->getValue();
+        foreach ($new_addresses as $key => $address) {
+            if (array_search($address['value'], array_column($addresses, 'value')) === false) {
+                $new_addresses[$key]['status'] = 'new';
+            };
+        }
+
+        return $new_addresses;
+    }
+
+    /**
+     * When all group memberships have been processed,
+     * decide if the user should be in the Master Access Group
+     *
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    private function synthesizeMemberships() {
 
         $_access_new = $this->_get_clean_boolean('jse_access');
         $_access_original = $this->_get_clean_boolean('jse_access', true);
@@ -213,26 +247,5 @@ class UserEntity extends User
 
             return;
         }
-    }
-
-    /**
-     * @return mixed
-     * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-     * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-     */
-    private function getDirtyAddresses()
-    {
-        $user = \Drupal::entityManager()
-            ->getStorage('user')
-            ->loadUnchanged($this->id());
-        $addresses = $user->field_email_addresses->getValue();
-        $new_addresses = $this->field_email_addresses->getValue();
-        foreach ($new_addresses as $key => $address) {
-            if (array_search($address['value'], array_column($addresses, 'value')) === false) {
-                $new_addresses[$key]['status'] = 'new';
-            };
-        }
-
-        return $new_addresses;
     }
 }
