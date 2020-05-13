@@ -13,3 +13,4 @@ group_type: dpc_gtype_special
 permissions_ui: true
 permissions:
   - 'view group'
+  - 'join group'

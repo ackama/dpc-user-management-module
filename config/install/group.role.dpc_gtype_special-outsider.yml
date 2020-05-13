@@ -12,5 +12,5 @@ audience: outsider
 group_type: dpc_gtype_special
 permissions_ui: true
 permissions:
-  - 'join group'
   - 'view group'
+  - 'join group'
