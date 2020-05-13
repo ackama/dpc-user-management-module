@@ -187,6 +187,16 @@ class UserEntity extends User
      */
     protected function processSpecialGroupsOnSave()
     {
+
+        // When user is being activated, add to special groups they have on their profile
+        $isActivating = $this->get('status')->value == 1 && !$this->original->get('status')->value;
+
+        if ($isActivating) {
+            array_map(function($_id) {
+                $this->removeFromGroupByID($_id);
+            }, $this->_get_target_ids('special_groups'));
+        }
+
         // Synchronise Special Groups memberships with checkboxes
         $_new = $this->_get_target_ids('special_groups');
         $_original = $this->_get_target_ids('special_groups', true);
