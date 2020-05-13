@@ -1,40 +1,22 @@
 <?php
 
-namespace Drupal\dpc_user_management\Handlers;
+namespace Drupal\dpc_user_management\Traits;
 
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\Group;
 
 /**
  * Class SpecialGroupsMembershipHandler
  * @package Drupal\dpc_user_management\Handlers
  */
-class SpecialGroupsMembershipHandler
+trait HandleMembershipTrait
 {
-
-    /**
-     * @var AccountInterface
-     */
-    protected $user;
-
-    /**
-     * SpecialGroupsMembershipHandler constructor.
-     *
-     * @param AccountInterface $user
-     */
-    function __construct(AccountInterface $user)
-    {
-        $this->user = $user;
-    }
-
     /**
      * @param Group $group
      * @return bool
      */
     public function inGroup(Group $group)
     {
-        return !!$group->getMember($this->user);
+        return !!$group->getMember($this);
     }
 
     /**
@@ -45,7 +27,7 @@ class SpecialGroupsMembershipHandler
         if (!$this->inGroup($group)) {
             // @ToDo Log Event for Addition
             // dpc_log_event('added', $group->id(), $user->id());
-            $group->addMember($this->user);
+            $group->addMember($this);
         }
     }
 
@@ -56,8 +38,8 @@ class SpecialGroupsMembershipHandler
     {
         if($this->inGroup($group)) {
             // @ToDo Log Event for Removal
-            // dpc_log_event('removed', $group->id(), $this->user->id());
-            $group->removeMember($this->user);
+            // dpc_log_event('removed', $group->id(), $this->id());
+            $group->removeMember($this);
         }
     }
 

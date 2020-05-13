@@ -4,8 +4,8 @@ namespace Drupal\dpc_user_management;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\dpc_user_management\Traits\HandleMembershipTrait;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
-use Drupal\dpc_user_management\Handlers\SpecialGroupsMembershipHandler;
 use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
@@ -13,6 +13,7 @@ use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
 class UserEntity extends User
 {
     use SendsEmailVerificationEmail, HandlesEmailDomainGroupMembership;
+    use HandleMembershipTrait;
 
     /**
      * Defines the Group Id
@@ -73,18 +74,6 @@ class UserEntity extends User
     public static $group_type_email_domain_label = 'DPC Managed - Email Domain Groups';
 
     /**
-     * @var SpecialGroupsMembershipHandler
-     */
-    protected $specialGroupHandler;
-
-    public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = [])
-    {
-        parent::__construct($values, $entity_type, $bundle, $translations);
-
-        $this->specialGroupHandler = new SpecialGroupsMembershipHandler($this);
-    }
-
-    /**
      * @param EntityStorageInterface $storage
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
@@ -97,9 +86,9 @@ class UserEntity extends User
         }
 
         $this->verify_email_addresses();
-        $this->toggle_special_groups();
+        $this->processSpecialGroupsOnSave();
 
-        $this->synthesizeMemberships();
+        $this->synchornizeMemberships();
 
         parent::preSave($storage);
     }
@@ -183,29 +172,32 @@ class UserEntity extends User
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
-    protected function toggle_special_groups()
+    protected function processSpecialGroupsOnSave()
     {
         // Synchronise Special Groups memberships with checkboxes
         $_new = $this->_get_target_ids('special_groups');
         $_original = $this->_get_target_ids('special_groups', true);
 
-        if ( $_original != $_new ) {
-            // Settings changed => Reprocess memberships
-
-            array_map(function($_id) {
-                $this->specialGroupHandler->removeFromGroupByID($_id);
-            }, array_diff($_original, $_new));
-
-            array_map(function($_id) {
-                $this->specialGroupHandler->addToGroupByID($_id);
-            }, array_diff($_new, $_original));
-
-            // Set access flag to true only if settings have changed and there are groups selected
-            // @ToDo move this elsewhere
-            if(!empty($_new)) {
-                $this->set('jse_access', true);
-            }
+        if ( $_original == $_new ) {
+            return;
         }
+
+        // Settings changed => Reprocess memberships
+
+        array_map(function($_id) {
+            $this->removeFromGroupByID($_id);
+        }, array_diff($_original, $_new));
+
+        array_map(function($_id) {
+            $this->addToGroupByID($_id);
+        }, array_diff($_new, $_original));
+
+        // Set access flag to true only if settings have changed and there are groups selected
+        // @ToDo move this elsewhere
+        if(!empty($_new)) {
+            $this->set('jse_access', true);
+        }
+
     }
 
     /**
@@ -235,7 +227,7 @@ class UserEntity extends User
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
-    private function synthesizeMemberships() {
+    private function synchornizeMemberships() {
 
         $_access_new = $this->_get_clean_boolean('jse_access');
         $_access_original = $this->_get_clean_boolean('jse_access', true);
