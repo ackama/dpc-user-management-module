@@ -108,6 +108,9 @@ function dpc_user_management_entity_type_build(&$entity_types)
     if (isset($entity_types['user'])) {
         $entity_types['user']->setClass('Drupal\dpc_user_management\UserEntity');
     }
+    if (isset($entity_types['group'])) {
+        $entity_types['group']->setClass('Drupal\dpc_user_management\GroupEntity');
+    }
 }
 
 /**
@@ -165,18 +168,6 @@ function dpc_user_management_user_login($account)
                 \Drupal::messenger()->addWarning($message);
             }
         }
-    }
-}
-
-function check_and_process_changed_groups()
-{
-    // get groups which have been updated in the last hour
-    $query = \Drupal::entityQuery('group');
-    $query->condition('type', 'email_domain_group', '=');
-    $gids = $query->condition('changed', strtotime('-1 hour'), '>=')->execute();
-    $queue = \Drupal::queue('group_membership_update_task');
-    foreach ($gids as $id) {
-        $queue->createItem(['group' => $id]);
     }
 }
 
