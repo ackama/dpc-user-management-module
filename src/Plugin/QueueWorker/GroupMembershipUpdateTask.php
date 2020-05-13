@@ -2,6 +2,7 @@
 
 namespace Drupal\dpc_user_management\Plugin\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
+use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
 
@@ -15,6 +16,7 @@ use Drupal\user\Entity\User;
  * )
  */
 class GroupMembershipUpdateTask extends QueueWorkerBase {
+    use HandlesEmailDomainGroupMembership;
 
     /**
      * Works on a single queue item.
@@ -71,14 +73,19 @@ class GroupMembershipUpdateTask extends QueueWorkerBase {
         $domains = array_column($domains, 'value');
 
         foreach ($users as $user) {
+            if ($group->getMember($user)) {
+                continue;
+            }
+
             $addresses = $user->field_email_addresses->getValue();
             if (empty($addresses)) {
-                $group->addMember($user);
+                self::addUserToGroup($user, $group);
+
                 continue;
             }
             foreach ($addresses as $key => $email) {
                 if (in_array(explode('@', $email['value'])[1], $domains) && $email['status'] === 'verified') {
-                    $group->addMember($user);
+                    self::addUserToGroup($user, $group);
                 }
             }
         }
