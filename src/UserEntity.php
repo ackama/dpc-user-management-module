@@ -246,11 +246,31 @@ class UserEntity extends User
         }
     }
 
+    /**
+     * @param string $type
+     * @return \Drupal\group\Entity\Group[]|\Drupal\Core\Entity\EntityInterface[]
+     */
+    static function getGroupsByType(string $type)
+    {
+        $group_ids = \Drupal::entityQuery('group')
+            ->condition('type', $type)
+            ->accessCheck(false)
+            ->execute();
+
+        return Group::loadMultiple($group_ids);
+    }
+
 
     /**
      * @return bool
      */
     protected function inSpecialGroups() {
+        foreach(self::getGroupsByType(UserEntity::$group_special_type_id) as $group) {
+            if ($this->inGroup($group)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -258,6 +278,12 @@ class UserEntity extends User
      * @return bool
      */
     protected function inEmailGroups() {
+        foreach(self::getGroupsByType(UserEntity::$group_type_email_domain_id) as $group) {
+            if ($this->inGroup($group)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
