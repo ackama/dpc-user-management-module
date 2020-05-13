@@ -25,8 +25,7 @@ trait HandlesEmailDomainGroupMembership
                     continue;
                 }
 
-                dpc_log_event('added', $group->id(), $user->id());
-                $group->addMember($user);
+                self::addUserToGroup($user, $group);
             }
         }
     }
@@ -51,11 +50,22 @@ trait HandlesEmailDomainGroupMembership
     }
 
     /**
+     * @param EntityInterface $user
+     * @param Group           $group
+     *
+     * @throws \Exception
+     */
+    static function addUserToGroup(EntityInterface $user, Group $group) {
+        dpc_log_event('added', $group->id(), $user->id());
+        $group->addMember($user);
+    }
+
+    /**
      * @param UserInterface $user
      * @param array         $removed_emails
      *
      *@throws \Exception
-*/
+    */
     static function removeUsersFromGroups(UserInterface $user, $removed_emails)
     {
         // get all the verified users emails
