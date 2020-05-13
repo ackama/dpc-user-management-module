@@ -5,6 +5,7 @@ namespace Drupal\dpc_user_management;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
+use Drupal\dpc_user_management\Handlers\SpecialGroupsMembershipHandler;
 use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
@@ -70,6 +71,18 @@ class UserEntity extends User
      * @var string
      */
     public static $group_type_email_domain_label = 'DPC Managed - Email Domain Groups';
+
+    /**
+     * @var SpecialGroupsMembershipHandler
+     */
+    protected $specialGroupHandler;
+
+    public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = [])
+    {
+        parent::__construct($values, $entity_type, $bundle, $translations);
+
+        $this->specialGroupHandler = new SpecialGroupsMembershipHandler($this);
+    }
 
     /**
      * @param EntityStorageInterface $storage
@@ -180,11 +193,11 @@ class UserEntity extends User
             // Settings changed => Reprocess memberships
 
             array_map(function($_id) {
-                Group::load($_id)->removeMember($this);
+                $this->specialGroupHandler->removeFromGroupByID($_id);
             }, array_diff($_original, $_new));
 
             array_map(function($_id) {
-                Group::load($_id)->addMember($this);
+                $this->specialGroupHandler->addToGroupByID($_id);
             }, array_diff($_new, $_original));
 
             // Set access flag to true only if settings have changed and there are groups selected
