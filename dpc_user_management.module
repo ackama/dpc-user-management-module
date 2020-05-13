@@ -108,6 +108,9 @@ function dpc_user_management_entity_type_build(&$entity_types)
     if (isset($entity_types['user'])) {
         $entity_types['user']->setClass('Drupal\dpc_user_management\UserEntity');
     }
+    if (isset($entity_types['group'])) {
+        $entity_types['group']->setClass('Drupal\dpc_user_management\GroupEntity');
+    }
 }
 
 /**
