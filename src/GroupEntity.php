@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\DPC_User_Management;
+namespace Drupal\dpc_user_management;
 
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\group\Entity\Group;

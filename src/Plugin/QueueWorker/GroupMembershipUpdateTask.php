@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\DPC_User_management\Plugin\QueueWorker;
+namespace Drupal\dpc_user_management\Plugin\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
@@ -10,7 +10,7 @@ use Drupal\user\Entity\User;
  *
  * @QueueWorker(
  *   id = "group_membership_update_task",
- *   title = @Translation("My Module Tasks Worker: Entity Updates"),
+ *   title = @Translation("Group membership updates after Group update"),
  *   cron = {"time" = 60}
  * )
  */
