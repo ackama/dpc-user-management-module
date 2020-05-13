@@ -237,13 +237,13 @@ class UserEntity extends User
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
     private function processManualRemoval() {
-        $_access_new = $this->_get_clean_boolean('jse_access');
-
-        // Prepare for removal from access group and set flag
-        if($_access_new) {
-            $this->set('jse_access', false);
-            $this->manualRemoval = true;
+        // If the flag has not been touched, do nothing
+        if (!$this->_get_clean_boolean('jse_access')) {
+            return;
         }
+
+        $this->set('jse_access', false);
+        $this->manualRemoval = true;
     }
 
     /**
@@ -295,17 +295,26 @@ class UserEntity extends User
      */
     private function synchronizeMemberships() {
 
-        $hasAccess = false;
+        // Keep record of access grant
+        $grantAccess = false;
 
-        if ($this->inSpecialGroups() && !$this->manualRemoval) {
-            $hasAccess = true;
+        // If User is in special groups, possibly grant Access
+        if ($this->inSpecialGroups()) {
+            $grantAccess = true;
+
+            // If user is manually removed, deny access
+            if ($this->manualRemoval) {
+                $grantAccess = false;
+            }
         }
 
+        // If user is part of the allowed email groups, grant access
         if ($this->inEmailGroups()) {
-            $hasAccess = true;
+            $grantAccess = true;
         }
 
-        if( $hasAccess ) {
+        // Provide access after all calculations have been done
+        if( $grantAccess ) {
             $this->accessGroup()->addMember($this);
 
             return;
