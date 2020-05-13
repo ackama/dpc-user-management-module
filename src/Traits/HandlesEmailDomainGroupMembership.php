@@ -21,6 +21,11 @@ trait HandlesEmailDomainGroupMembership
         /** @var Group $group */
         foreach ($groups as $group) {
             if (self::userHasGroupEmailDomains([$email], $group)) {
+                if ($group->getMember($user)) {
+                    continue;
+                }
+
+                dpc_log_event('added', $group->id(), $user->id());
                 $group->addMember($user);
             }
         }
@@ -48,7 +53,9 @@ trait HandlesEmailDomainGroupMembership
     /**
      * @param UserInterface $user
      * @param array         $removed_emails
-     */
+     *
+     *@throws \Exception
+*/
     static function removeUsersFromGroups(UserInterface $user, $removed_emails)
     {
         // get all the verified users emails
@@ -74,6 +81,7 @@ trait HandlesEmailDomainGroupMembership
                 // remove the user from the group
                 $group->removeMember($user);
                 array_push($groups_removed_from, $group->get('label')->getValue()[0]['value']);
+                dpc_log_event('removed', $group->id(), $user->id());
             };
         }
 

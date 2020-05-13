@@ -71,13 +71,18 @@ class GroupMembershipUpdateTask extends QueueWorkerBase {
         $domains = array_column($domains, 'value');
 
         foreach ($users as $user) {
+            if ($group->getMember($user)) {
+                continue;
+            }
             $addresses = $user->field_email_addresses->getValue();
             if (empty($addresses)) {
+                dpc_log_event('added', $group->id(), $user->id());
                 $group->addMember($user);
                 continue;
             }
             foreach ($addresses as $key => $email) {
                 if (in_array(explode('@', $email['value'])[1], $domains) && $email['status'] === 'verified') {
+                    dpc_log_event('added', $group->id(), $user->id());
                     $group->addMember($user);
                 }
             }
