@@ -74,11 +74,6 @@ class UserEntity extends User
     public static $group_type_email_domain_label = 'DPC Managed - Email Domain Groups';
 
     /**
-     * @var bool
-     */
-    private $manualRemoval = false;
-
-    /**
      * @param EntityStorageInterface $storage
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
@@ -234,19 +229,6 @@ class UserEntity extends User
     }
 
     /**
-     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
-     */
-    private function processManualRemoval() {
-        // If the flag has not been touched, do nothing
-        if (!$this->_get_clean_boolean('jse_access')) {
-            return;
-        }
-
-        $this->set('jse_access', false);
-        $this->manualRemoval = true;
-    }
-
-    /**
      * @param string $type
      * @return \Drupal\group\Entity\Group[]|\Drupal\Core\Entity\EntityInterface[]
      */
@@ -288,6 +270,14 @@ class UserEntity extends User
     }
 
     /**
+     * @return bool
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    protected function isOverrideAccessTrue() {
+        return $this->_get_clean_boolean('jse_access');
+    }
+
+    /**
      * When all group memberships have been processed,
      * decide if the user should be in the Access Group
      *
@@ -301,15 +291,14 @@ class UserEntity extends User
         // If User is in special groups, possibly grant Access
         if ($this->inSpecialGroups()) {
             $grantAccess = true;
-
-            // If user is manually removed, deny access
-            if ($this->manualRemoval) {
-                $grantAccess = false;
-            }
         }
 
         // If user is part of the allowed email groups, grant access
         if ($this->inEmailGroups()) {
+            $grantAccess = true;
+        }
+
+        if ($this->isOverrideAccessTrue()) {
             $grantAccess = true;
         }
 

@@ -10,8 +10,8 @@ dependencies:
 id: user.user.jse_access
 field_name: jse_access
 bundle: user
-label: 'Remove Content Access'
-description: 'Manually Remove Content access provided by Special Group Memberships'
+label: 'Provide Content Access'
+description: 'Manually provide Content access provided to users who do not belong to any specific access group'
 required: false
 translatable: false
 settings:

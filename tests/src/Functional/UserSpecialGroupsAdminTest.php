@@ -94,15 +94,12 @@ class UserSpecialGroupsAdminTest extends BrowserTestBase
     {
         // User should not be in Group upon creation
         $this->assertFalse($this->group->getMember($this->regular_user));
-        $this->group->addMember($this->regular_user);
-
-        $this->drupalGet('user/' . $this->regular_user->id() . '/edit');
 
         // We check the removal field in profile and Save
         $this->getSession()->getPage()->checkField('edit-jse-access-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
         // User should not be in Group
-        $this->assertFalse($this->group->getMember($this->regular_user));
+        $this->assertTrue($this->group->getMember($this->regular_user));
     }
 }
