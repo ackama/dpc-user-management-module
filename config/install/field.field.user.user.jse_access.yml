@@ -10,11 +10,13 @@ dependencies:
 id: user.user.jse_access
 field_name: jse_access
 bundle: user
-label: 'JSE Access'
-description: 'User has access to JSE Access'
+label: 'Remove Content Access'
+description: 'Manually Remove Content access provided by Special Group Memberships'
 required: false
 translatable: false
-settings: {  }
+settings:
+  on_label: 'On'
+  off_label: 'Off'
 field_type: boolean
 entity_type: user
 default_value:
