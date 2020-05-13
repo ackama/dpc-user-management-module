@@ -46,6 +46,13 @@ class UserSpecialGroupsAdminTest extends BrowserTestBase
     protected $user;
 
     /**
+     * A normal user
+     *
+     * @var \Drupal\user\UserInterface
+     */
+    protected $regular_user;
+
+    /**
      * @var Group $group
      */
     protected $group;
@@ -62,9 +69,16 @@ class UserSpecialGroupsAdminTest extends BrowserTestBase
     protected function setUp()
     {
         parent::setUp();
-        $this->user = $this->drupalCreateUser(['administer group fields', 'access content'], null, false);
+
+        // Setup Admin User
+        $this->user = $this->drupalCreateUser(['administer group fields', 'access content'], null, true);
+
+        // Setup Normal User
+        $this->regular_user = $this->drupalCreateUser();
+
+        // Log in as admin
         $this->drupalLogin($this->user);
-        $this->drupalGet('user/' . $this->user->id() . '/edit');
+        $this->drupalGet('user/' . $this->regular_user->id() . '/edit');
 
         // Get Access Group
         $group_ids =  \Drupal::entityQuery('group')
@@ -79,20 +93,20 @@ class UserSpecialGroupsAdminTest extends BrowserTestBase
     public function testJSEAccessValueControlsGroup()
     {
         // User should not be in Group upon creation
-        $this->assertFalse($this->group->getMember($this->user));
+        $this->assertFalse($this->group->getMember($this->regular_user));
 
         // We check the field in profile and Save
         $this->getSession()->getPage()->checkField('edit-jse-access-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
         // User should be in Group
-        $this->assertTrue($this->group->getMember($this->user));
+        $this->assertTrue($this->group->getMember($this->regular_user));
 
         // We uncheck the field in profile and Save
         $this->getSession()->getPage()->uncheckField('edit-jse-access-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
         // User should not be in Group
-        $this->assertFalse($this->group->getMember($this->user));
+        $this->assertFalse($this->group->getMember($this->regular_user));
     }
 }
