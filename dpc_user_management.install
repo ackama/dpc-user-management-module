@@ -5,7 +5,7 @@
  * Installation functions for DPC User Management Module
  */
 
-use Drupal\DPC_User_Management\UserEntity;
+use Drupal\dpc_user_management\UserEntity;
 
 /**
  * Implements hook_install().
@@ -15,10 +15,10 @@ function dpc_user_management_install()
     Drupal::logger('dpc_user_management')->notice('DPC User Management Installed');
 
     // Adds DPC Module Managed Group Type if it doesn't exist
-    if( is_null( \Drupal\group\Entity\GroupType::load(\Drupal\DPC_User_Management\UserEntity::$group_type_id) ) ) {
+    if( is_null( \Drupal\group\Entity\GroupType::load(\Drupal\dpc_user_management\UserEntity::$group_type_id) ) ) {
         $group_type = \Drupal\group\Entity\GroupType::create([
-            'id' => \Drupal\DPC_User_Management\UserEntity::$group_type_id,
-            'label' => \Drupal\DPC_User_Management\UserEntity::$group_type_label,
+            'id' => \Drupal\dpc_user_management\UserEntity::$group_type_id,
+            'label' => \Drupal\dpc_user_management\UserEntity::$group_type_label,
             'description' => '',
             'creator_membership' => false,
             'creator_wizard' => true,
@@ -123,6 +123,19 @@ function dpc_user_management_install()
 
         $view_display->save();
     }
+
+    /** @var \Drupal\Core\Theme\ActiveTheme $theme */
+    $theme = \Drupal::service('theme.manager')->getActiveTheme();
+
+    /** @var \Drupal\block\Entity\Block $block */
+    $block = \Drupal\block\Entity\Block::create([
+        'id' => \Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock::$_id,
+        'plugin' => \Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock::$_id,
+        'theme' => $theme->getName(),
+        'region' => 'highlighted'
+    ]);
+    $block->save();
+
 }
 
 /**

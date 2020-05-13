@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\DPC_User_Management\Controller;
+namespace Drupal\dpc_user_management\Controller;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Controller\ControllerBase;

@@ -18,7 +18,10 @@
         "behat/mink-goutte-driver": "^1.2",
         "phpunit/phpunit": "^7",
         "symfony/phpunit-bridge": "^5.0",
-        "drupal/group": "dev-1.x"
+        "drupal/admin_toolbar": "^2.2",
+        "drupal/group": "dev-1.x",
+        "drupal/phpmailer_smtp": "^1.4",
+        "drupal/mailsystem": "^4.3"
     },
     "repositories": {
         "drupal": {

@@ -3,11 +3,11 @@ status: true
 dependencies:
   config:
     - field.storage.group.field_email_domain
-    - group.type.email_domain_group
-id: group.email_domain_group.field_email_domain
+    - group.type.dpc_gtype_email_domain
+id: group.dpc_gtype_email_domain.field_email_domain
 field_name: field_email_domain
 entity_type: group
-bundle: email_domain_group
+bundle: dpc_gtype_email_domain
 label: 'Email domain'
 description: 'Email domains are used to automatically add users with matching email addresses to the group'
 required: false
