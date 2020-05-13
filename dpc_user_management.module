@@ -168,6 +168,18 @@ function dpc_user_management_user_login($account)
     }
 }
 
+function check_and_process_changed_groups()
+{
+    // get groups which have been updated in the last hour
+    $query = \Drupal::entityQuery('group');
+    $query->condition('type', 'email_domain_group', '=');
+    $gids = $query->condition('changed', strtotime('-1 hour'), '>=')->execute();
+    $queue = \Drupal::queue('group_membership_update_task');
+    foreach ($gids as $id) {
+        $queue->createItem(['group' => $id]);
+    }
+}
+
 /**
  * Adds "is_primary" field to email addresses
  * Implements hook_update_N
