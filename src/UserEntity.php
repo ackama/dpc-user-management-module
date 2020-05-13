@@ -171,11 +171,20 @@ class UserEntity extends User
      */
     protected function toggle_special_groups()
     {
-        // Adds JSE Access when Special Groups selections are changed and a group is selected
+        // Synchronise Special Groups memberships with checkboxes
         $_new = $this->_get_target_ids('special_groups');
         $_original = $this->_get_target_ids('special_groups', true);
 
         if ( $_original != $_new ) {
+
+            array_map(function($_id) {
+                Group::load($_id)->removeMember($this);
+            }, array_diff($_original, $_new));
+
+            array_map(function($_id) {
+                Group::load($_id)->addMember($this);
+            }, array_diff($_new, $_original));
+
             // Set access flag to true only if setting has changed
             if(!empty($_new)) {
                 $this->set('jse_access', true);
