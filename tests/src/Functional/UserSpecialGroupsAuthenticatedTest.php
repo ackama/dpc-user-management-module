@@ -166,6 +166,9 @@ class UserSpecialGroupsAuthenticatedTest extends BrowserTestBase
         $this->getSession()->getPage()->checkField($element_id);
         $this->getSession()->getPage()->pressButton('edit-submit');
 
+        // User should be in Group with index 1
+        $this->assertTrue($this->special_groups[1]->getMember($this->user));
+
         // User should be in Access Group now
         $this->assertTrue($this->group->getMember($this->user));
     }
