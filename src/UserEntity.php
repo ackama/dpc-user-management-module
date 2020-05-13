@@ -74,6 +74,11 @@ class UserEntity extends User
     public static $group_type_email_domain_label = 'DPC Managed - Email Domain Groups';
 
     /**
+     * @var bool
+     */
+    private $manualRemoval = false;
+
+    /**
      * @param EntityStorageInterface $storage
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
@@ -87,6 +92,7 @@ class UserEntity extends User
 
         $this->verify_email_addresses();
         $this->processSpecialGroupsOnSave();
+        $this->processManualRemoval();
 
         $this->synchronizeMemberships();
 
@@ -131,6 +137,19 @@ class UserEntity extends User
         if (!empty($verification_sent)) {
             \Drupal::messenger()->addMessage(t('A verification email was sent to ' . implode(',', $verification_sent)));
         }
+    }
+
+    protected function accessGroup() {
+        // Toggles user access to content group
+        $group_ids =  \Drupal::entityQuery('group')
+            ->condition('label', UserEntity::$group_label)
+            ->accessCheck(false)
+            ->execute();
+
+        /** @var Group $group */
+        $group = Group::load(array_pop($group_ids));
+
+        return $group;
     }
 
     /**
@@ -191,13 +210,6 @@ class UserEntity extends User
         array_map(function($_id) {
             $this->addToGroupByID($_id);
         }, array_diff($_new, $_original));
-
-        // Set access flag to true only if settings have changed and there are groups selected
-        // @ToDo move this elsewhere
-        if(!empty($_new)) {
-            $this->set('jse_access', true);
-        }
-
     }
 
     /**
@@ -222,35 +234,60 @@ class UserEntity extends User
     }
 
     /**
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     */
+    private function processManualRemoval() {
+        $_access_new = $this->_get_clean_boolean('jse_access');
+
+        // Prepare for removal from access group and set flag
+        if($_access_new) {
+            $this->set('jse_access', false);
+            $this->manualRemoval = true;
+        }
+    }
+
+
+    /**
+     * @return bool
+     */
+    protected function inSpecialGroups() {
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function inEmailGroups() {
+        return false;
+    }
+
+    /**
      * When all group memberships have been processed,
-     * decide if the user should be in the Master Access Group
+     * decide if the user should be in the Access Group
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
     private function synchronizeMemberships() {
 
-        $_access_new = $this->_get_clean_boolean('jse_access');
-        $_access_original = $this->_get_clean_boolean('jse_access', true);
+        $hasAccess = false;
 
-        if($_access_original !== $_access_new) {
-            // Toggles user access to content group
-            $group_ids =  \Drupal::entityQuery('group')
-                ->condition('label', UserEntity::$group_label)
-                ->accessCheck(false)
-                ->execute();
+        if ($this->inSpecialGroups() && !$this->manualRemoval) {
+            $hasAccess = true;
+        }
 
-            /** @var Group $group */
-            $group = Group::load(array_pop($group_ids));
+        if ($this->inEmailGroups()) {
+            $hasAccess = true;
+        }
 
-            if( $this->_get_clean_boolean('jse_access') ) {
-                $group->addMember($this);
-
-                return;
-            }
-
-            $group->removeMember($this);
+        if( $hasAccess ) {
+            $this->accessGroup()->addMember($this);
 
             return;
         }
+
+        $this->accessGroup()->removeMember($this);
+
+        return;
+
     }
 }
