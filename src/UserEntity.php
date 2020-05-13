@@ -88,7 +88,7 @@ class UserEntity extends User
         $this->verify_email_addresses();
         $this->processSpecialGroupsOnSave();
 
-        $this->synchornizeMemberships();
+        $this->synchronizeMemberships();
 
         parent::preSave($storage);
     }
@@ -227,7 +227,7 @@ class UserEntity extends User
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
-    private function synchornizeMemberships() {
+    private function synchronizeMemberships() {
 
         $_access_new = $this->_get_clean_boolean('jse_access');
         $_access_original = $this->_get_clean_boolean('jse_access', true);
