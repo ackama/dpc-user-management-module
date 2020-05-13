@@ -87,7 +87,6 @@ class UserEntity extends User
 
         $this->verify_email_addresses();
         $this->processSpecialGroupsOnSave();
-        $this->processManualRemoval();
 
         $this->synchronizeMemberships();
 
