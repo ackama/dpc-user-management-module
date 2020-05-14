@@ -83,7 +83,16 @@ class AccessReminderBlock extends BlockBase implements BlockPluginInterface{
      * {@inheritdoc}
      */
     public function blockForm($form, FormStateInterface $form_state) {
+        $form = parent::blockForm($form, $form_state);
+
         $config = $this->getConfiguration();
+
+        $form['access_reminder_block'] = [
+            '#type' => 'textfield',
+            '#title' => $this->t('Reminder Text'),
+            '#description' => $this->t('Text that users who don\'t yet have access to the content will see. Use <b>%s</b> to insert the user\'s profile link. ie. <a href="%s">My Profile</a>'),
+            '#default_value' => isset($config[self::$_id]) ? $config[self::$_id] : self::$_default_text,
+        ];
 
         return $form;
     }
@@ -92,7 +101,8 @@ class AccessReminderBlock extends BlockBase implements BlockPluginInterface{
      * {@inheritdoc}
      */
     public function blockSubmit($form, FormStateInterface $form_state) {
+        parent::blockSubmit($form, $form_state);
+        $values = $form_state->getValues();
         $this->configuration[self::$_id] = $form_state->getValue(self::$_id);
     }
-
 }
