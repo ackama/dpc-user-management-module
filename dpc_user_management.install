@@ -132,7 +132,11 @@ function dpc_user_management_install()
         'id' => \Drupal\dpc_user_management\Plugin\Block\AccessReminderBlock::$_id,
         'plugin' => \Drupal\dpc_user_management\Plugin\Block\AccessReminderBlock::$_id,
         'theme' => $theme->getName(),
-        'region' => 'highlighted'
+        'region' => 'highlighted',
+        'settings' => [
+            'label' => 'Access Reminder Block',
+            'label_display' => '0'
+        ]
     ]);
     $block->save();
 
