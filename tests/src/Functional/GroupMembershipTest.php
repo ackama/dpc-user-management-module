@@ -216,4 +216,18 @@ class GroupMembershipTest extends BrowserTestBase
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         $this->assertFalse($this->group->getMember($this->user));
     }
+
+    public function testGroupMembershipActionsAreLogged()
+    {
+        $admin = $this->drupalCreateUser(['administer site configuration', 'access administration pages']);
+
+        // user was added to a group
+        $this->drupalLogin($this->user);
+
+        $this->drupalLogin($admin);
+        $this->drupalGet('admin/config/system/group-events-log');
+        $group_name = $this->group->getName();
+        $user_name = $this->user->getDisplayName();
+        $this->assertText("added $group_name $user_name");
+    }
 }
