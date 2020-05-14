@@ -99,8 +99,6 @@ class UserEntity extends User
      */
     protected function verify_email_addresses()
     {
-        dpm('verify_email_addresses');
-
         $verification_sent = [];
         $user = User::load($this->id());
         // Check email addresses
@@ -186,13 +184,10 @@ class UserEntity extends User
      */
     protected function processSpecialGroupsOnSave()
     {
-        dpm('processSpecialGroupsOnSave');
-
         // When user is being activated, add to special groups they have on their profile
         $isActivating = $this->get('status')->value == 1 && !$this->original->get('status')->value;
 
         if ($isActivating) {
-            dpm('$isActivating');
             array_map(function($_id) {
                 $this->removeFromGroupByID($_id);
             }, $this->_get_target_ids('special_groups'));
@@ -203,14 +198,10 @@ class UserEntity extends User
         $_original = $this->_get_target_ids('special_groups', true);
 
         if ( $_original == $_new ) {
-            dpm('No Changes in Special Groups');
             return;
         }
 
         // Settings changed => Reprocess memberships
-
-        dpm('Groups Maybe');
-        dpm([$_original, $_new]);
 
         array_map(function($_id) {
             $this->removeFromGroupByID($_id);
@@ -299,29 +290,22 @@ class UserEntity extends User
      */
     private function synchronizeMemberships() {
 
-        dpm('synchronizeMemberships');
-
         // Keep record of access grant
         $grantAccess = false;
 
         // If User is in special groups, possibly grant Access
         if ($this->inSpecialGroups()) {
-            dpm('inSpecialGroups');
             $grantAccess = true;
         }
 
         // If user is part of the allowed email groups, grant access
         if ($this->inEmailGroups()) {
-            dpm('inEmailGroups');
             $grantAccess = true;
         }
 
         if ($this->isOverrideAccessTrue()) {
-            dpm('Value of checkbox: ' . $this->_get_clean_boolean('jse_access'));
             $grantAccess = true;
         }
-
-        dpm('Value of grantAccess: ' . $grantAccess);
 
         // Provide access after all calculations have been done
         if( $grantAccess ) {
