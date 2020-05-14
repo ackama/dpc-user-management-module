@@ -7,6 +7,8 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
+use Drupal\dpc_user_management\UserEntity;
+use Drupal\group\Entity\Group;
 
 /**
  * Provides a 'Remind user to add a valid email in their account' Block.
@@ -62,8 +64,17 @@ class EmailDomainReminderBlock extends BlockBase {
      * {@inheritdoc}
      */
     protected function blockAccess(AccountInterface $account) {
+        // @ToDo Possibly refactor after merging with PR https://github.com/ackama/dpc-user-management-module/pull/32
+        $group_ids =  \Drupal::entityQuery('group')
+            ->condition('label', UserEntity::$group_label)
+            ->accessCheck(false)
+            ->execute();
+
+        /** @var Group $group */
+        $group = Group::load(array_pop($group_ids));
+
         return !$account->isAnonymous()
-            ? AccessResult::allowedIf(!self::isUserInGroups($account))
+            ? AccessResult::allowedIf(!$group->getMember($account))
             : AccessResult::forbidden();
     }
 
