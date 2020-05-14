@@ -78,7 +78,6 @@ class UserSpecialGroupsAdminTest extends BrowserTestBase
 
         // Log in as admin
         $this->drupalLogin($this->user);
-        $this->drupalGet('user/' . $this->regular_user->id() . '/edit');
 
         // Get Access Group
         $group_ids =  \Drupal::entityQuery('group')
@@ -96,6 +95,7 @@ class UserSpecialGroupsAdminTest extends BrowserTestBase
         $this->assertFalse($this->group->getMember($this->regular_user));
 
         // We check the removal field in profile and Save
+        $this->drupalGet('user/' . $this->regular_user->id() . '/edit');
         $this->getSession()->getPage()->checkField('edit-jse-access-value');
         $this->getSession()->getPage()->pressButton('edit-submit');
 
