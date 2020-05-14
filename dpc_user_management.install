@@ -129,8 +129,8 @@ function dpc_user_management_install()
 
     /** @var \Drupal\block\Entity\Block $block */
     $block = \Drupal\block\Entity\Block::create([
-        'id' => \Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock::$_id,
-        'plugin' => \Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock::$_id,
+        'id' => \Drupal\dpc_user_management\Plugin\Block\AccessReminderBlock::$_id,
+        'plugin' => \Drupal\dpc_user_management\Plugin\Block\AccessReminderBlock::$_id,
         'theme' => $theme->getName(),
         'region' => 'highlighted'
     ]);

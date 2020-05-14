@@ -9,24 +9,25 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\dpc_user_management\UserEntity;
 use Drupal\group\Entity\Group;
+use Drupal\Core\Block\BlockPluginInterface;
 
 /**
  * Provides a 'Remind user to add a valid email in their account' Block.
  *
  * @Block(
- *   id = "dpc_emaildomain_reminder_block",
+ *   id = "dpc_access_reminder_block",
  *   admin_label = @Translation("Remind Valid Email"),
  *   category = @Translation("DPC User Management"),
  * )
  */
-class EmailDomainReminderBlock extends BlockBase {
+class AccessReminderBlock extends BlockBase implements BlockPluginInterface{
 
     use HandlesEmailDomainGroupMembership;
 
     /**
      * @var string
      */
-    public static $_id = 'dpc_emaildomain_reminder_block';
+    public static $_id = 'dpc_access_reminder_block';
 
     /**
      * @var string
