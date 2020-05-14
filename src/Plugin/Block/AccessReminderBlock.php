@@ -16,7 +16,7 @@ use Drupal\Core\Block\BlockPluginInterface;
  *
  * @Block(
  *   id = "dpc_access_reminder_block",
- *   admin_label = @Translation("Remind Valid Email"),
+ *   admin_label = @Translation("Access Reminder Block"),
  *   category = @Translation("DPC User Management"),
  * )
  */
