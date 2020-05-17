@@ -21,4 +21,9 @@ class GroupEntity extends Group
             $queue->createItem(['group' => $this->id()]);
         }
     }
+
+    public function getName()
+    {
+        return $this->get('label')->getValue()[0]['value'];
+    }
 }
