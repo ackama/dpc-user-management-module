@@ -13,15 +13,14 @@ class EventsLogController extends ControllerBase
         $db   = \Drupal::database();
         $logs = $db->query('SELECT * from {dpc_group_events}');
         $logs = $logs->fetchAll();
-
         $gids   = array_map(function ($log) {
             return $log->gid;
         }, $logs);
         $uids   = array_map(function ($log) {
             return $log->uid;
         }, $logs);
-        $groups = Group::loadMultiple($gids);
-        $users  = User::loadMultiple($uids);
+        $groups = Group::loadMultiple(array_unique($gids));
+        $users  = User::loadMultiple(array_unique($uids));
 
         $markup = '<table>';
         $markup .= '<tr><th>Date</th><th>Action</th><th>Group</th><th>User</th><th>Status</th></tr>';
