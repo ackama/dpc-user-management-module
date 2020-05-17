@@ -8,11 +8,54 @@ use Drupal\user\Entity\User;
 
 class EventsLogController extends ControllerBase
 {
+
+    /**
+     * @return \Drupal\Core\Database\Connection
+     */
+    private function getDB() {
+        return \Drupal::database();
+    }
+
+    /**
+     * Returns query object with passed SQL query
+     *
+     * @param $query
+     * @return \Drupal\Core\Database\StatementInterface|int|null
+     */
+    private function query($query) {
+        return $this->getDB()->query($query);
+    }
+
+    /**
+     * Returns all records in table
+     *
+     * @return mixed
+     */
+    private function getAllRecords() {
+        $query = 'SELECT * from {dpc_group_events}';
+
+        return $this->query($query)->fetchAll();
+    }
+
+    /**
+     * Returns records that have not been processed
+     *
+     * @return mixed
+     */
+    private function getUnprocessedRecords() {
+        $query = 'SELECT * from {dpc_group_events}';
+
+        return $this->query($query)->fetchAll();
+    }
+
+    /**
+     * Displays all event records
+     *
+     * @return array
+     */
     public function display()
     {
-        $db   = \Drupal::database();
-        $logs = $db->query('SELECT * from {dpc_group_events}');
-        $logs = $logs->fetchAll();
+        $logs = $this->getAllRecords();
         $gids   = array_map(function ($log) {
             return $log->gid;
         }, $logs);
@@ -45,5 +88,9 @@ class EventsLogController extends ControllerBase
         return [
             '#markup' => $markup
         ];
+    }
+
+    public function processRecords(){
+
     }
 }
