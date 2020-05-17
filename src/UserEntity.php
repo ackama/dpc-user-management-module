@@ -245,7 +245,7 @@ class UserEntity extends User
      * @param string $type
      * @return \Drupal\group\Entity\Group[]|\Drupal\Core\Entity\EntityInterface[]
      */
-    static function getGroupsByType(string $type)
+    public static function getGroupsByType(string $type)
     {
         $group_ids = \Drupal::entityQuery('group')
             ->condition('type', $type)
@@ -255,11 +255,27 @@ class UserEntity extends User
         return Group::loadMultiple($group_ids);
     }
 
-
     /**
+     * Returns true if user is part of the Master Access Group.
+     *
      * @return bool
      */
-    protected function inSpecialGroups() {
+    public function inAccessGroup() {
+        foreach(self::getGroupsByType(UserEntity::$group_type_id) as $group) {
+            if ($this->inGroup($group)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true if user is part of Special Groups
+     *
+     * @return bool
+     */
+    public function inSpecialGroups() {
         foreach(self::getGroupsByType(UserEntity::$group_special_type_id) as $group) {
             if ($this->inGroup($group)) {
                 return true;
@@ -270,9 +286,11 @@ class UserEntity extends User
     }
 
     /**
+     * Returns true if user is part of the Email Domain Groups
+     *
      * @return bool
      */
-    protected function inEmailGroups() {
+    public function inEmailGroups() {
         foreach(self::getGroupsByType(UserEntity::$group_type_email_domain_id) as $group) {
             if ($this->inGroup($group)) {
                 return true;
@@ -283,10 +301,12 @@ class UserEntity extends User
     }
 
     /**
+     * Returns true if user has been granted access via manual override
+     *
      * @return bool
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
-    protected function isOverrideAccessTrue() {
+    public function isOverrideAccessTrue() {
         return $this->_get_clean_boolean('jse_access');
     }
 
