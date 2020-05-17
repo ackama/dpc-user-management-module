@@ -103,10 +103,10 @@ class EmailDomainReminderTest extends BrowserTestBase
         $this->user = $this->drupalCreateUser();
         $this->drupalLogin($this->user);
 
-        $web_assert = $this->assertSession();
-
         // Check home URL with an anonymous
         $this->drupalGet('');
+
+        $web_assert = $this->assertSession();
 
         // Banner should not be visible
         $web_assert->elementNotExists('css', $this->selector);
