@@ -1,0 +1,10 @@
+# group.type.dpc_gtype_special.yml
+langcode: en
+status: true
+dependencies: {  }
+id: dpc_gtype_special
+label: 'DPC Managed - Special Groups'
+description: 'Groups where users can claim to be part of that grant access to restricted content'
+creator_membership: false
+creator_wizard: true
+creator_roles: {  }
