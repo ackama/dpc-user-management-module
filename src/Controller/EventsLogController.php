@@ -3,6 +3,7 @@ namespace Drupal\dpc_user_management\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Pager\PagerManager;
 use Drupal\Core\Render\Markup;
 use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
@@ -120,6 +121,7 @@ class EventsLogController extends ControllerBase
         // Get total items count
         $total = count($items);
         // Get the number of the current page
+        /** @var PagerManager $pager_manager */
         $pager_manager = \Drupal::service('pager.manager');
         $pager         = $pager_manager->createPager($total, $num_page);
         $current_page  = $pager->getCurrentPage();
