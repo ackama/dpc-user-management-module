@@ -5,6 +5,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Pager\PagerManager;
 use Drupal\Core\Render\Markup;
+use Drupal\dpc_user_management\UserEntity;
 use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
 
@@ -133,16 +134,51 @@ class EventsLogController extends ControllerBase
     }
 
     /**
+     * Returns what happened to user based on the logs.
+     *
      * @param $uid
      * @param $user_logs
-     * @return array|bool
+     * @return array
      */
     public function processRecordsForUser($uid, $user_logs) {
-        // @ToDo
-        if(false) {
-            return false;
+        /** @var UserEntity $user */
+        $user = User::load($uid);
+        $group_states = [];
+
+        $group_states = array_reduce($user_logs, function($c, $log) {
+            $c[$log->gid] = isset($c[$log->gid])
+                ? array_merge($c[$log->gid], [$log->status])
+                : [];
+            return $c;
+        }, []);
+
+        $responses = [];
+
+        foreach ($group_states as $group_id => $group_data) {
+            $responses[$group_id] = [
+                'original' => $group_data[0] === 'added' ? 'removed' : 'added',
+                'first' => $group_data[0],
+                'last' => array_pop($group_data)
+            ];
         }
-        return [];
+
+        $added = array_filter($responses, function ($r) {
+            return $r['original'] !== $r['last'] && $r['last'] === 'added';
+        });
+
+        $removed = array_filter($responses, function ($r) {
+            return $r['original'] !== $r['last'] && $r['last'] === 'removed';
+        });
+
+        if(!empty($removed)) {
+            return $removed;
+        }
+
+        // Return state changes
+        return [
+            'added'   => $added,
+            'removed' => $removed
+        ];
     }
 
     /**
@@ -157,13 +193,26 @@ class EventsLogController extends ControllerBase
         }, []);
 
         foreach ($user_logs as $uid => $logs) {
-            $result = $this->processRecordsForUser($uid, $logs);
-            if (!$result) {
+            $results = $this->processRecordsForUser($uid, $logs);
+
+            if (empty($result['added']) && empty($result['removed'])) {
+                // There're logs but nothing happened regarding memberships.
+                // i.e. User does something and then undoes it
+                // @ToDo mark status as processed and save timestamp
+                // $this->markLogsAsProcessed($logs);
                 break;
             }
+
+            // If user is not in access Group, check what happened and possibly send email
+            /** @var UserEntity $user */
+            $user = User::load($uid);
+            if (!$user->inAccessGroup() && key_exists($user->accessGroup()->id(), $result['removed'])) {
+                // @ToDo request sending email
+                // $this->sendEmail(['uid' => $uid, 'logs' => $logs, 'result' => $result]);
+            }
+
             // @ToDo mark status as processed and save timestamp
-            // @ToDo request sending email
-            // $this->sendEmail(['uid' => $uid, 'logs' => $logs, 'result' => $result]);
+            // $this->markLogsAsProcessed($logs);
         }
     }
 }

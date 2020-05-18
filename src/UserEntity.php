@@ -146,7 +146,7 @@ class UserEntity extends User
         }
     }
 
-    protected function accessGroup() {
+    public function accessGroup() {
         // Toggles user access to content group
         $group_ids =  \Drupal::entityQuery('group')
             ->condition('label', UserEntity::$group_label)
