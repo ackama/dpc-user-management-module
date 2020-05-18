@@ -6,7 +6,6 @@ use Drupal\Core\Test\AssertMailTrait;
 use Drupal\dpc_user_management\UserEntity as User;
 use Drupal\dpc_user_management\GroupEntity as Group;
 use Drupal\Tests\BrowserTestBase;
-use Faker\Provider\Person;
 
 /**
  * @group dpc_user_management
@@ -149,9 +148,6 @@ class ProcessEventLogs extends BrowserTestBase
      * @throws \Drupal\Core\Entity\EntityStorageException
      */
     public function createTestUser($data) {
-        // Initialises faker
-        $fake_person = new Person();
-
         // Map email addresses to field_email_addresses field
         $email_field = array_map(function($email) {
             return [
@@ -163,7 +159,7 @@ class ProcessEventLogs extends BrowserTestBase
         $email_field[0]['is_primary'] = 1;
 
         /** @var User $user */
-        $user = $this->drupalCreateUser([], $fake_person->name(), false);
+        $user = $this->drupalCreateUser([], $data['name'], false);
         $user->set('field_email_addresses',$email_field);
         $user->save();
 
@@ -176,17 +172,17 @@ class ProcessEventLogs extends BrowserTestBase
     public function fakeTestUsers() {
         return [
             'user1' => [
-                'name' => 'User 1',
+                'name' => 'Lorenzo Llamas',
                 'emails' => [
-                    'user1@test.net',
-                    'user1@example.com'
+                    'lorenzo.llamas@test.net',
+                    'lorenzo.llamas@example.com'
                 ],
             ],
             'user2' => [
-                'name' => 'User 2',
+                'name' => 'Dalai Llama',
                 'emails' => [
-                    'user2@gmail.com',
-                    'user2@domain.org'
+                    'dalai.llama@gmail.com',
+                    'dalai.llama@domain.org'
                 ],
             ]
         ];
