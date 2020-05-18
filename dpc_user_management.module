@@ -45,25 +45,25 @@ function dpc_user_management_schema()
             'id'      => [
                 'description' => 'The primary key to store unique information.',
                 'type'        => 'serial',
-                'not null'    => TRUE,
+                'not null'    => true,
             ],
             'uid'     => [
                 'description' => 'The primary identifier for a User.',
                 'type'        => 'int',
-                'unsigned'    => TRUE,
-                'not null'    => TRUE,
+                'unsigned'    => true,
+                'not null'    => true,
             ],
             'gid'     => [
                 'description' => 'The primary identifier for a Group.',
                 'type'        => 'int',
-                'unsigned'    => TRUE,
-                'not null'    => TRUE,
+                'unsigned'    => true,
+                'not null'    => true,
             ],
             'name'    => [
                 'description' => 'The name of the event',
                 'type'        => 'varchar',
                 'length'      => 32,
-                'not null'    => TRUE,
+                'not null'    => true,
                 'default'     => '',
             ],
             'status'  => [
@@ -74,12 +74,12 @@ function dpc_user_management_schema()
             ],
             'created' => [
                 'type'     => 'int',
-                'not null' => FALSE,
+                'not null' => false,
                 'size'     => 'normal',
             ],
             'changed' => [
                 'type'     => 'int',
-                'not null' => FALSE,
+                'not null' => false,
                 'size'     => 'normal',
             ],
         ],
@@ -104,10 +104,11 @@ function dpc_log_event($name, $gid, $uid)
 {
     $connection = \Drupal::database();
     $connection->insert('dpc_group_events')->fields([
-        'name'   => $name,
-        'uid'    => $uid,
-        'gid'    => $gid,
-        'status' => 'pending'
+        'name'    => $name,
+        'uid'     => $uid,
+        'gid'     => $gid,
+        'status'  => 'pending',
+        'created' => strtotime('now')
     ])->execute();
 }
 
