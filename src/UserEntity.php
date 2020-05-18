@@ -242,20 +242,6 @@ class UserEntity extends User
     }
 
     /**
-     * @param string $type
-     * @return \Drupal\group\Entity\Group[]|\Drupal\Core\Entity\EntityInterface[]
-     */
-    public static function getGroupsByType(string $type)
-    {
-        $group_ids = \Drupal::entityQuery('group')
-            ->condition('type', $type)
-            ->accessCheck(false)
-            ->execute();
-
-        return Group::loadMultiple($group_ids);
-    }
-
-    /**
      * Returns true if user is part of the Master Access Group.
      *
      * @return bool
