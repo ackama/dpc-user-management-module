@@ -228,6 +228,7 @@ class GroupMembershipTest extends BrowserTestBase
         $this->drupalGet('admin/config/system/group-events-log');
         $group_name = $this->group->getName();
         $user_name = $this->user->getDisplayName();
-        $this->assertTrue($this->getSession()->getPage()->hasContent("added$group_name$user_name"));
+
+        $this->assertContains("added $group_name $user_name pending", $this->getSession()->getPage()->getText());
     }
 }
