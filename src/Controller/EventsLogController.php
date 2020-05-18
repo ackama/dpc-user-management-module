@@ -11,8 +11,19 @@ use Drupal\user\Entity\User;
 
 class EventsLogController extends ControllerBase
 {
-
+    /**
+     * Table name
+     *
+     * @var string
+     */
     private $table_name = 'dpc_group_events';
+
+    /**
+     * Table alias.
+     *
+     * @var string
+     */
+    private $t = 'dpc_group_events';
 
     /**
      * @return \Drupal\Core\Database\Connection
@@ -27,7 +38,7 @@ class EventsLogController extends ControllerBase
      * @return \Drupal\Core\Database\Query\SelectInterface
      */
     private function query() {
-        return $this->getDB()->select($this->table_name);
+        return $this->getDB()->select($this->table_name, $this->t);
     }
 
     /**
@@ -36,7 +47,9 @@ class EventsLogController extends ControllerBase
      * @return mixed
      */
     private function getAllRecords() {
-        return $this->query()->execute();
+        return $this->query()
+            ->fields($this->t)
+            ->execute();
     }
 
     /**
