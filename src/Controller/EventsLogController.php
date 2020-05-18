@@ -119,6 +119,7 @@ class EventsLogController extends ControllerBase
             if (!$result) {
                 break;
             }
+            // @ToDo mark status as processed and save timestamp
             // @ToDo request sending email
             // $this->sendEmail(['uid' => $uid, 'logs' => $logs, 'result' => $result]);
         }
