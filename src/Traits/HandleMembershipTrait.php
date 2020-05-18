@@ -21,31 +21,32 @@ trait HandleMembershipTrait
     }
 
     /**
-     * @param Group           $group
+     * @param Group $group
+     * @throws \Exception
      */
     public function addToGroup(Group $group)
     {
         if (!$this->inGroup($group)) {
-            // @ToDo Log Event for Addition
-            // dpc_log_event('added', $group->id(), $user->id());
             $group->addMember($this);
+            dpc_log_event('added', $group->id(), $this->id());
         }
     }
 
     /**
-     * @param Group            $group
+     * @param Group $group
+     * @throws \Exception
      */
     public function removeFromGroup(Group $group)
     {
         if($this->inGroup($group)) {
-            // @ToDo Log Event for Removal
-            // dpc_log_event('removed', $group->id(), $this->id());
             $group->removeMember($this);
+            dpc_log_event('removed', $group->id(), $this->id());
         }
     }
 
     /**
      * @param int $_id
+     * @throws \Exception
      */
     public function addToGroupByID(int $_id) {
         /** @var Group $group */
@@ -56,6 +57,7 @@ trait HandleMembershipTrait
 
     /**
      * @param int $_id
+     * @throws \Exception
      */
     public function removeFromGroupByID(int $_id) {
         /** @var Group $group */
