@@ -2,13 +2,13 @@
 
 namespace Drupal\dpc_user_management\Plugin\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
-use Drupal\user\Entity\User;
+use Drupal\dpc_user_management\Controller\EventsLogController;
 
 /**
  * Processes
  *
  * @QueueWorker(
- *   id = "group_logs_task",
+ *   id = "process_group_logs_task",
  *   title = @Translation("Process Group Logs in order to trigger reports"),
  *   cron = {"time" = 60}
  * )
@@ -40,6 +40,7 @@ class ProcessGroupLogsTask extends QueueWorkerBase {
      */
     public function processItem($data)
     {
-
+        $EventsLog = new EventsLogController();
+        $EventsLog->processUnprocessedRecords();
     }
 }
