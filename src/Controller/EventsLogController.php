@@ -106,6 +106,9 @@ class EventsLogController extends ControllerBase
         return [];
     }
 
+    /**
+     * Gets all unprocessed records, groups them by user and processes each user group.
+     */
     public function processUnprocessedRecords(){
         $user_logs = array_reduce($this->getUnprocessedRecords(), function($c, $log) {
             $c[$log->uid] = isset($c[$log->uid])
