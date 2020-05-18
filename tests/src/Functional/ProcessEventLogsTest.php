@@ -98,7 +98,7 @@ class ProcessEventLogs extends BrowserTestBase
         parent::setUp();
 
         $this->setUpGroups();
-        $this->setUpUsers();
+        $this->setupTestUsers();
 
         // Setup Admin User
         $this->admin = $this->drupalCreateUser([
@@ -115,7 +115,7 @@ class ProcessEventLogs extends BrowserTestBase
     protected function setUpGroups()
     {
         $this->groups = array_map(function ($group) {
-            return $this->createGroup($group);
+            return $this->createTestGroup($group);
         }, $this->group_defs);
     }
 
@@ -126,7 +126,7 @@ class ProcessEventLogs extends BrowserTestBase
      * @return \Drupal\Core\Entity\EntityInterface
      * @throws \Drupal\Core\Entity\EntityStorageException
      */
-    protected function createGroup($data)
+    protected function createTestGroup($data)
     {
         // Create Group
         $group = Group::create(['type' => User::$group_type_email_domain_id, 'label' => $data['label']]);
@@ -143,8 +143,11 @@ class ProcessEventLogs extends BrowserTestBase
 
     /**
      * Creates user with passed configuration
+     * @param $data
+     * @return User
      * @throws \Drupal\Core\Entity\EntityStorageException
      */
+    public function createTestUser($data) {
     public function createUser($data) {
         /** @var User $user */
         $user = $this->drupalCreateUser();
@@ -155,7 +158,7 @@ class ProcessEventLogs extends BrowserTestBase
     /**
      * @return array
      */
-    public function fakeUsers() {
+    public function fakeTestUsers() {
         return [
             'user1' => [
                 'name' => 'User 1',
@@ -177,10 +180,10 @@ class ProcessEventLogs extends BrowserTestBase
     /**
      * Sets Up Users to be used in tests
      */
-    public function setUpUsers() {
+    public function setupTestUsers() {
         $this->users = array_map(function($user){
-            return $this->createUser($user);
-        }, $this->fakeUsers());
+            return $this->createTestUser($user);
+        }, $this->fakeTestUsers());
     }
 
     public function testLogsAreProcessed()
