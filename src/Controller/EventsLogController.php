@@ -93,7 +93,34 @@ class EventsLogController extends ControllerBase
         ];
     }
 
-    public function processRecords(){
+    /**
+     * @param $uid
+     * @param $user_logs
+     * @return array|bool
+     */
+    public function processRecordsForUser($uid, $user_logs) {
+        // @ToDo
+        if(false) {
+            return false;
+        }
+        return [];
+    }
 
+    public function processUnprocessedRecords(){
+        $user_logs = array_reduce($this->getUnprocessedRecords(), function($c, $log) {
+            $c[$log->uid] = isset($c[$log->uid])
+                ? array_merge($c[$log->uid], [$log])
+                : [];
+            return $c;
+        }, []);
+
+        foreach ($user_logs as $uid => $logs) {
+            $result = $this->processRecordsForUser($uid, $logs);
+            if (!$result) {
+                break;
+            }
+            // @ToDo request sending email
+            // $this->sendEmail(['uid' => $uid, 'logs' => $logs, 'result' => $result]);
+        }
     }
 }
