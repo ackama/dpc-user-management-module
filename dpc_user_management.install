@@ -65,7 +65,7 @@ function dpc_user_management_install()
             // Prevents overwriting of configuration when disabling and enabling
             if (!$view->getComponent('special_group')) {
                 /** @var Drupal\Core\Entity\Display\EntityDisplayInterface $view */
-                $view->setComponent('special_group', [
+                $view->setComponent('special_groups', [
                     'type' => 'boolean',
                     'settings' => []
                 ])->save();
@@ -92,11 +92,12 @@ function dpc_user_management_install()
             // Prevents overwriting of configuration when disabling and enabling
             if (!$view->getComponent('special_group')) {
                 /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
-                $view->setComponent('special_group', [
-                    'type' => 'boolean_checkbox',
+                $view->setComponent('special_groups', [
+                    'type' => 'options_buttons',
                     'settings' => []
                 ])->save();
             }
+
             if (!$view->getComponent('jse_access')) {
                 /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
                 $view->setComponent('jse_access', [
@@ -129,10 +130,14 @@ function dpc_user_management_install()
 
     /** @var \Drupal\block\Entity\Block $block */
     $block = \Drupal\block\Entity\Block::create([
-        'id' => \Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock::$_id,
-        'plugin' => \Drupal\dpc_user_management\Plugin\Block\EmailDomainReminderBlock::$_id,
+        'id' => \Drupal\dpc_user_management\Plugin\Block\AccessReminderBlock::$_id,
+        'plugin' => \Drupal\dpc_user_management\Plugin\Block\AccessReminderBlock::$_id,
         'theme' => $theme->getName(),
-        'region' => 'highlighted'
+        'region' => 'highlighted',
+        'settings' => [
+            'label' => 'Access Reminder Block',
+            'label_display' => '0'
+        ]
     ]);
     $block->save();
 

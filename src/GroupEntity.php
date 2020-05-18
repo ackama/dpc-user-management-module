@@ -15,9 +15,15 @@ class GroupEntity extends Group
     {
         parent::postSave($storage, $update);
 
-        if ($this->getGroupType() == UserEntity::$group_type_email_domain_id) {
+        if ($this->getGroupType()->id() == UserEntity::$group_type_email_domain_id) {
+
             $queue = \Drupal::queue('group_membership_update_task');
             $queue->createItem(['group' => $this->id()]);
         }
+    }
+
+    public function getName()
+    {
+        return $this->get('label')->getValue()[0]['value'];
     }
 }
