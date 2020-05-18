@@ -94,10 +94,6 @@ trait HandlesEmailDomainGroupMembership
                 dpc_log_event('removed', $group->id(), $user->id());
             };
         }
-
-        if (!empty($groups_removed_from)) {
-            self::sendNotificationUserIsRemovedFromGroup($user_emails, $groups_removed_from, $user->getPreferredLangcode());
-        }
     }
 
     /**
