@@ -134,6 +134,21 @@ class EventsLogController extends ControllerBase
     }
 
     /**
+     * Marks list of logged records as processed with a certain timestamp.
+     * Receives a list of records
+     *
+     * @param $logs object[]
+     */
+    public function markLogsAsProcessed($logs) {
+        $logs_ids = array_map(function($log) { return $log->id; }, $logs);
+        $this->getDB()
+            ->update($this->table_name)
+            ->fields(['changed' => time()])
+            ->condition('id', $logs_ids, 'IN')
+            ->execute();
+    }
+
+    /**
      * Returns what happened to user based on the logs.
      *
      * @param $uid
