@@ -128,29 +128,4 @@ trait HandlesEmailDomainGroupMembership
 
         return count(array_intersect($user_email_domains, $group_emails)) > 0;
     }
-
-    /**
-     * @param               $user_emails
-     * @param Group[]|array $groups
-     * @param               $langcode
-     */
-    static function sendNotificationUserIsRemovedFromGroup($user_emails, $groups, $langcode)
-    {
-        $config = \Drupal::config('system.site');
-        $site_name = $config->get('name');
-
-        $message = "Changes were made to you account which has affected your group membership. \n\r";
-        $message .= sprintf(
-            "You have been removed from the following %s: %s",
-            (count($groups) > 1 ? 'groups' : 'group'),
-            implode(', ', $groups)
-        );
-        $params['context']['subject'] = "$site_name: You have been removed from a group" ;
-        $params['context']['message'] = $message;
-
-        $mailManager = \Drupal::service('plugin.manager.mail');
-        foreach ($user_emails as $email) {
-            $mailManager->mail('system', 'mail', $email, $langcode, $params);
-        }
-    }
 }
