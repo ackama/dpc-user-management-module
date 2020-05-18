@@ -213,8 +213,8 @@ class EventsLogController extends ControllerBase
             if (empty($result['added']) && empty($result['removed'])) {
                 // There're logs but nothing happened regarding memberships.
                 // i.e. User does something and then undoes it
-                // @ToDo mark status as processed and save timestamp
-                // $this->markLogsAsProcessed($logs);
+                // Mark logs as processed.
+                $this->markLogsAsProcessed($logs);
                 break;
             }
 
@@ -226,8 +226,8 @@ class EventsLogController extends ControllerBase
                 // $this->sendEmail(['uid' => $uid, 'logs' => $logs, 'result' => $result]);
             }
 
-            // @ToDo mark status as processed and save timestamp
-            // $this->markLogsAsProcessed($logs);
+            // Mark logs as processed.
+            $this->markLogsAsProcessed($logs);
         }
     }
 }
