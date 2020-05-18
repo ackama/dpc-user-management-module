@@ -213,20 +213,27 @@ class EventsLogController extends ControllerBase
             if (empty($result['added']) && empty($result['removed'])) {
                 // There're logs but nothing happened regarding memberships.
                 // i.e. User does something and then undoes it
-                // Mark logs as processed.
+                // Mark logs as processed. Early Exit.
                 $this->markLogsAsProcessed($logs);
                 break;
             }
 
-            // If user is not in access Group, check what happened and possibly send email
+            // Get User
             /** @var UserEntity $user */
             $user = User::load($uid);
+
+            // If user is not in access Group, check what happened and possibly send email
+            // If there are groups in the removed key of the response, attempt sending emails
             if (!$user->inAccessGroup() && key_exists($user->accessGroup()->id(), $result['removed'])) {
-                // @ToDo request sending email
-                // $this->sendEmail(['uid' => $uid, 'logs' => $logs, 'result' => $result]);
+                // Queues sending notifications
+                $queue = \Drupal::queue('notify_user_task');
+                $queue->createItem([
+                    'user_id' => $user->id(),
+                    'removed' => $result['removed']
+                ]);
             }
 
-            // Mark logs as processed.
+            // Mark logs as processed at the end always
             $this->markLogsAsProcessed($logs);
         }
     }
