@@ -23,7 +23,6 @@ class EventsLogController extends ControllerBase
     /**
      * Returns query object with passed SQL query
      *
-     * @param $query
      * @return \Drupal\Core\Database\Query\SelectInterface
      */
     private function query() {
