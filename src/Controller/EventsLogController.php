@@ -9,6 +9,8 @@ use Drupal\user\Entity\User;
 class EventsLogController extends ControllerBase
 {
 
+    private $table_name = 'dpc_group_events';
+
     /**
      * @return \Drupal\Core\Database\Connection
      */
@@ -20,10 +22,10 @@ class EventsLogController extends ControllerBase
      * Returns query object with passed SQL query
      *
      * @param $query
-     * @return \Drupal\Core\Database\StatementInterface|int|null
+     * @return \Drupal\Core\Database\Query\SelectInterface
      */
-    private function query($query) {
-        return $this->getDB()->query($query);
+    private function query() {
+        return $this->getDB()->select($this->table_name);
     }
 
     /**
@@ -32,9 +34,7 @@ class EventsLogController extends ControllerBase
      * @return mixed
      */
     private function getAllRecords() {
-        $query = 'SELECT * from {dpc_group_events}';
-
-        return $this->query($query)->fetchAll();
+        return $this->query()->execute();
     }
 
     /**
@@ -43,9 +43,12 @@ class EventsLogController extends ControllerBase
      * @return mixed
      */
     private function getUnprocessedRecords() {
-        $query = 'SELECT * from {dpc_group_events}';
-
-        return $this->query($query)->fetchAll();
+        return $this->query()
+            ->orderBy('uid')
+            ->orderBy('gid')
+            ->orderBy('created')
+            ->condition('status',null)
+            ->execute();
     }
 
     /**
