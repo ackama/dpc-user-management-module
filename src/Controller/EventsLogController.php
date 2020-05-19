@@ -268,7 +268,7 @@ class EventsLogController extends ControllerBase
         foreach ($user_logs as $uid => $logs) {
             $results = $this->processRecordsForUser($uid, $logs);
 
-            if (empty($result['added']) && empty($result['removed'])) {
+            if (empty($results['added']) && empty($results['removed'])) {
                 // There're logs but nothing happened regarding memberships.
                 // i.e. User does something and then undoes it
                 // Mark logs as processed. Early Exit.
@@ -282,11 +282,11 @@ class EventsLogController extends ControllerBase
 
             // If user is not in access Group, check what happened and possibly send email
             // If there are groups in the removed key of the response, attempt sending emails
-            if (!$user->inAccessGroup() && key_exists($user->accessGroup()->id(), $result['removed'])) {
+            if (!$user->inAccessGroup() && key_exists($user->accessGroup()->id(), $results['removed'])) {
                 // Queues sending notifications
                 $this->queue()->createItem([
                     'user_id' => $user->id(),
-                    'removed' => $result['removed']
+                    'removed' => $results['removed']
                 ]);
             }
 
