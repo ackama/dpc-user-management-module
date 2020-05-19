@@ -33,6 +33,7 @@ trait MembershipMailTrait {
         $params['context']['subject'] = "$site_name: You have been removed from a group" ;
         $params['context']['message'] = $message;
 
+        /** @var Drupal\Core\Mail\MailManager $mailManager */
         $mailManager = \Drupal::service('plugin.manager.mail');
         foreach ($user_emails as $email) {
             $mailManager->mail('system', 'mail', $email, $user->getPreferredLangcode(), $params);
