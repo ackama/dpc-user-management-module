@@ -252,6 +252,110 @@ class UserEntity extends User
     }
 
     /**
+     * Checks if user already has that email in their information
+     *
+     * @param $email
+     * @return bool
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
+    public function emailExists($email) {
+        return in_array($email, array_map(function ($x) {
+            return $x['value'];
+        }, $this->get('field_email_addresses')->getValue()));
+    }
+
+    /**
+     * Adds email address to user object
+     *
+     * @param $email
+     * @return int|null
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
+    public function addEmailAddress($email) {
+        if ($this->emailExists($email)) {
+            return null;
+        }
+
+        $addresses = $this->get('field_email_addresses')->getValue();
+        $addresses[] = ['value' => $email, 'is_primary' => 0];
+        $this->set('field_email_addresses', $addresses);
+
+        return $this->save();
+    }
+
+    /**
+     * Remove Email Address form User
+     *
+     * @param $email
+     * @return int|null
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
+    public function removeEmailAddress($email) {
+        if (!$this->emailExists($email)) {
+            return null;
+        }
+
+        $addresses = $this->get('field_email_addresses')->getValue();
+        $addresses = array_filter($addresses, function($email_address) use ($email) {
+            return $email == $email_address['value'];
+        });
+        $this->set('field_email_addresses', $addresses);
+
+        return $this->save();
+    }
+
+    public function makeEmailVerified($email) {
+        if (!$this->emailExists($email)) {
+            return null;
+        }
+
+        $addresses = $this->get('field_email_addresses')->getValue();
+        $addresses = array_map(function($email_address) use ($email) {
+            if($email_address['value'] == $email) {
+                return array_merge(
+                    $email_address,
+                    [
+                        'status' => 'verified',
+                        'verification_token' => null
+                    ]
+                );
+            }
+
+            return $email_address;
+        }, $addresses);
+        $this->set('field_email_addresses', $addresses);
+
+        $this->save();
+    }
+
+    /**
+     * @param $email
+     * @return |null
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
+    public function makeEmailPrimary($email) {
+        if (!$this->emailExists($email)) {
+            return null;
+        }
+
+        $addresses = $this->get('field_email_addresses')->getValue();
+        $addresses = array_map(function($email_address) use ($email) {
+            if($email_address['value'] == $email) {
+                $email_address['is_primary'] = 1;
+
+                return $email_address;
+            }
+
+            $email_address['is_primary'] = 0;
+
+            return $email_address;
+        }, $addresses);
+        $this->set('field_email_addresses', $addresses);
+
+        $this->save();
+    }
+
+    /**
      * Returns true if user is part of the Master Access Group.
      *
      * @return bool
