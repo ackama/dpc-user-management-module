@@ -3,6 +3,7 @@
 namespace Drupal\dpc_user_management\Events;
 
 use Drupal\custom_events\Event\PrimaryEmailUpdated;
+use Drupal\dpc_user_management\Traits\HandlesMailchimpSubscriptions;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use DrewM\MailChimp\MailChimp;
@@ -14,6 +15,10 @@ use DrewM\MailChimp\MailChimp;
  */
 class UserAccountEventsSubscriber implements EventSubscriberInterface
 {
+    use HandlesMailchimpSubscriptions {
+        HandlesMailchimpSubscriptions::__construct as private _mc_handler_construct;
+    }
+
     /**
      * @var MailChimp|null
      */
@@ -29,10 +34,8 @@ class UserAccountEventsSubscriber implements EventSubscriberInterface
 
     public function __construct()
     {
-        $this->config      = \Drupal::config('dpc_mailchimp.settings');
-        $this->audience_id = $this->config->get('audience_id');
         try {
-            $this->mailchimp = new MailChimp($this->config->get('api_key'));
+            $this->_mc_handler_construct();
         } catch (\Exception $e) {
         }
     }
@@ -68,32 +71,20 @@ class UserAccountEventsSubscriber implements EventSubscriberInterface
      */
     public function updateMailchimpEmailAddress(PrimaryEmailUpdated $event)
     {
-        if (!$this->mailchimp || !$this->audience_id) {
+        if (!$event->account->hasAccess()) {
             return;
-        }
-
-        // TODO: check if user is eligible to receive newsletter
+        };
 
         $new_email = $event->account->getEmail();
 
         if ($event->old_address) {
             // find the MC member and update their address
-            $member_id = $this->mailchimp::subscriberHash($event->old_address);
-            $this->mailchimp->patch("lists/$this->audience_id/members/$member_id", [
-                'email_address' => $new_email
-            ]);
-            \Drupal::service('user.data')->set('dpc_user_management', $event->account->id(), 'mc_subscribed_email', $new_email);
+            $this->updateEmail($event->account, $event->old_address, $new_email);
             return;
         }
 
         // subscribe the new email
-        $this->mailchimp->post("lists/$this->audience_id/members", [
-            'email_address' => $new_email,
-            'status'        => 'subscribed',
-        ]);
-
-        \Drupal::service('user.data')->set('dpc_user_management', $event->account->id(), 'mc_subscribed_email', $new_email);
-
+        $this->subscribe($event->account);
     }
 
     /**
@@ -101,16 +92,6 @@ class UserAccountEventsSubscriber implements EventSubscriberInterface
      */
     public function unsubscribeEmailAddress(Event $event)
     {
-        if (!$this->mailchimp || !$this->audience_id) {
-            return;
-        }
-
-        $member_id = $this->mailchimp::subscriberHash($event->address);
-
-        $this->mailchimp->put( "lists/$this->audience_id/members/$member_id", [
-            'status' => 'unsubscribed',
-        ]);
-
-        \Drupal::service('user.data')->delete('dpc_user_management', $event->account->id(), 'mc_subscribed_email');
+        $this->unsubscribe($event->account, $event->address);
     }
 }

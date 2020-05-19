@@ -3,6 +3,7 @@ namespace Drupal\DPC_User_Management\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\dpc_user_management\Traits\HandlesMailchimpSubscriptions;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use DrewM\MailChimp\MailChimp;
@@ -11,6 +12,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class MailchimpController extends ControllerBase
 {
+    use HandlesMailchimpSubscriptions {
+        HandlesMailchimpSubscriptions::__construct as _mc_handler_construct;
+    }
+
     /**
      * @var MailChimp|null
      */
@@ -31,15 +36,16 @@ class MailchimpController extends ControllerBase
      * @var string|null
      */
     protected $context;
+    /**
+     * @var array
+     */
+    public $operations_list = [];
 
     public function __construct($context = null)
     {
-        $this->config      = \Drupal::config('dpc_mailchimp.settings');
-        $this->audience_id = $this->config->get('audience_id');
         $this->context     = $context;
         try {
-            $this->mailchimp = new MailChimp($this->config->get('api_key'));
-            $this->batch     = $this->mailchimp->new_batch();
+            $this->_mc_handler_construct();
         } catch (\Exception $e) {
         }
     }
@@ -56,18 +62,30 @@ class MailchimpController extends ControllerBase
             throw new HttpException(400, 'Invalid request');
         }
 
-        if (!$this->mailchimp || !$this->audience_id) {
+        if (!$this->mailchimpConnected()) {
             return new JsonResponse('Unable to Sync users: Mailchimp configuration is missing', 400);
         }
 
         // TODO: logging
         $this->updateMembersInList();
+        $this->addMissingUsersToList();
 
         if ($this->batch->get_operations()) {
             $this->batch->execute();
+
+            $this->operations_list += array_map(function($item) {
+                $operation = json_decode($item['body']);
+
+                return "$operation->email_address will be $operation->status";
+            }, $this->batch->get_operations());
         }
 
-        return new JsonResponse('Syncing has been processed', 200);
+        if (!empty($this->operations_list)) {
+
+            return new JsonResponse($this->operations_list);
+        }
+
+        return new JsonResponse('There are no updates to make.');
     }
 
     /**
@@ -101,9 +119,7 @@ class MailchimpController extends ControllerBase
 
             // unsubscribe the member is the user is not found
             if (!$user) {
-                $this->batch->put('unsub' . $member['id'], "lists/$this->audience_id/members/" . $member['id'], [
-                    'status' => 'unsubscribed',
-                ]);
+                $this->batchUnsubscribe($user, $email);
 
                 continue;
             }
@@ -121,9 +137,8 @@ class MailchimpController extends ControllerBase
             if ($primary['status'] !== 'verified') {
                 continue;
             }
-            $this->batch->put('unsub' . $member['id'], "lists/$this->audience_id/members/" . $member['id'], [
-                'email_address' => $primary['value'],
-            ]);
+
+            $this->batchUnsubscribe($user, $email);
         };
     }
 
@@ -136,6 +151,9 @@ class MailchimpController extends ControllerBase
             $mc_address = \Drupal::service('user.data')->get('dpc_user_management', $id, 'mc_subscribed_email');
             if (!$mc_address) {
                 $user = User::load($id);
+                if ($user->hasAccess()) {
+                    $this->batchSubscribe($user);
+                }
             }
         }
     }

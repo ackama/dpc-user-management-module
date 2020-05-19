@@ -161,6 +161,15 @@ class UserEntity extends User
     }
 
     /**
+     * Is the user in the master 'Access' group
+     *
+     * @return bool
+     */
+    public function hasAccess() {
+        return $this->accessGroup()->getMember($this) ? true : false;
+    }
+
+    /**
      * Because drupal can't handle adding default values to old records (ie existing users)
      * when creating these fields, we need to check for unset values first
      * We use this helper function to keep things DRY

@@ -2,7 +2,7 @@
 
 namespace Drupal\custom_events\Event;
 
-use Drupal\user\UserInterface;
+use Drupal\user\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -15,7 +15,7 @@ class PrimaryEmailUpdated extends Event {
     /**
      * The user account.
      *
-     * @var \Drupal\user\UserInterface
+     * @var User
      */
     public $account;
 
@@ -27,10 +27,9 @@ class PrimaryEmailUpdated extends Event {
     /**
      * Constructs the object.
      *
-     * @param \Drupal\user\UserInterface $account
-     *   The account of the user logged in.
+     * @param User $account
      */
-    public function __construct(UserInterface $account) {
+    public function __construct(User $account) {
         $this->account = $account;
         $this->old_address = \Drupal::service('user.data')->get('dpc_user_management', $account->id(), 'mc_subscribed_email');
     }

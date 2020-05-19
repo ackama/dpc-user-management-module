@@ -17,8 +17,15 @@
           button.html('Processing...');
         },
         success: function (result) {
-          console.log(result);
-          button.html('Verification sent!');
+          button.html('Syncing has started');
+          if (Array.isArray(result)) {
+            result = $.map(result, function (item) {
+              return `<li> ${item} </li>`;
+            }).join('');
+            result = 'The following will be processed: <ul>' + result + '</ul>';
+          }
+
+          $('#mc-sync-result').show().html(result);
         },
         error: function () {
           button.removeClass('is-disabled');

@@ -16,6 +16,9 @@ user_frontend:
 
 mailchimp:
   version: 'VERSION'
+  css:
+    theme:
+      css/backend.css: {}
   js:
     js/mailchimp.js: {}
   dependencies:

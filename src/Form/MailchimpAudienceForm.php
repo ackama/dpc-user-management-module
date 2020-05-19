@@ -15,12 +15,12 @@ class MailchimpAudienceForm extends ConfigFormBase
 {
     protected $mailchimp = null;
 
-    public function __construct(ConfigFactoryInterface $config_factory)
+    public function __construct(ConfigFactoryInterface $config_factory, $mailchimp = MailChimp::class)
     {
         parent::__construct($config_factory);
 
         try {
-            $this->mailchimp = $this->mailchimpConfig()->get('api_key') ? new MailChimp($this->mailchimpConfig()->get('api_key')) : null;
+            $this->mailchimp = $this->mailchimpConfig()->get('api_key') ? new $mailchimp($this->mailchimpConfig()->get('api_key')) : null;
         } catch (\Exception $exception) {
             \Drupal::messenger()->addError('Mailchimp API connection error: ' . $exception->getMessage());
         }
@@ -47,6 +47,14 @@ class MailchimpAudienceForm extends ConfigFormBase
      */
     public function buildForm(array $form, FormStateInterface $form_state)
     {
+        if (!$this->mailchimp) {
+            $form['not_connected'] = [
+                '#title'  => $this->t('No MailChimp Connection'),
+                '#markup' => t('Add your MailChimp API Key to manage audiences.'),
+            ];
+
+            return parent::buildForm($form, $form_state);
+        }
         $form['audience_id'] = [
             '#title'         => $this->t('Mailchimp Audience'),
             '#type'          => 'select',
@@ -115,8 +123,9 @@ class MailchimpAudienceForm extends ConfigFormBase
      */
     private function getResyncMarkup()
     {
-        $markup = '<div class="form-item"><span class="button ' . ( !$this->mailchimp ? 'is-disabled' : '' ) . '" id="dpc_resync_mc">Re-sync audience with users</span> <br/>';
-        $markup .= $this->t('Syncing the Mailchimp Audience with the drupal users ensures that eligible users are part of the MailChimp audience.');
+        $markup = '<div class="form-item"><span class="button ' . (!$this->mailchimp ? 'is-disabled' : '') . '" id="dpc_resync_mc">Re-sync audience with users</span> <br/>';
+        $markup .= '<div id="mc-sync-result"></div>';
+        $markup .= '<p>' . $this->t('Syncing the Mailchimp Audience with the drupal users ensures that eligible users are part of the MailChimp audience and those marked as unsubscribed are unsubscribed from the audience.') . '</p>';
         $markup .= '</div>';
 
         return $markup;
