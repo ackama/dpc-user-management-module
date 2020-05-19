@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\custom_events\Event;
+namespace Drupal\dpc_user_management\Event;
 
 use Drupal\user\Entity\User;
 use Symfony\Component\EventDispatcher\Event;

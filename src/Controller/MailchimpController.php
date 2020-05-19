@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\DPC_User_Management\Controller;
+namespace Drupal\dpc_user_management\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityInterface;
@@ -43,7 +43,7 @@ class MailchimpController extends ControllerBase
 
     public function __construct($context = null)
     {
-        $this->context     = $context;
+        $this->context = $context;
         try {
             $this->_mc_handler_construct();
         } catch (\Exception $e) {
@@ -73,7 +73,7 @@ class MailchimpController extends ControllerBase
         if ($this->batch->get_operations()) {
             $this->batch->execute();
 
-            $this->operations_list += array_map(function($item) {
+            $this->operations_list += array_map(function ($item) {
                 $operation = json_decode($item['body']);
 
                 return "$operation->email_address will be $operation->status";
@@ -110,8 +110,12 @@ class MailchimpController extends ControllerBase
             // check if user is unsubscribed
             if ($member['status'] === 'unsubscribed') {
                 if ($user) {
-                    // set user setting
-                    // TODO: update user profile setting
+                    // update the user field
+                    if ( $user->field_mailchimp_audience_status->getValue() && $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
+                        $user->field_mailchimp_audience_status->setValue('unsubscribed');
+                        $this->operations_list[] = $user->getDisplayName() . ' has unsubscribed.';
+                        $user->save();
+                    }
                 }
 
                 continue;
@@ -119,7 +123,7 @@ class MailchimpController extends ControllerBase
 
             // unsubscribe the member is the user is not found
             if (!$user) {
-                $this->batchUnsubscribe($user, $email);
+                $this->batchUnsubscribe($email);
 
                 continue;
             }
@@ -127,21 +131,24 @@ class MailchimpController extends ControllerBase
             // check if email is the primary email
             $user_emails      = $user->field_email_addresses->getValue();
             $subscribed_email = $user_emails[array_search($email, array_column($user_emails, 'value'))];
-            if ($subscribed_email['is_primary']) {
-                continue;
-            }
-
-            // if the email is not the primary, update the member
-            $primary = $user_emails[array_search(true, array_column($user_emails, 'is_primary'))];
-            // unless it is not yet verfied
-            if ($primary['status'] !== 'verified') {
-                continue;
+            if (!$subscribed_email['is_primary']) {
+                // if the email is not the primary, update the member
+                $primary = $user_emails[array_search(true, array_column($user_emails, 'is_primary'))];
+                // unless it is not yet verfied
+                if ($primary['status'] !== 'verified') {
+                    continue;
+                }
+                $this->operations_list[] = $user->getDisplayName() . ' has updated their primary email, subscribed email will be updated.';
+                $this->updateEmail($user, $subscribed_email['value'], $primary['value']);
             }
 
             $this->batchUnsubscribe($user, $email);
         };
     }
 
+    /**
+     * Add missing users to the list
+     */
     private function addMissingUsersToList()
     {
         $query = \Drupal::entityQuery('user');
@@ -150,8 +157,9 @@ class MailchimpController extends ControllerBase
         foreach ($user_ids as $id) {
             $mc_address = \Drupal::service('user.data')->get('dpc_user_management', $id, 'mc_subscribed_email');
             if (!$mc_address) {
-                $user = User::load($id);
-                if ($user->hasAccess()) {
+                $user      = User::load($id);
+                if ($user->hasGroupContentAccess() && $user->field_mailchimp_audience_status->getValue() &&
+                $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
                     $this->batchSubscribe($user);
                 }
             }

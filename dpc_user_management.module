@@ -8,10 +8,12 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\dpc_user_management\Controller\MailchimpController;
 use Drupal\user\Entity\User;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * TODO: add helpful content or remove this hook
@@ -112,14 +114,11 @@ function dpc_log_event($name, $gid, $uid)
     ])->execute();
 }
 
-/**
- * Implements hook_cron()
- */
-function dpc_user_management_cron()
-{
-
+function dpc_user_management_cron(){
+    $mc_controller = new MailchimpController('cron');
+    $request = new Request();
+    $mc_controller->syncAudience($request);
 }
-
 /**
  * Implements hook_entity_prepare_form().
  *
@@ -146,6 +145,11 @@ function dpc_user_management_user_prepare_form(
                     ]
                 ]);
             }
+
+            $mc_audience_status = $entity->get('field_mailchimp_audience_status');
+            if (empty($mc_audience_status->getValue())) {
+                $mc_audience_status->setValue('Not subscribed');
+            }
         } catch (\Exception $exception) {
         }
     }
@@ -169,15 +173,24 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
         // add validation
         $form['#validate'][] = 'dpc_user_management_email_validation';
 
+        $mc_config = \Drupal::config('dpc_mailchimp.settings');
+        if (!$mc_config->get('audience_id') || ! $mc_config->get('api_key')) {
+            unset($form['field_mailchimp_audience_status']);
+        }
+
+        if (isset($form['field_mailchimp_audience_status'])) {
+            $form['field_mailchimp_audience_status']['widget'][0]['value']['#attributes']['disabled'] = TRUE;
+        }
+
         if (!\Drupal::currentUser()->hasPermission('administer group fields')) {
             unset($form['jse_access']);
         }
-
     }
 
     if ($form_id === 'user_register_form') {
         // hide email addresses form on registration
         unset($form['field_email_addresses']);
+        unset($form['field_mailchimp_audience_status']);
 
         if (!\Drupal::currentUser()->hasPermission('administer group fields')) {
             unset($form['jse_access']);

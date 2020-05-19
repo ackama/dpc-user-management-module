@@ -15,6 +15,7 @@ trait SendsEmailVerificationEmail {
     function sendVerificationNotification($to, $token, $user)
     {
         $token_hash = Crypt::hashBase64($token . $user->id() . $to);
+
         $mailManager = Drupal::service('plugin.manager.mail');
         $id = $user->id();
         $message = "Please click the follow this link to verify this email address: ";

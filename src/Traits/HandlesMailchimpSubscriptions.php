@@ -52,6 +52,7 @@ trait HandlesMailchimpSubscriptions
             'status'        => 'subscribed'
         ]);
 
+        $user->field_mailchimp_audience_status->setValue('subscribed');
         \Drupal::service('user.data')->set('dpc_user_management', $user->id(), 'mc_subscribed_email', $user->getEmail());
     }
 
@@ -71,6 +72,8 @@ trait HandlesMailchimpSubscriptions
             'status' => 'unsubscribed',
         ]);
 
+        $user->field_mailchimp_audience_status->setValue('unsubscribed');
+        $user->save();
         \Drupal::service('user.data')->delete('dpc_user_management', $user->id(), 'mc_subscribed_email');
     }
 
@@ -107,14 +110,15 @@ trait HandlesMailchimpSubscriptions
             'status'        => 'subscribed',
         ]);
 
+        $user->field_mailchimp_audience_status->setValue('subscribed');
+        $user->save();
         \Drupal::service('user.data')->set('dpc_user_management', $user->id(), 'mc_subscribed_email', $user->mail->value);
     }
 
     /**
-     * @param User $user
      * @param      $subscribed_address
      */
-    public function batchUnsubscribe(User $user, $subscribed_address)
+    public function batchUnsubscribe($subscribed_address)
     {
         if (!$this->mailchimpConnected()) {
             return;
@@ -125,8 +129,6 @@ trait HandlesMailchimpSubscriptions
         $this->batch->put('unsubscribed', "lists/$this->audience_id/members/" . $member_id, [
             'status' => 'unsubscribed',
         ]);
-
-        \Drupal::service('user.data')->delete('dpc_user_management', $user->id(), 'mc_subscribed_email');
     }
 
     /**

@@ -1,5 +1,6 @@
 services:
-  user_email_events_subscriber:
-    class: '\Drupal\dpc_user_management\Events\UserAccountEventsSubscriber'
+  user_account_event_subscriber:
+    class: Drupal\dpc_user_management\EventSubscriber\UserAccountEventSubscriber
+    arguments: []
     tags:
-      - { name: 'user_account_event_subscriber'}
+      - { name: event_subscriber }

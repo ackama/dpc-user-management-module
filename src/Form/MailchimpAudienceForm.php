@@ -65,10 +65,13 @@ class MailchimpAudienceForm extends ConfigFormBase
             '#description'   => $this->t('Choose the audience you wish to use for user subcriptions')
         ];
 
-        $form['refresh_audience'] = [
-            '#title'  => $this->t('refresh audience'),
-            '#markup' => $this->getResyncMarkup(),
-        ];
+        if ($this->mailchimpConfig()->get('audience_id')) {
+            $form['refresh_audience'] = [
+                '#title'  => $this->t('refresh audience'),
+                '#markup' => $this->getResyncMarkup(),
+            ];
+        }
+
 
         return parent::buildForm($form, $form_state);
     }

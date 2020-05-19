@@ -165,7 +165,7 @@ class UserEntity extends User
      *
      * @return bool
      */
-    public function hasAccess() {
+    public function hasGroupContentAccess() {
         return $this->accessGroup()->getMember($this) ? true : false;
     }
 
