@@ -202,18 +202,18 @@ class EventsLogController extends ControllerBase
 
         $group_states = array_reduce($user_logs, function($c, $log) {
             $c[$log->gid] = isset($c[$log->gid])
-                ? array_merge($c[$log->gid], [$log->status])
-                : [];
+                ? array_merge($c[$log->gid], [$log])
+                : [$log];
             return $c;
         }, []);
 
         $responses = [];
 
-        foreach ($group_states as $group_id => $group_data) {
-            $responses[$group_id] = [
-                'original' => $group_data[0] === 'added' ? 'removed' : 'added',
-                'first' => $group_data[0],
-                'last' => array_pop($group_data)
+        foreach ($group_states as $group_data) {
+            $responses[$group_data[0]->gid] = [
+                'original' => $group_data[0]->name === 'added' ? 'removed' : 'added',
+                'first' => $group_data[0]->name,
+                'last' => (array_pop($group_data))->name
             ];
         }
 
@@ -224,11 +224,7 @@ class EventsLogController extends ControllerBase
         $removed = array_filter($responses, function ($r) {
             return $r['original'] !== $r['last'] && $r['last'] === 'removed';
         });
-
-        if(!empty($removed)) {
-            return $removed;
-        }
-
+        
         // Return state changes
         return [
             'added'   => $added,
