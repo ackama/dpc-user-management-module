@@ -5,6 +5,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Pager\PagerManager;
 use Drupal\Core\Render\Markup;
+use Drupal\dpc_user_management\Plugin\QueueWorker\NotifyUserTask;
 use Drupal\dpc_user_management\UserEntity;
 use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
@@ -24,6 +25,13 @@ class EventsLogController extends ControllerBase
      * @var string
      */
     private $t = 'dpc_group_events';
+
+    /**
+     * Queue Name
+     *
+     * @var string
+     */
+    private static $queue_name = 'notify_user_task';
 
     /**
      * @return \Drupal\Core\Database\Connection
@@ -67,6 +75,22 @@ class EventsLogController extends ControllerBase
             ->condition('status','pending')
             ->execute()
             ->fetchAll();
+    }
+
+    /**
+     * Returns Queue
+     *
+     * @return \Drupal\Core\Queue\QueueInterface
+     */
+    public function queue() {
+        return \Drupal::queue(self::$queue_name, true);
+    }
+
+    /**
+     * @return NotifyUserTask
+     */
+    public function queueWorker() {
+        return \Drupal::service('plugin.manager.queue_worker')->createInstance(self::$queue_name);
     }
 
     /**
