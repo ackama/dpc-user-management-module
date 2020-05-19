@@ -147,6 +147,11 @@ class UserEntity extends User
         }
     }
 
+    /**
+     * Returns Main Access Group
+     *
+     * @return \Drupal\dpc_user_management\GroupEntity
+     */
     public function accessGroup() {
         // Toggles user access to content group
         $group_ids =  \Drupal::entityQuery('group')
