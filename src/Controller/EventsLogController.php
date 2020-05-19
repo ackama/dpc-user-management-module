@@ -26,6 +26,9 @@ class EventsLogController extends ControllerBase
      */
     private $t = 'dpc_group_events';
 
+    /**
+     * @var \Drupal\Core\Database\Connection
+     */
     private $_db;
 
     /**
@@ -35,8 +38,14 @@ class EventsLogController extends ControllerBase
      */
     private static $queue_name = 'notify_user_task';
 
+    /**
+     * @var \Drupal\Core\Queue\QueueInterface
+     */
     private $_queue;
 
+    /**
+     * @var NotifyUserTask
+     */
     private $_queue_worker;
 
     /**
