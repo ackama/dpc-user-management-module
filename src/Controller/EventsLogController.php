@@ -240,7 +240,11 @@ class EventsLogController extends ControllerBase
      * Gets all unprocessed records, groups them by user and processes each user group.
      */
     public function processUnprocessedRecords(){
-        $user_logs = array_reduce($this->getUnprocessedRecords(), function($c, $log) {
+        // Get all unprocessed records
+        $allRecords = $this->getUnprocessedRecords();
+
+        // Group records by User
+        $user_logs = array_reduce($allRecords, function($c, $log) {
             $c[$log->uid] = isset($c[$log->uid])
                 ? array_merge($c[$log->uid], [$log])
                 : [];
@@ -276,6 +280,12 @@ class EventsLogController extends ControllerBase
             // Mark logs as processed at the end always
             $this->markLogsAsProcessed($logs);
         }
+
+        return [
+            'total' => count($allRecords),
+            'users' => count($user_logs),
+            'queued' => $this->queue()->numberOfItems()
+        ];
     }
 
     public function sendNotifications() {
