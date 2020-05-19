@@ -73,7 +73,7 @@ class EventsLogController extends ControllerBase
      *
      * @return mixed
      */
-    private function getAllRecords() {
+    public function getAllRecords() {
         return $this->query()
             ->fields($this->t)
             ->execute()
@@ -85,7 +85,7 @@ class EventsLogController extends ControllerBase
      *
      * @return mixed
      */
-    private function getUnprocessedRecords() {
+    public function getUnprocessedRecords() {
         return $this->query()
             ->fields($this->t)
             ->orderBy('uid')
