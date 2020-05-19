@@ -52,7 +52,7 @@ class NotifyUserTask extends QueueWorkerBase {
         $user = User::load($data['user_id']);
 
         /** @var Group[] $groups */
-        $groups = self::getGroupsByType($data['removed']);
+        $groups = Group::loadMultiple(array_keys($data['removed']));
 
         self::sendEmail($user, $groups);
         // @ToDo Hook sending sms notifications when available

@@ -21,14 +21,16 @@ trait MembershipMailTrait {
             return $g->label();
         }, $groups);
 
-        $user_emails = $user->get('field_email_addresses');
+        $user_emails = array_map(function($email) {
+            return $email['value'];
+        }, $user->get('field_email_addresses')->getValue());
 
         // Build message
         $message = "Changes were made to you account which has affected your content access membership. \n\r";
         $message .= sprintf(
             "You have been removed from the following %s: %s",
             (count($group_names) > 1 ? 'groups' : 'group'),
-            implode(', ', $groups)
+            implode(', ', $group_names)
         );
         $params['context']['subject'] = "$site_name: You have been removed from a group" ;
         $params['context']['message'] = $message;
