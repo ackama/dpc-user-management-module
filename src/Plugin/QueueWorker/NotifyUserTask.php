@@ -20,9 +20,8 @@ class NotifyUserTask extends QueueWorkerBase {
 
     use MembershipMailTrait;
     use HandleMembershipTrait;
+
     /**
-     * Works with no parameters as it checks all available unprocessed logs
-     *
      * @param $data
      *
      * @throws \Drupal\Core\Queue\RequeueException
