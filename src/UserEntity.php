@@ -211,11 +211,15 @@ class UserEntity extends User
         /** @var $safe_groups Group[] */
         $safe_groups = array_filter(
             self::getGroupsByType(self::$group_special_type_id),
-            function (Group $g) {
+            function (GroupEntity $g) {
                 if (in_array($g->id(), $this->_get_target_ids('special_groups'))) {
-                    $g->addMember($this);
+                    $this->addToGroup($g);
+
                     return true;
                 }
+
+                $this->removeFromGroup($g);
+
                 return false;
             }
         );
