@@ -49,7 +49,8 @@ class EventsLogController extends ControllerBase
     private function getAllRecords() {
         return $this->query()
             ->fields($this->t)
-            ->execute();
+            ->execute()
+            ->fetchAll();
     }
 
     /**
@@ -59,11 +60,13 @@ class EventsLogController extends ControllerBase
      */
     private function getUnprocessedRecords() {
         return $this->query()
+            ->fields($this->t)
             ->orderBy('uid')
             ->orderBy('gid')
             ->orderBy('created')
-            ->condition('status',null)
-            ->execute();
+            ->condition('status','pending')
+            ->execute()
+            ->fetchAll();
     }
 
     /**
