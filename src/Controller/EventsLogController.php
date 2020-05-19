@@ -247,7 +247,7 @@ class EventsLogController extends ControllerBase
         $user_logs = array_reduce($allRecords, function($c, $log) {
             $c[$log->uid] = isset($c[$log->uid])
                 ? array_merge($c[$log->uid], [$log])
-                : [];
+                : [$log];
             return $c;
         }, []);
 
