@@ -201,7 +201,10 @@ class EventsLogController extends ControllerBase
         $logs_ids = array_map(function($log) { return $log->id; }, $logs);
         $this->getDB()
             ->update($this->table_name)
-            ->fields(['changed' => time()])
+            ->fields([
+                'changed' => time(),
+                'status' => 'processed']
+            )
             ->condition('id', $logs_ids, 'IN')
             ->execute();
     }
