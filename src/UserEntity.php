@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\dpc_user_management\Traits\HandleMembershipTrait;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
+use Drupal\dpc_user_management\GroupEntity;
 use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
@@ -153,8 +154,8 @@ class UserEntity extends User
             ->accessCheck(false)
             ->execute();
 
-        /** @var Group $group */
-        $group = Group::load(array_pop($group_ids));
+        /** @var GroupEntity $group */
+        $group = GroupEntity::load(array_pop($group_ids));
 
         return $group;
     }
@@ -301,6 +302,7 @@ class UserEntity extends User
      * decide if the user should be in the Access Group
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     * @throws \Exception
      */
     private function synchronizeMemberships($update) {
 
@@ -323,12 +325,12 @@ class UserEntity extends User
 
         // Provide access after all calculations have been done
         if( $grantAccess ) {
-            $this->accessGroup()->addMember($this);
+            $this->addToGroup($this->accessGroup());
 
             return;
         }
 
-        $this->accessGroup()->removeMember($this);
+        $this->removeFromGroup($this->accessGroup());
 
         return;
 
