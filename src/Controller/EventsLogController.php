@@ -277,4 +277,15 @@ class EventsLogController extends ControllerBase
             $this->markLogsAsProcessed($logs);
         }
     }
+
+    public function sendNotifications() {
+        while($this->queue()->numberOfItems()){
+            $item = $this->queue()->claimItem();
+            try{
+                $this->queueWorker()->processItem($item);
+            } catch (\Exception $e) {
+                $this->queue()->releaseItem($item);
+            }
+        }
+    }
 }
