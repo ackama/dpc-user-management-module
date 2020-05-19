@@ -10,7 +10,7 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * @group dpc_user_management
  */
-class ProcessEventLogs extends BrowserTestBase
+class ProcessEventLogsTest extends BrowserTestBase
 {
     use AssertMailTrait {
         getMails as drupalGetMails;
