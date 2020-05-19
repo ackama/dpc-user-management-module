@@ -111,7 +111,7 @@ class GroupMembershipTest extends BrowserTestBase
 
         // get the verification email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
@@ -138,7 +138,7 @@ class GroupMembershipTest extends BrowserTestBase
 
         // verify the new email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
@@ -155,7 +155,7 @@ class GroupMembershipTest extends BrowserTestBase
         $site_name = \Drupal::config('system.site')->get('name');
         $captured_emails = $this->drupalGetMails();
 
-        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[2]['subject']);
+        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[1]['subject']);
     }
 
     /**
@@ -178,7 +178,7 @@ class GroupMembershipTest extends BrowserTestBase
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         // verify the new email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
