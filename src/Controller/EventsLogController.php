@@ -26,6 +26,8 @@ class EventsLogController extends ControllerBase
      */
     private $t = 'dpc_group_events';
 
+    private $_db;
+
     /**
      * Queue Name
      *
@@ -33,11 +35,19 @@ class EventsLogController extends ControllerBase
      */
     private static $queue_name = 'notify_user_task';
 
+    private $_queue;
+
+    private $_queue_worker;
+
     /**
      * @return \Drupal\Core\Database\Connection
      */
     private function getDB() {
-        return \Drupal::database();
+        if (is_null($this->_db)) {
+            $this->_db = \Drupal::database();
+        }
+
+        return $this->_db;
     }
 
     /**
@@ -83,14 +93,22 @@ class EventsLogController extends ControllerBase
      * @return \Drupal\Core\Queue\QueueInterface
      */
     public function queue() {
-        return \Drupal::queue(self::$queue_name, true);
+        if (is_null($this->_queue)) {
+            $this->_queue = \Drupal::queue(self::$queue_name, true);
+        }
+
+        return $this->_queue;
     }
 
     /**
      * @return NotifyUserTask
      */
     public function queueWorker() {
-        return \Drupal::service('plugin.manager.queue_worker')->createInstance(self::$queue_name);
+        if (is_null($this->_queue_worker)) {
+            $this->_queue = \Drupal::service('plugin.manager.queue_worker')->createInstance(self::$queue_name);
+        }
+
+        return $this->_queue_worker;
     }
 
     /**
