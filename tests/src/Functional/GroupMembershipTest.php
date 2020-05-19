@@ -2,6 +2,7 @@
 namespace Drupal\Tests\dpc_user_management\Functional;
 
 use Drupal\Core\Test\AssertMailTrait;
+use Drupal\dpc_user_management\Controller\EventsLogController;
 use Drupal\dpc_user_management\UserEntity;
 use Drupal\group\Entity\Group;
 use Drupal\Tests\BrowserTestBase;
@@ -150,6 +151,11 @@ class GroupMembershipTest extends BrowserTestBase
 
         // check that the user was removed from the group
         $this->assertFalse($this->group->getMember($this->user));
+
+        // Process Logs and Send Notifications
+        $EventsLog = new EventsLogController();
+        $EventsLog->processUnprocessedRecords();
+        $EventsLog->sendNotifications();
 
         // check that the user received a notification after being removed
         $site_name = \Drupal::config('system.site')->get('name');
