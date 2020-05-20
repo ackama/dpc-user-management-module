@@ -255,12 +255,28 @@ class ProcessEventLogsTest extends BrowserTestBase
 
         /**
          * @ToDo User 1 Block 1
-         * Add Email
-         * Add Email2
-         * Count logs = 3
+         * Add Email[0] (Group 1) (Master Group)
+         * Add Email[1] (Group 2) (Group 3)
+         * Count logs = 4
          * Process Logs
-         * Logs should be all empty
+         *  total 4
+         *  users 1
+         *  queued 0
+         * Count logs = 0
          */
+
+        $this->users['user1']->addEmailAndVerify($this->fakeTestUsersSeed()['user1']['emails'][0]);
+        $this->users['user1']->addEmailAndVerify($this->fakeTestUsersSeed()['user1']['emails'][1]);
+
+        $this->assertCount(4, $this->EventsLog->getUnprocessedRecords());
+
+        $this->assertEqual([
+            'total' => 4,
+            'users' => 1,
+            'queued' => 0
+        ], $this->EventsLog->processUnprocessedRecords());
+
+        $this->assertCount(0, $this->EventsLog->getUnprocessedRecords());
 
         /**
          * @ToDo User 1 Block 2
