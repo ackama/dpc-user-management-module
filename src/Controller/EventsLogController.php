@@ -112,7 +112,7 @@ class EventsLogController extends ControllerBase
      */
     public function queueWorker() {
         if (is_null($this->_queue_worker)) {
-            $this->_queue = \Drupal::service('plugin.manager.queue_worker')->createInstance(self::$queue_name);
+            $this->_queue_worker = \Drupal::service('plugin.manager.queue_worker')->createInstance(self::$queue_name);
         }
 
         return $this->_queue_worker;
