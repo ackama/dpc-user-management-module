@@ -338,20 +338,47 @@ class ProcessEventLogsTest extends BrowserTestBase
             'queued' => 1
         ], $this->EventsLog->processUnprocessedRecords());
 
+        // Delete Items from Queue for the lack of a better option
+        $this->EventsLog->queue()->deleteQueue();
+
         $this->assertCount(0, $this->EventsLog->getUnprocessedRecords());
 
         /**
          * @ToDo User 2 Block 1
          *
-         * Add Special Group
-         * Remove Special Group
+         * Add Special Group 1
+         * Remove Special Group 1
          * Add Special Group 2
          * Remove Special Group 2
-         * Count log = 6
+         * Count log = 8
          * Process Logs
-         * Email is not Sent
-         * Logs Should empty
+         *  total 8
+         *  users 1
+         *  queued 0
+         * Count log 0
          */
+
+        $this->users['user2']->set('special_groups', [['target_id' => $this->special_groups['special_group_1']->id()]]);
+        $this->users['user2']->save();
+        // We set this to empty because we know the user only has one group
+        $this->users['user2']->set('special_groups', []);
+        $this->users['user2']->save();
+
+        $this->users['user2']->set('special_groups', [['target_id' => $this->special_groups['special_group_2']->id()]]);
+        $this->users['user2']->save();
+        // We set this to empty because we know the user only has one group
+        $this->users['user2']->set('special_groups', []);
+        $this->users['user2']->save();
+
+        $this->assertCount(8, $this->EventsLog->getUnprocessedRecords());
+
+        $this->assertEqual([
+            'total' => 8,
+            'users' => 1,
+            'queued' => 0
+        ], $this->EventsLog->processUnprocessedRecords());
+
+        $this->assertCount(0, $this->EventsLog->getUnprocessedRecords());
 
         /**
          * @ToDo User 2 Block 2
