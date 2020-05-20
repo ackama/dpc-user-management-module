@@ -383,26 +383,36 @@ class ProcessEventLogsTest extends BrowserTestBase
         /**
          * @ToDo User 2 Block 2
          *
-         * Add Special Group
-         * Override Access
-         * Remove Special Group
-         * Count log = 4
+         * Add Special Group (Group + Master Group)
+         * Override Access (+ Secures Master Group)
+         * Remove Special Group (- Group)
+         * Count log = 3
          * Process Logs
-         * Email is not Sent
-         * Logs Should empty
+         *  total 3
+         *  users 1
+         *  queued 0
+         * Count log 0
          */
 
-        /**
-         * @ToDo User 2 Block 3
-         *
-         * Remove Override
-         * Override Access
-         * Remove Special Group
-         * Count log = 4
-         * Process Logs
-         * Email is not Sent
-         * Logs Should empty
-         */
+        $this->users['user2']->set('special_groups', [['target_id' => $this->special_groups['special_group_1']->id()]]);
+        $this->users['user2']->save();
+
+        $this->users['user2']->set('jse_access', [['value' => 1]]);
+        $this->users['user2']->save();
+
+        // We set this to empty because we know the user only has one group
+        $this->users['user2']->set('special_groups', []);
+        $this->users['user2']->save();
+
+        $this->assertCount(3, $this->EventsLog->getUnprocessedRecords());
+
+        $this->assertEqual([
+            'total' => 3,
+            'users' => 1,
+            'queued' => 0
+        ], $this->EventsLog->processUnprocessedRecords());
+
+        $this->assertCount(0, $this->EventsLog->getUnprocessedRecords());
 
         /**
          * @ToDo General Test
