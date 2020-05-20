@@ -88,9 +88,7 @@ class EventsLogController extends ControllerBase
     public function getUnprocessedRecords() {
         return $this->query()
             ->fields($this->t)
-            ->orderBy('uid')
-            ->orderBy('gid')
-            ->orderBy('created')
+            ->orderBy('id')
             ->condition('status','pending')
             ->execute()
             ->fetchAll();
