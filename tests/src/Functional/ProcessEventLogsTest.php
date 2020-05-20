@@ -301,7 +301,7 @@ class ProcessEventLogsTest extends BrowserTestBase
         $this->users['user1']->save();
         $this->users['user1']->removeEmailAddress($this->fakeTestUsersSeed()['user1']['emails'][1]);
         $this->users['user1']->save();
-        $this->users['user1']->addEmailAndVerify($this->fakeTestUsersSeed()['user1']['invalid_emails'][1]);
+        $this->users['user1']->addEmailAndVerify($this->fakeTestUsersSeed()['user1']['invalid_emails'][0]);
         $this->users['user1']->save();
 
         $this->assertCount(4, $this->EventsLog->getUnprocessedRecords());
