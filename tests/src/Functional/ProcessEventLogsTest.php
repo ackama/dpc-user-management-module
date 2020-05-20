@@ -3,6 +3,7 @@
 namespace Drupal\Tests\dpc_user_management\Functional;
 
 use Drupal\Core\Test\AssertMailTrait;
+use Drupal\dpc_user_management\Controller\EventsLogController;
 use Drupal\dpc_user_management\UserEntity as User;
 use Drupal\dpc_user_management\GroupEntity as Group;
 use Drupal\Tests\BrowserTestBase;
@@ -153,6 +154,8 @@ class ProcessEventLogsTest extends BrowserTestBase
 
         $this->setUpGroups();
         $this->setupTestUsers();
+
+        $this->EventsLog = new EventsLogController();
 
         // Setup Admin User
         $this->admin = $this->drupalCreateUser([
