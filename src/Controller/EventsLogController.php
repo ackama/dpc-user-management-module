@@ -261,6 +261,20 @@ class EventsLogController extends ControllerBase
     }
 
     /**
+     * @param $logs
+     * @return mixed
+     */
+    public function groupRecordsByUser($logs) {
+        // Group records by User
+        return array_reduce($logs, function($c, $log) {
+            $c[$log->uid] = isset($c[$log->uid])
+                ? array_merge($c[$log->uid], [$log])
+                : [$log];
+            return $c;
+        }, []);
+    }
+
+    /**
      * Gets all unprocessed records, groups them by user and processes each user group.
      */
     public function processUnprocessedRecords(){
@@ -268,15 +282,12 @@ class EventsLogController extends ControllerBase
         $allRecords = $this->getUnprocessedRecords();
 
         // Group records by User
-        $user_logs = array_reduce($allRecords, function($c, $log) {
-            $c[$log->uid] = isset($c[$log->uid])
-                ? array_merge($c[$log->uid], [$log])
-                : [$log];
-            return $c;
-        }, []);
+        $user_logs = $this->groupRecordsByUser($allRecords);
 
         foreach ($user_logs as $uid => $logs) {
             $results = $this->processRecordsForUser($uid, $logs);
+
+            dump($results);
 
             if (empty($results['added']) && empty($results['removed'])) {
                 // There're logs but nothing happened regarding memberships.
