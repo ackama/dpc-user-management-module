@@ -426,4 +426,81 @@ class ProcessEventLogsTest extends BrowserTestBase
          */
 
     }
+
+    function multipleUsersTest() {
+
+        /**
+         * @ToDo All Users Block 1
+         *
+         * Add All Emails[0] (Group 1) (Group 2) (Group 3) (Group Master) x 2
+         * Add invalid domain email to User 2
+         * Count logs = 4
+         * Process Logs
+         *  total 4
+         *  users 2
+         *  queued 0
+         * Count logs = 0
+         */
+
+        $this->users['user1']->addEmailAndVerify($this->fakeTestUsersSeed()['user1']['emails'][0]);
+        $this->users['user1']->addEmailAndVerify($this->fakeTestUsersSeed()['user1']['emails'][1]);
+        $this->users['user2']->addEmailAndVerify($this->fakeTestUsersSeed()['user2']['emails'][0]);
+        $this->users['user2']->addEmailAndVerify($this->fakeTestUsersSeed()['user2']['emails'][1]);
+        $this->users['user2']->addEmailAndVerify($this->fakeTestUsersSeed()['user2']['invalid_emails'][0]);
+
+        $this->assertCount(4, $this->EventsLog->getUnprocessedRecords());
+
+        $this->assertEqual([
+            'total' => 4,
+            'users' => 2,
+            'queued' => 0
+        ], $this->EventsLog->processUnprocessedRecords());
+
+        $this->assertCount(0, $this->EventsLog->getUnprocessedRecords());
+
+        /**
+         * @ToDo All Users Block 2
+         *
+         * Add invalid domain to Group3 (User 2 maintains)
+         * Remove all domains from groups (User1 = -2 Groups, User2 = -1 Groups, User 1= -1 Master Group)
+         * Count log = 4
+         * Process Logs
+         *  total 4
+         *  users 2
+         *  queued 1
+         * Count log 0
+         */
+
+        $this->mail_groups['group_3']->set('field_email_domain', [['value' => 'gmail.com']]);
+        $this->mail_groups['group_3']->save();
+
+        $this->mail_groups['group_1']->set('field_email_domain', [['value' => 'nonexisting.com']]);
+        $this->mail_groups['group_1']->save();
+
+        $this->mail_groups['group_2']->set('field_email_domain', [['value' => 'nonexisting.com']]);
+        $this->mail_groups['group_2']->save();
+
+//
+//        (new UserEntityController())->processGroupMemberships(['group' => $this->mail_groups['group_1']->id()]);
+//        (new UserEntityController())->processGroupMemberships(['group' => $this->mail_groups['group_2']->id()]);
+//        (new UserEntityController())->processGroupMemberships(['group' => $this->mail_groups['group_3']->id()]);
+
+//        dump($this->mail_groups['group_1']->toArray());
+//        dump($this->mail_groups['group_2']->toArray());
+//        dump($this->mail_groups['group_3']->toArray());
+
+//        dump($this->users['user1']->toArray());
+//        dump($this->users['user2']->toArray());
+        dump($this->EventsLog->getUnprocessedRecords());
+
+        $this->assertCount(4, $this->EventsLog->getUnprocessedRecords());
+
+        $this->assertEqual([
+            'total' => 4,
+            'users' => 2,
+            'queued' => 1
+        ], $this->EventsLog->processUnprocessedRecords());
+
+        $this->assertCount(0, $this->EventsLog->getUnprocessedRecords());
+    }
 }
