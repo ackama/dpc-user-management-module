@@ -284,14 +284,35 @@ class ProcessEventLogsTest extends BrowserTestBase
         /**
          * @ToDo User 1 Block 2
          * Add Special Group
-         * Remove Email 1
-         * Remove Email 2
-         * Add Email 3 Invalid
-         * Count logs = 4
+         * Remove Email[0] (- Group 1)
+         * Remove Email[1] (- Group 2) (- Group 3)
+         * Add Email Invalid[0] Invalid (No Group)
+         * Count logs 4
          * Process Logs
-         * Email is Not Sent
-         * Logs should be all empty
+         *  total 4
+         *  users 1
+         *  queued 0
+         * Count logs 0
          */
+
+        $this->users['user1']->set('special_groups', [['target_id' => $this->special_groups['special_group_1']->id()]]);
+        $this->users['user1']->save();
+        $this->users['user1']->removeEmailAddress($this->fakeTestUsersSeed()['user1']['emails'][0]);
+        $this->users['user1']->save();
+        $this->users['user1']->removeEmailAddress($this->fakeTestUsersSeed()['user1']['emails'][1]);
+        $this->users['user1']->save();
+        $this->users['user1']->addEmailAndVerify($this->fakeTestUsersSeed()['user1']['invalid_emails'][1]);
+        $this->users['user1']->save();
+
+        $this->assertCount(4, $this->EventsLog->getUnprocessedRecords());
+
+        $this->assertEqual([
+            'total' => 4,
+            'users' => 1,
+            'queued' => 0
+        ], $this->EventsLog->processUnprocessedRecords());
+
+        $this->assertCount(0, $this->EventsLog->getUnprocessedRecords());
 
         /**
          * @ToDo User 1 Block 3
