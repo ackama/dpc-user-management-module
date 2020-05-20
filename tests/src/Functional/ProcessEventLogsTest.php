@@ -93,11 +93,11 @@ class ProcessEventLogsTest extends BrowserTestBase
             ],
             'group_2' => [
                 'label' => 'Group 2',
-                'domains' => ['domain.org', 'example.com']
+                'domains' => ['domain.org', 'dummy.net']
             ],
             'group_3' => [
                 'label' => 'Group 3',
-                'domains' => ['example.com', 'test.net']
+                'domains' => ['dummy.net', 'test.net']
             ]
         ],
         'special' => [
@@ -115,13 +115,10 @@ class ProcessEventLogsTest extends BrowserTestBase
      */
     protected $user_defs = [
         'user1' => [
-            'name' => 'Lorenzo Llamas',
+            'name' => 'lorenzo.llamas',
             'emails' => [
-                'lorenzo.llamas@dummy.net'
-            ],
-            'new_emails' => [
                 'lorenzo.llamas@test.net',
-                'lorenzo.llamas@example.com'
+                'lorenzo.llamas@dummy.net'
             ],
             'invalid_emails' => [
                 'lorenzo.llamas@gmail.com',
@@ -129,12 +126,9 @@ class ProcessEventLogsTest extends BrowserTestBase
             ]
         ],
         'user2' => [
-            'name' => 'Dalai Llama',
+            'name' => 'dalai.llama',
             'emails' => [
-                'dalai.llama@dummy.net'
-            ],
-            'new_emails' => [
-                'dalai.llama@gmail.com',
+                'dalai.llama@dummy.net',
                 'dalai.llama@domain.org'
             ],
             'invalid_emails' => [
@@ -226,19 +220,15 @@ class ProcessEventLogsTest extends BrowserTestBase
      * @throws \Drupal\Core\Entity\EntityStorageException
      */
     public function createTestUser($data) {
-
         /** @var User $user */
         $user = $this->drupalCreateUser([], $data['name'], false);
 
-        //
-        foreach( $data['emails'] as $email) {
-            $user->addEmailAddress($email);
-            $user->makeEmailVerified($email);
-        }
+        $user->addEmailAndVerify($user->getEmail());
+
+        $user->makeEmailPrimary($user->getEmail());
+        $user->save();
 
         $this->drupalLogin($user);
-
-        $user->save();
 
         return $user;
     }
