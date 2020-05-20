@@ -328,7 +328,7 @@ class EventsLogController extends ControllerBase
         while($this->queue()->numberOfItems()){
             $item = $this->queue()->claimItem();
             try{
-                $this->queueWorker()->processItem($item);
+                $this->queueWorker()->processItem($item->data);
             } catch (\Exception $e) {
                 $this->queue()->releaseItem($item);
             }
