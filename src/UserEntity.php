@@ -114,7 +114,7 @@ class UserEntity extends User
      * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
      */
-    protected function verify_email_addresses()
+    public function verify_email_addresses()
     {
         $verification_sent = [];
         $user = User::load($this->id());
@@ -278,10 +278,14 @@ class UserEntity extends User
         }
 
         $addresses = $this->get('field_email_addresses')->getValue();
-        $addresses[] = ['value' => $email, 'is_primary' => 0];
+        $addresses[] = [
+            'value' => $email,
+            'is_primary' => 0,
+            'status' => 'new'
+        ];
         $this->set('field_email_addresses', $addresses);
 
-        return $this->save();
+        return true;
     }
 
     /**
@@ -290,6 +294,7 @@ class UserEntity extends User
      * @param $email
      * @return int|null
      * @throws \Drupal\Core\Entity\EntityStorageException
+     * @throws \Exception
      */
     public function removeEmailAddress($email) {
         if (!$this->emailExists($email)) {
@@ -298,13 +303,20 @@ class UserEntity extends User
 
         $addresses = $this->get('field_email_addresses')->getValue();
         $addresses = array_filter($addresses, function($email_address) use ($email) {
-            return $email == $email_address['value'];
+            return $email != $email_address['value'];
         });
         $this->set('field_email_addresses', $addresses);
 
-        return $this->save();
+        self::removeUsersFromGroups($this, [$email]);
+
+        return true;
     }
 
+    /**
+     * @param $email
+     * @return bool|null
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
     public function makeEmailVerified($email) {
         if (!$this->emailExists($email)) {
             return null;
@@ -313,19 +325,28 @@ class UserEntity extends User
         $addresses = $this->get('field_email_addresses')->getValue();
         $addresses = array_map(function($email_address) use ($email) {
             if($email_address['value'] == $email) {
-                return array_merge(
-                    $email_address,
-                    [
-                        'status' => 'verified',
-                        'verification_token' => null
-                    ]
-                );
+                $email_address['status'] = 'verified';
+                $email_address['verification_token'] = null;
             }
 
             return $email_address;
         }, $addresses);
         $this->set('field_email_addresses', $addresses);
 
+        self::addUserToGroups($this, $email);
+
+        return true;
+    }
+
+    /**
+     * @param $email
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
+    public function addEmailAndVerify($email) {
+        $this->addEmailAddress($email);
+        $this->save();
+
+        $this->makeEmailVerified($email);
         $this->save();
     }
 
@@ -351,9 +372,10 @@ class UserEntity extends User
 
             return $email_address;
         }, $addresses);
+
         $this->set('field_email_addresses', $addresses);
 
-        $this->save();
+        return true;
     }
 
     /**
