@@ -249,6 +249,9 @@ class ProcessEventLogsTest extends BrowserTestBase
         }, $this->fakeTestUsersSeed());
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testLogsAreProcessed()
     {
         $this->drupalLogin($this->admin);
