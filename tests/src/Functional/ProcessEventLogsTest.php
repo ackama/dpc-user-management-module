@@ -51,9 +51,19 @@ class ProcessEventLogsTest extends BrowserTestBase
     protected $users;
 
     /**
-     * @var Group $group
+     * @var Group[] $mail_groups
      */
-    protected $groups;
+    protected $mail_groups;
+
+    /**
+     * @var Group[] $special_groups
+     */
+    protected $special_groups;
+
+    /**
+     * @var EventsLogController
+     */
+    protected $EventsLog;
 
     /**
      * @var array
@@ -75,17 +85,61 @@ class ProcessEventLogsTest extends BrowserTestBase
      * @var array
      */
     protected $group_defs = [
-        'group-1' => [
-            'label' => 'Group 1',
-            'domains' => ['test.net', 'domain.org']
+        'mail' => [
+            'group_1' => [
+                'label' => 'Group 1',
+                'domains' => ['test.net', 'domain.org']
+            ],
+            'group_2' => [
+                'label' => 'Group 2',
+                'domains' => ['domain.org', 'example.com']
+            ],
+            'group_3' => [
+                'label' => 'Group 3',
+                'domains' => ['example.com', 'test.net']
+            ]
         ],
-        'group-2' => [
-            'label' => 'Group 2',
-            'domains' => ['domain.org', 'example.com']
+        'special' => [
+            'special_group_1' => [
+                'label' => 'Special Group 1'
+            ],
+            'special_group_2' => [
+                'label' => 'Special Group 2'
+            ]
+        ]
+    ];
+
+    /**
+     * @var array
+     */
+    protected $user_defs = [
+        'user1' => [
+            'name' => 'Lorenzo Llamas',
+            'emails' => [
+                'lorenzo.llamas@dummy.net'
+            ],
+            'new_emails' => [
+                'lorenzo.llamas@test.net',
+                'lorenzo.llamas@example.com'
+            ],
+            'invalid_emails' => [
+                'lorenzo.llamas@gmail.com',
+                'lorenzo.llamas@yahoo.com',
+            ]
         ],
-        'group-3' => [
-            'label' => 'Group 3',
-            'domains' => ['example.com', 'test.net']
+        'user2' => [
+            'name' => 'Dalai Llama',
+            'emails' => [
+                'dalai.llama@dummy.net'
+            ],
+            'new_emails' => [
+                'dalai.llama@gmail.com',
+                'dalai.llama@domain.org'
+            ],
+            'invalid_emails' => [
+                'dalai.llams@gmail.com',
+                'dalai.llam@yahoo.com',
+            ]
         ]
     ];
 
@@ -114,19 +168,23 @@ class ProcessEventLogsTest extends BrowserTestBase
      */
     protected function setUpGroups()
     {
-        $this->groups = array_map(function ($group) {
-            return $this->createTestGroup($group);
-        }, $this->group_defs);
+        $this->mail_groups = array_map(function ($group) {
+            return $this->createMailTestGroup($group);
+        }, $this->group_defs['mail']);
+
+        $this->special_groups = array_map(function ($group) {
+            return $this->createSpecialTestGroup($group);
+        }, $this->group_defs['special']);
     }
 
     /**
-     * Create a New Group with the specified data
+     * Create a New Mail Group with the specified data
      *
      * @param $data
      * @return \Drupal\Core\Entity\EntityInterface
      * @throws \Drupal\Core\Entity\EntityStorageException
      */
-    protected function createTestGroup($data)
+    protected function createMailTestGroup($data)
     {
         // Create Group
         $group = Group::create(['type' => User::$group_type_email_domain_id, 'label' => $data['label']]);
@@ -142,25 +200,41 @@ class ProcessEventLogsTest extends BrowserTestBase
     }
 
     /**
+     * Create a New Special Group with the specified data
+     *
+     * @param $data
+     * @return \Drupal\Core\Entity\EntityInterface
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
+    protected function createSpecialTestGroup($data)
+    {
+        // Create Group
+        $group = Group::create(['type' => User::$group_special_type_id, 'label' => $data['label']]);
+
+        $group->save();
+
+        return $group;
+    }
+
+    /**
      * Creates user with passed configuration
      * @param $data
      * @return User
      * @throws \Drupal\Core\Entity\EntityStorageException
      */
     public function createTestUser($data) {
-        // Map email addresses to field_email_addresses field
-        $email_field = array_map(function($email) {
-            return [
-                'email' => $email,
-                'status' => 1,
-                'is_primary' => 0
-            ];
-        }, $data['emails']);
-        $email_field[0]['is_primary'] = 1;
 
         /** @var User $user */
         $user = $this->drupalCreateUser([], $data['name'], false);
-        $user->set('field_email_addresses',$email_field);
+
+        //
+        foreach( $data['emails'] as $email) {
+            $user->addEmailAddress($email);
+            $user->makeEmailVerified($email);
+        }
+
+        $this->drupalLogin($user);
+
         $user->save();
 
         return $user;
@@ -169,23 +243,8 @@ class ProcessEventLogsTest extends BrowserTestBase
     /**
      * @return array
      */
-    public function fakeTestUsers() {
-        return [
-            'user1' => [
-                'name' => 'Lorenzo Llamas',
-                'emails' => [
-                    'lorenzo.llamas@test.net',
-                    'lorenzo.llamas@example.com'
-                ],
-            ],
-            'user2' => [
-                'name' => 'Dalai Llama',
-                'emails' => [
-                    'dalai.llama@gmail.com',
-                    'dalai.llama@domain.org'
-                ],
-            ]
-        ];
+    public function fakeTestUsersSeed() {
+        return $this->user_defs;
     }
 
     /**
@@ -194,7 +253,7 @@ class ProcessEventLogsTest extends BrowserTestBase
     public function setupTestUsers() {
         $this->users = array_map(function($user){
             return $this->createTestUser($user);
-        }, $this->fakeTestUsers());
+        }, $this->fakeTestUsersSeed());
     }
 
     public function testLogsAreProcessed()
