@@ -320,9 +320,25 @@ class ProcessEventLogsTest extends BrowserTestBase
          * Remove Special Group
          * Count log = 2
          * Process Logs
-         * Email is Sent
-         * Logs should be all empty
+         *  total 2
+         *  user 1
+         *  queued 1
+         * Count Log = 0
          */
+
+        // We set this to empty because we know the user only has one group from before
+        $this->users['user1']->set('special_groups', []);
+        $this->users['user1']->save();
+
+        $this->assertCount(2, $this->EventsLog->getUnprocessedRecords());
+
+        $this->assertEqual([
+            'total' => 2,
+            'users' => 1,
+            'queued' => 1
+        ], $this->EventsLog->processUnprocessedRecords());
+
+        $this->assertCount(0, $this->EventsLog->getUnprocessedRecords());
 
         /**
          * @ToDo User 2 Block 1
