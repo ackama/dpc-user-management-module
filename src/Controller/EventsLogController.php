@@ -285,9 +285,8 @@ class EventsLogController extends ControllerBase
         $user_logs = $this->groupRecordsByUser($allRecords);
 
         foreach ($user_logs as $uid => $logs) {
+            // Get Results based on logs
             $results = $this->processRecordsForUser($uid, $logs);
-
-            dump($results);
 
             if (empty($results['added']) && empty($results['removed'])) {
                 // There're logs but nothing happened regarding memberships.
@@ -322,6 +321,9 @@ class EventsLogController extends ControllerBase
         ];
     }
 
+    /**
+     * Processes queue and sends out notifications
+     */
     public function sendNotifications() {
         while($this->queue()->numberOfItems()){
             $item = $this->queue()->claimItem();
