@@ -12,7 +12,8 @@ trait HandlesEmailDomainGroupMembership
 {
     /**
      * @param EntityInterface $user
-     * @param string          $email
+     * @param string $email
+     * @throws \Exception
      */
     static function addUserToGroups(EntityInterface $user, $email)
     {
