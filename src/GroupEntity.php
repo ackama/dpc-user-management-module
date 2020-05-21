@@ -42,6 +42,18 @@ class GroupEntity extends Group
         \Drupal::state()->set('dpc_group_domains_remove', array_merge($domains, $removed));
     }
 
+    public function getDomainsToBeRemoved() {
+        // Get domains from State API
+        $doomed = \Drupal::state()->get('dpc_group_domains_remove',[]);
+
+        // Return early if this is empty
+        if(empty($doomed)) {
+            return [];
+        }
+
+        return array_diff($doomed,$this->domains());
+    }
+
     public function preSave(EntityStorageInterface $storage)
     {
         parent::preSave($storage);
