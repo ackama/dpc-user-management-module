@@ -8,11 +8,6 @@ use Drupal\group\Entity\Group;
 class GroupEntity extends Group
 {
     /**
-     * @var \Drupal\Core\Field\FieldItemListInterface
-     */
-    private $original;
-
-    /**
      * Saves removed domains in state key in order to process them postSave
      * It does this by looking at the dirty field and the new one pre save.
      * This pushes the domain values into an array of domains that is not cleaned
