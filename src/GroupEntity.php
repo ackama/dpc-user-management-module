@@ -3,11 +3,14 @@ namespace Drupal\dpc_user_management;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\dpc_user_management\Controller\GroupEntityController;
 use Drupal\group\Entity\Group;
 
 class GroupEntity extends Group
 {
+    /**
+     * @var \Drupal\Core\Field\FieldItemListInterface
+     */
+    private $original;
 
     /**
      * Saves removed domains in state key in order to process them postSave
@@ -18,6 +21,8 @@ class GroupEntity extends Group
      *
      * The result is stored in the State store.
      * IMPORTANT: values need to be rechecked before removing before doing anything
+     *
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
     public function rememberDomainsPreSave() {
 
@@ -147,7 +152,7 @@ class GroupEntity extends Group
     }
 
     /**
-     * @return bool|EntityInterface[]|mixed|void
+     * @return array|void
      */
     protected function discoverRemovableMembers () {
 
@@ -215,14 +220,24 @@ class GroupEntity extends Group
             // @ToDo Remove these uids from $users_to_be_removed_uids
         }
 
+        return $users_to_be_removed_uids;
+    }
+
+    /**
+     * Removes users from groups where domains are no longer valid
+     */
+    protected function removeExistingMembers() {
+
+        $users_to_be_removed_uids = $this->discoverRemovableMembers();
+
+        // Early exit
+        if(empty($users_to_be_removed_uids)){
+            return;
+        }
+
         foreach ($users_to_be_removed_uids as $uid) {
             $user = UserEntity::load($uid);
             $user->removeFromGroup($this);
         }
     }
-
-    protected function removeExistingMembers() {
-
-    }
-
 }
