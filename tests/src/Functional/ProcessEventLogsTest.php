@@ -4,6 +4,7 @@ namespace Drupal\Tests\dpc_user_management\Functional;
 
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\dpc_user_management\Controller\EventsLogController;
+use Drupal\dpc_user_management\Controller\UserEntityController;
 use Drupal\dpc_user_management\UserEntity as User;
 use Drupal\dpc_user_management\GroupEntity as Group;
 use Drupal\Tests\BrowserTestBase;
@@ -414,29 +415,22 @@ class ProcessEventLogsTest extends BrowserTestBase
 
         $this->assertCount(0, $this->EventsLog->getUnprocessedRecords());
 
-        /**
-         * @ToDo General Test
-         *
-         * Add invalid email to Group3
-         * Remove domains that user 1 have.
-         * Count log ??
-         * Process Logs
-         * Email is Sent to user 1 not user 2
-         * Logs should be empty
-         */
-
     }
 
-    function multipleUsersTest() {
+    /**
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     * @throws \Exception
+     */
+    public function testMultipleUsers() {
 
         /**
          * @ToDo All Users Block 1
          *
          * Add All Emails[0] (Group 1) (Group 2) (Group 3) (Group Master) x 2
          * Add invalid domain email to User 2
-         * Count logs = 4
+         * Count logs = 8
          * Process Logs
-         *  total 4
+         *  total 8
          *  users 2
          *  queued 0
          * Count logs = 0
@@ -448,10 +442,10 @@ class ProcessEventLogsTest extends BrowserTestBase
         $this->users['user2']->addEmailAndVerify($this->fakeTestUsersSeed()['user2']['emails'][1]);
         $this->users['user2']->addEmailAndVerify($this->fakeTestUsersSeed()['user2']['invalid_emails'][0]);
 
-        $this->assertCount(4, $this->EventsLog->getUnprocessedRecords());
+        $this->assertCount(8, $this->EventsLog->getUnprocessedRecords());
 
         $this->assertEqual([
-            'total' => 4,
+            'total' => 8,
             'users' => 2,
             'queued' => 0
         ], $this->EventsLog->processUnprocessedRecords());
