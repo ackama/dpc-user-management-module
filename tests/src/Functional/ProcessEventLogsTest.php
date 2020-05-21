@@ -474,19 +474,6 @@ class ProcessEventLogsTest extends BrowserTestBase
         $this->mail_groups['group_2']->set('field_email_domain', [['value' => 'nonexisting.com']]);
         $this->mail_groups['group_2']->save();
 
-//
-//        (new UserEntityController())->processGroupMemberships(['group' => $this->mail_groups['group_1']->id()]);
-//        (new UserEntityController())->processGroupMemberships(['group' => $this->mail_groups['group_2']->id()]);
-//        (new UserEntityController())->processGroupMemberships(['group' => $this->mail_groups['group_3']->id()]);
-
-//        dump($this->mail_groups['group_1']->toArray());
-//        dump($this->mail_groups['group_2']->toArray());
-//        dump($this->mail_groups['group_3']->toArray());
-
-//        dump($this->users['user1']->toArray());
-//        dump($this->users['user2']->toArray());
-        dump($this->EventsLog->getUnprocessedRecords());
-
         $this->assertCount(4, $this->EventsLog->getUnprocessedRecords());
 
         $this->assertEqual([
