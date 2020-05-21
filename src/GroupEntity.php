@@ -81,7 +81,7 @@ class GroupEntity extends Group
             $this->rememberDomainsPreSave();
         }
 
-        parent::preSave($storage);
+        return parent::preSave($storage);
     }
 
     /**
@@ -197,7 +197,7 @@ class GroupEntity extends Group
 
         // Nothing to do here.
         if(empty($this->getDomainsToBeRemoved())){
-            return;
+            return [];
         }
 
         $query = \Drupal::entityQuery('user');
@@ -225,7 +225,7 @@ class GroupEntity extends Group
 
         // Early exit if we didn't find any users with these domains
         if(empty($users_to_be_removed_uids)) {
-            return;
+            return [];
         }
 
         // Then if we haven't existed early, we find users that are entitled
