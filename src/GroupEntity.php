@@ -104,7 +104,13 @@ class GroupEntity extends Group
      */
     public function processGroupMemberships()
     {
-        $this->discoverMembers();
+        // Discover potential members and adds them to Group
+        $newMembers = $this->discoverMembers();
+        $this->addMembers($newMembers);
+
+        // Discovers removable members and removes them from Group
+        $discoverRemoveableMembers = $this->discoverRemovableMembers();
+        $this->removeExistingMembers($discoverRemoveableMembers);
     }
 
     /**
@@ -209,11 +215,9 @@ class GroupEntity extends Group
 
     /**
      * Removes users from groups where domains are no longer valid
+     * @param $users_to_be_removed_uids
      */
-    protected function removeExistingMembers() {
-
-        $users_to_be_removed_uids = $this->discoverRemovableMembers();
-
+    protected function removeExistingMembers($users_to_be_removed_uids) {
         // Early exit
         if(empty($users_to_be_removed_uids)){
             return;
