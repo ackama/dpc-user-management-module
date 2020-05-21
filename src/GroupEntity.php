@@ -124,6 +124,10 @@ class GroupEntity extends Group
      * @return array
      */
     public function discoverMembers() {
+        if(empty($this->domains())){
+            return [];
+        }
+
         $query = \Drupal::entityQuery('user');
 
         $emails_to_be_kept = $query->orConditionGroup();
@@ -150,6 +154,11 @@ class GroupEntity extends Group
      * @throws \Exception
      */
     protected function addMembers($uids) {
+        // Exit if no uids
+        if (empty($uids)) {
+            return;
+        }
+
         /** @var UserEntity[] $users */
         $users = \Drupal\user\Entity\User::loadMultiple($uids);
 
