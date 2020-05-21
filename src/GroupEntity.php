@@ -1,7 +1,6 @@
 <?php
 namespace Drupal\dpc_user_management;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\group\Entity\Group;
 
