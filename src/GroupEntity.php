@@ -24,7 +24,7 @@ class GroupEntity extends Group
         // Gets original field data
         $original = array_map(function($x){
             return $x['value'];
-        },$this->original->get('field_email_domain')->getValue());
+        }, $this->original->get('field_email_domain')->getValue());
 
         // Gets current object data
         $clean = array_map(function($x){
