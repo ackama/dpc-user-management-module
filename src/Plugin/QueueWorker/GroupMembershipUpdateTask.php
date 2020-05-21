@@ -2,7 +2,7 @@
 
 namespace Drupal\dpc_user_management\Plugin\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
-use Drupal\dpc_user_management\Controller\UserEntityController;
+use Drupal\dpc_user_management\Controller\GroupEntityController;
 
 /**
  * Processes Entity Update Tasks for My Module.
@@ -42,7 +42,7 @@ class GroupMembershipUpdateTask extends QueueWorkerBase {
      */
     public function processItem($data)
     {
-        $controller = new UserEntityController();
+        $controller = new GroupEntityController();
         $controller->processGroupMemberships($data);
     }
 }

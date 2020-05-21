@@ -2,7 +2,7 @@
 namespace Drupal\dpc_user_management;
 
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\dpc_user_management\Controller\UserEntityController;
+use Drupal\dpc_user_management\Controller\GroupEntityController;
 use Drupal\group\Entity\Group;
 
 class GroupEntity extends Group
@@ -17,7 +17,7 @@ class GroupEntity extends Group
         parent::postSave($storage, $update);
 
         if ($this->getGroupType()->id() == UserEntity::$group_type_email_domain_id) {
-            (new UserEntityController())->processGroupMemberships(['group' =>  $this->id()]);
+            (new GroupEntityController())->processGroupMemberships(['group' =>  $this->id()]);
         }
     }
 
