@@ -146,6 +146,20 @@ class GroupEntity extends Group
         }
     }
 
+    /**
+     * @return bool|EntityInterface[]|mixed|void
+     */
+    protected function discoverRemovableMembers () {
+
+        // Nothing to do here.
+        if(empty($this->getDomainsToBeRemoved())){
+            return;
+        }
+
+        $query = \Drupal::entityQuery('user');
+
+    }
+
     protected function removeExistingMembers() {
 
     }
