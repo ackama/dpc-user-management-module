@@ -107,19 +107,6 @@ class MailchimpControllerTest extends BrowserTestBase
             ],
         ]);
         $this->user2->save();
-        // /**
-        //  * User3 Email has been invalidated and should be
-        //  * unsubscribed from the audience
-        //  */
-        // $this->user3 = $this->drupalCreateUser(['administer users', 'administer node fields'], 'user2', false, ['mail' => 'user2@subscribedemail.com']);
-        // $this->user3->field_email_addresses->setValue([
-        //     [
-        //         'value'=> 'user3@subscribedemail.com',
-        //         'status' => 'unverified',
-        //         'is_primary' => true
-        //     ]
-        // ]);
-        // $this->user3->save();
 
         $this->mailChimpApi = new FakeMailchimp($this->api_key);
         $this->controller   = new MailchimpController(null, $this->mailChimpApi, $this->audeince_id);
