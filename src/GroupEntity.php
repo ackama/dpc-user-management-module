@@ -158,6 +158,67 @@ class GroupEntity extends Group
 
         $query = \Drupal::entityQuery('user');
 
+        // First we get users to be removed based on the
+        // domains provided by ($this->getDomainsToBeRemoved()
+
+        $emails_to_be_removed = $query->orConditionGroup();
+        $emails_to_be_removed_main = $query->orConditionGroup();
+
+        foreach ($this->getDomainsToBeRemoved() as $domain) {
+            $emails_to_be_removed->condition(
+                $query->andConditionGroup()
+                    ->condition('field_email_addresses.value', '%' . $domain, 'like')
+                    ->condition('field_email_addresses.status', 'verified')
+            );
+            $emails_to_be_removed_main->condition('mail', '%' . $domain, 'like');
+        }
+
+        $users_to_be_removed = $query->andConditionGroup()
+            ->condition($emails_to_be_removed)
+            ->condition($emails_to_be_removed_main);
+
+        $users_to_be_removed_uids = $query->condition($users_to_be_removed)->execute();
+
+        // Early exit if we didn't find any users with these domains
+        if(empty($users_to_be_removed_uids)) {
+            return;
+        }
+
+        // @ToDo find these ids in membership table to further reduce the list of potential removals
+        // if(empty($users_to_be_removed_uids)) {
+        //     return;
+        // }
+        //
+
+        // Then if we haven't existed early, we find users that are entitled
+        // to stay in the group based on the domains provided by $this->domains()
+
+        $emails_to_be_kept = $query->orConditionGroup();
+        $emails_to_be_kept_main = $query->orConditionGroup();
+
+        foreach ($this->domains() as $domain) {
+            $emails_to_be_kept->condition(
+                $query->andConditionGroup()
+                    ->condition('field_email_addresses.value', '%' . $domain, 'like')
+                    ->condition('field_email_addresses.status', 'verified')
+            );
+            $emails_to_be_kept_main->condition('mail', '%' . $domain, 'like');
+        }
+
+        $users_to_be_kept = $query->andConditionGroup()
+            ->condition($emails_to_be_kept)
+            ->condition($emails_to_be_kept_main);
+
+        $users_to_be_kept_uids = $query->condition($users_to_be_kept)->execute();
+
+        if(!empty($users_to_be_kept_uids)){
+            // @ToDo Remove these uids from $users_to_be_removed_uids
+        }
+
+        foreach ($users_to_be_removed_uids as $uid) {
+            $user = UserEntity::load($uid);
+            $user->removeFromGroup($this);
+        }
     }
 
     protected function removeExistingMembers() {
