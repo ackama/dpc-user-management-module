@@ -93,7 +93,7 @@ class MailchimpControllerTest extends BrowserTestBase
          * User2 is part of the audience and has updated their
          * primary email. Email should get updated in mc
          */
-        $this->user2 = $this->drupalCreateUser(['administer users', 'administer node fields'], 'user3', false, ['mail' => 'user2@subscribedmail.com']);
+        $this->user2 = $this->drupalCreateUser(['administer users', 'administer node fields'], 'user3', false, ['mail' => 'user2@newemail.com']);
         $this->user2->field_email_addresses->setValue([
             [
                 'value'=> 'user2@newemail.com',
@@ -101,7 +101,7 @@ class MailchimpControllerTest extends BrowserTestBase
                 'is_primary' => true
             ],
             [
-                'value'=> 'user2@example.net',
+                'value'=> 'user2@subscribedmail.com',
                 'status' => 'verified',
                 'is_primary' => false
             ],
