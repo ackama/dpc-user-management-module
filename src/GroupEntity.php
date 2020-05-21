@@ -195,19 +195,13 @@ class GroupEntity extends Group
             return;
         }
 
-        // @ToDo find these ids in membership table to further reduce the list of potential removals
-        // if(empty($users_to_be_removed_uids)) {
-        //     return;
-        // }
-        //
-
         // Then if we haven't existed early, we find users that are entitled
         // to stay in the group based on the domains provided by $this->discoverMembers()
 
         $users_to_be_kept_uids = $this->discoverMembers();
 
         if(!empty($users_to_be_kept_uids)){
-            // @ToDo Remove these uids from $users_to_be_removed_uids
+            $users_to_be_removed_uids = array_diff($users_to_be_removed_uids, $users_to_be_kept_uids);
         }
 
         return $users_to_be_removed_uids;
