@@ -15,6 +15,7 @@ class GroupEntity extends Group
      *
      * The result is stored in the State store.
      * IMPORTANT: values need to be rechecked before removing before doing anything
+     *            Use $this->getDomainsToBeRemoved() to retrieve them
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
@@ -41,6 +42,11 @@ class GroupEntity extends Group
         \Drupal::state()->set('dpc_group_domains_remove', array_merge($domains, $removed));
     }
 
+    /**
+     * Gets cleaned confirmed list of domains to be removed
+     *
+     * @return array|mixed
+     */
     public function getDomainsToBeRemoved() {
         // Get domains from State API
         $doomed = \Drupal::state()->get('dpc_group_domains_remove',[]);
@@ -53,10 +59,18 @@ class GroupEntity extends Group
         return array_diff($doomed,$this->domains());
     }
 
+    /**
+     * Clear domain removal memory
+     */
     public function clearDomainRemovalMemory() {
         \Drupal::state()->delete('dpc_group_domains_remove');
     }
 
+    /**
+     * @inheritDoc
+     * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     * @throws \Exception
+     */
     public function preSave(EntityStorageInterface $storage)
     {
         if ($this->isNew()) {
@@ -71,8 +85,7 @@ class GroupEntity extends Group
     }
 
     /**
-     * @param EntityStorageInterface $storage
-     *
+     * @inheritDoc
      * @throws \Exception
      */
     public function postSave(EntityStorageInterface $storage, $update = TRUE)
@@ -102,6 +115,8 @@ class GroupEntity extends Group
     }
 
     /**
+     * Controls process that adds and removed members when a group  is modified
+     *
      * @throws \Exception
      */
     public function processGroupMemberships()
@@ -150,6 +165,8 @@ class GroupEntity extends Group
     }
 
     /**
+     * Adds members based on uids
+     *
      * @param $uids
      * @throws \Exception
      */
@@ -172,7 +189,9 @@ class GroupEntity extends Group
     }
 
     /**
-     * @return array|void
+     * Gets a list of ids of user who can safely be removed based on removed domains
+     *
+     * @return array
      */
     protected function discoverRemovableMembers () {
 
@@ -224,6 +243,7 @@ class GroupEntity extends Group
     /**
      * Removes users from groups where domains are no longer valid
      * @param $users_to_be_removed_uids
+     * @throws \Exception
      */
     protected function removeExistingMembers($users_to_be_removed_uids) {
         // Early exit
@@ -232,6 +252,7 @@ class GroupEntity extends Group
         }
 
         foreach ($users_to_be_removed_uids as $uid) {
+            /** @var UserEntity $user */
             $user = UserEntity::load($uid);
             $user->removeFromGroup($this);
         }

@@ -316,6 +316,7 @@ class UserEntity extends User
      * @param $email
      * @return bool|null
      * @throws \Drupal\Core\Entity\EntityStorageException
+     * @throws \Exception
      */
     public function makeEmailVerified($email) {
         if (!$this->emailExists($email)) {
