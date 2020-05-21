@@ -29,13 +29,24 @@ trait HandlesMailchimpSubscriptions
      * HandlesMailchimpSubscriptions constructor.
      *
      * @param string $mailchimp
+     * @param null   $audience_id
+     *
+     * @throws \Exception
      */
-    public function __construct($mailchimp = MailChimp::class)
+    public function __construct($mailchimp = null, $audience_id = null)
     {
+        $this->mailchimp = $mailchimp;
+        $this->audience_id = $audience_id;
+
         $this->config      = \Drupal::config('dpc_mailchimp.settings');
-        $this->audience_id = $this->config->get('audience_id');
-        $this->mailchimp   = new $mailchimp($this->config->get('api_key'));
-        $this->batch       = $this->mailchimp->new_batch();
+        if (!$mailchimp) {
+            $this->mailchimp   = new MailChimp($this->config->get('api_key'));
+        }
+        if (!$this->audience_id) {
+            $this->audience_id = $this->config->get('audience_id');
+        }
+
+        $this->batch = $this->mailchimp->new_batch();
     }
 
     /**

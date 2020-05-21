@@ -114,11 +114,17 @@ function dpc_log_event($name, $gid, $uid)
     ])->execute();
 }
 
+/**
+ * Implements hook_cron()
+ *
+ * @throws Exception
+ */
 function dpc_user_management_cron(){
     $mc_controller = new MailchimpController('cron');
     $request = new Request();
     $mc_controller->syncAudience($request);
 }
+
 /**
  * Implements hook_entity_prepare_form().
  *

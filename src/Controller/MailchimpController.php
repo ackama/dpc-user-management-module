@@ -37,15 +37,20 @@ class MailchimpController extends ControllerBase
      */
     protected $context;
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+    /**
      * @var array
      */
     public $operations_list = [];
 
-    public function __construct($context = null)
+    public function __construct($context = null, $mailchimp = null, $audience_id = null)
     {
         $this->context = $context;
+        $this->logger  = \Drupal::logger('dpc_user_management');
         try {
-            $this->_mc_handler_construct();
+            $this->_mc_handler_construct($mailchimp, $audience_id);
         } catch (\Exception $e) {
         }
     }
@@ -66,7 +71,7 @@ class MailchimpController extends ControllerBase
             return new JsonResponse('Unable to Sync users: Mailchimp configuration is missing', 400);
         }
 
-        // TODO: logging
+        $this->logger->info('Start MailChimp audience sync');
         $this->updateMembersInList();
         $this->addMissingUsersToList();
 
@@ -81,17 +86,22 @@ class MailchimpController extends ControllerBase
         }
 
         if (!empty($this->operations_list)) {
+            foreach ($this->operations_list as $operation) {
+                $this->logger->info($operation, ['@label' => 'MailChimp Sync']);
+            }
 
+            $this->logger->info('End MailChimp audience sync');
             return new JsonResponse($this->operations_list);
         }
 
+        $this->logger->info('End MailChimp audience sync');
         return new JsonResponse('There are no updates to make.');
     }
 
     /**
      * Remove list members who are no longer eligible in drupal
      */
-    private function updateMembersInList()
+    public function updateMembersInList()
     {
         $member_list = $this->mailchimp->get('lists/' . $this->audience_id . '/members');
 
@@ -100,12 +110,17 @@ class MailchimpController extends ControllerBase
             $query = \Drupal::entityQuery('user');
             $query->Condition('field_email_addresses', $email, '=');
             $user_id = $query->execute();
-            /** @var EntityInterface $user */
-            if (empty($user_id)) {
+            $user_id = array_shift($user_id);
+
+            // unsubscribe the member is the user is not found
+            if (!$user_id) {
+                $this->batchUnsubscribe($email);
+
                 continue;
             }
 
-            $user = User::load(array_shift($user_id));
+            /** @var EntityInterface $user */
+            $user = User::load($user_id);
 
             // check if user is unsubscribed
             if ($member['status'] === 'unsubscribed') {
@@ -117,13 +132,6 @@ class MailchimpController extends ControllerBase
                         $user->save();
                     }
                 }
-
-                continue;
-            }
-
-            // unsubscribe the member is the user is not found
-            if (!$user) {
-                $this->batchUnsubscribe($email);
 
                 continue;
             }
@@ -142,14 +150,14 @@ class MailchimpController extends ControllerBase
                 $this->updateEmail($user, $subscribed_email['value'], $primary['value']);
             }
 
-            $this->batchUnsubscribe($user, $email);
+            $this->batchUnsubscribe($email);
         };
     }
 
     /**
      * Add missing users to the list
      */
-    private function addMissingUsersToList()
+    public function addMissingUsersToList()
     {
         $query = \Drupal::entityQuery('user');
         $query->Condition('status', 1, '=');
