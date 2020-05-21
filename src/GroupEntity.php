@@ -59,6 +59,10 @@ class GroupEntity extends Group
         return array_diff($doomed,$this->domains());
     }
 
+    public function clearDomainRemovalMemory() {
+        \Drupal::state()->delete('dpc_group_domains_remove');
+    }
+
     public function preSave(EntityStorageInterface $storage)
     {
         parent::preSave($storage);
@@ -111,6 +115,9 @@ class GroupEntity extends Group
         // Discovers removable members and removes them from Group
         $discoverRemoveableMembers = $this->discoverRemovableMembers();
         $this->removeExistingMembers($discoverRemoveableMembers);
+
+        // Clears domain removal memory from State API
+        $this->clearDomainRemovalMemory();
     }
 
     /**
