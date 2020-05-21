@@ -60,11 +60,15 @@ class GroupEntity extends Group
 
     public function preSave(EntityStorageInterface $storage)
     {
-        parent::preSave($storage);
+        if ($this->isNew()) {
+            return parent::preSave($storage);
+        }
 
         if ($this->getGroupType()->id() == UserEntity::$group_type_email_domain_id) {
             $this->rememberDomainsPreSave();
         }
+
+        parent::preSave($storage);
     }
 
     /**
