@@ -110,38 +110,38 @@ class GroupEntity extends Group
     /**
      * Discover Members who have emails belonging to the group's domain list
      *
-     * @return EntityInterface[]|UserEntity[]
+     * @return array
      */
     public function discoverMembers() {
         $query = \Drupal::entityQuery('user');
 
-        $field_email_orgroup = $query->orConditionGroup();
-        $mail_orgroup = $query->orConditionGroup();
-        $base_orgroup = $query->orConditionGroup();
+        $emails_to_be_kept = $query->orConditionGroup();
+        $emails_to_be_kept_main = $query->orConditionGroup();
 
         foreach ($this->domains() as $domain) {
-            $field_email_orgroup->condition(
+            $emails_to_be_kept->condition(
                 $query->andConditionGroup()
                     ->condition('field_email_addresses.value', '%' . $domain, 'like')
                     ->condition('field_email_addresses.status', 'verified')
             );
-            $mail_orgroup->condition('mail', '%' . $domain, 'like');
+            $emails_to_be_kept_main->condition('mail', '%' . $domain, 'like');
         }
 
-        $base_orgroup->condition($field_email_orgroup);
-        $base_orgroup->condition($mail_orgroup);
-        $query->condition($base_orgroup);
+        $users_to_be_kept = $query->andConditionGroup()
+            ->condition($emails_to_be_kept)
+            ->condition($emails_to_be_kept_main);
 
-        $uids = $query->execute();
-
-        return \Drupal\user\Entity\User::loadMultiple($uids);
+        return $query->condition($users_to_be_kept)->execute();
     }
 
     /**
-     * @param $users UserEntity[]
+     * @param $uids
      * @throws \Exception
      */
-    protected function addMembers($users) {
+    protected function addMembers($uids) {
+        /** @var UserEntity[] $users */
+        $users = \Drupal\user\Entity\User::loadMultiple($uids);
+
         foreach ($users as $user) {
             if ($this->getMember($user)) {
                 continue;
@@ -196,25 +196,9 @@ class GroupEntity extends Group
         //
 
         // Then if we haven't existed early, we find users that are entitled
-        // to stay in the group based on the domains provided by $this->domains()
+        // to stay in the group based on the domains provided by $this->discoverMembers()
 
-        $emails_to_be_kept = $query->orConditionGroup();
-        $emails_to_be_kept_main = $query->orConditionGroup();
-
-        foreach ($this->domains() as $domain) {
-            $emails_to_be_kept->condition(
-                $query->andConditionGroup()
-                    ->condition('field_email_addresses.value', '%' . $domain, 'like')
-                    ->condition('field_email_addresses.status', 'verified')
-            );
-            $emails_to_be_kept_main->condition('mail', '%' . $domain, 'like');
-        }
-
-        $users_to_be_kept = $query->andConditionGroup()
-            ->condition($emails_to_be_kept)
-            ->condition($emails_to_be_kept_main);
-
-        $users_to_be_kept_uids = $query->condition($users_to_be_kept)->execute();
+        $users_to_be_kept_uids = $this->discoverMembers();
 
         if(!empty($users_to_be_kept_uids)){
             // @ToDo Remove these uids from $users_to_be_removed_uids
