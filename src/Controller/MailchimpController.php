@@ -144,10 +144,13 @@ class MailchimpController extends ControllerBase
                 $primary = $user_emails[array_search(true, array_column($user_emails, 'is_primary'))];
                 // unless it is not yet verfied
                 if ($primary['status'] !== 'verified') {
+
                     continue;
                 }
                 $this->operations_list[] = $user->getDisplayName() . ' has updated their primary email, subscribed email will be updated.';
                 $this->updateEmail($user, $subscribed_email['value'], $primary['value']);
+
+                continue;
             }
 
             $this->batchUnsubscribe($email);
