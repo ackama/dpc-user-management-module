@@ -7,6 +7,13 @@ use Drupal\group\Entity\Group;
 class GroupEntity extends Group
 {
     /**
+     * Returns key used by domain removal state memory
+     * @return string
+     */
+    public function domainMemoryKey() {
+        return 'dpc_group_domains_remove_' . $this->id();
+    }
+    /**
      * Saves removed domains in state key in order to process them postSave
      * It does this by looking at the dirty field and the new one pre save.
      * This pushes the domain values into an array of domains that is not cleaned
@@ -38,8 +45,8 @@ class GroupEntity extends Group
             return;
         }
 
-        $domains = \Drupal::state()->get('dpc_group_domains_remove',[]);
-        \Drupal::state()->set('dpc_group_domains_remove', array_merge($domains, $removed));
+        $domains = \Drupal::state()->get($this->domainMemoryKey(),[]);
+        \Drupal::state()->set($this->domainMemoryKey(), array_merge($domains, $removed));
     }
 
     /**
@@ -49,7 +56,7 @@ class GroupEntity extends Group
      */
     public function getDomainsToBeRemoved() {
         // Get domains from State API
-        $doomed = \Drupal::state()->get('dpc_group_domains_remove',[]);
+        $doomed = \Drupal::state()->get($this->domainMemoryKey(),[]);
 
         // Return early if this is empty
         if(empty($doomed)) {
@@ -63,7 +70,7 @@ class GroupEntity extends Group
      * Clear domain removal memory
      */
     public function clearDomainRemovalMemory() {
-        \Drupal::state()->delete('dpc_group_domains_remove');
+        \Drupal::state()->delete($this->domainMemoryKey());
     }
 
     /**
