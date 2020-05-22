@@ -35,7 +35,7 @@ class UserEntityController extends ControllerBase
         $user = User::load($user->id());
         
         /** @var \Drupal\Core\Field\FieldItemList $addresses */
-        $addresses = $user->field_email_addresses->getValue();
+        $addresses = $user->get('field_email_addresses')->getValue();
 
         if (!empty($addresses)) {
             foreach ($addresses as $key => $address) {
@@ -48,7 +48,7 @@ class UserEntityController extends ControllerBase
                 }
             }
 
-            $user->field_email_addresses->setValue($addresses);
+            $user->get('field_email_addresses')->setValue($addresses);
             $user->save();
         }
 
@@ -75,7 +75,7 @@ class UserEntityController extends ControllerBase
         $user = User::load($user->id());
 
         /** @var \Drupal\Core\Field\FieldItemList $addresses */
-        $addresses = $user->field_email_addresses->getValue();
+        $addresses = $user->get('field_email_addresses')->getValue();
         if (!empty($addresses)) {
             foreach ($addresses as $key => $address) {
                 if ($address['value'] == $email) {
@@ -90,7 +90,7 @@ class UserEntityController extends ControllerBase
                 return new JsonResponse('Email and user do not match', 404);
             }
 
-            $user->field_email_addresses->setValue($addresses);
+            $user->get('field_email_addresses')->setValue($addresses);
             $user->save();
         }
 
@@ -137,7 +137,7 @@ class UserEntityController extends ControllerBase
                 continue;
             }
 
-            $addresses = $user->field_email_addresses->getValue();
+            $addresses = $user->get('field_email_addresses')->getValue();
             if (empty($addresses)) {
                 self::addUserToGroup($user, $group);
 

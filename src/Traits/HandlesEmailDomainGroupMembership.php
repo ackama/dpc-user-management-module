@@ -69,7 +69,7 @@ trait HandlesEmailDomainGroupMembership
     static function removeUsersFromGroups(UserInterface $user, $removed_emails)
     {
         // get all the verified users emails
-        $user_emails = array_filter($user->field_email_addresses->getValue(), function($email) {
+        $user_emails = array_filter($user->get('field_email_addresses')->getValue(), function($email) {
             return isset($email['status']) && $email['status'] == 'verified';
         });
 
