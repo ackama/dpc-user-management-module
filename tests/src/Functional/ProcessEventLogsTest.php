@@ -4,7 +4,6 @@ namespace Drupal\Tests\dpc_user_management\Functional;
 
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\dpc_user_management\Controller\EventsLogController;
-use Drupal\dpc_user_management\Controller\UserEntityController;
 use Drupal\dpc_user_management\UserEntity as User;
 use Drupal\dpc_user_management\GroupEntity as Group;
 use Drupal\Tests\BrowserTestBase;
@@ -456,28 +455,26 @@ class ProcessEventLogsTest extends BrowserTestBase
          * @ToDo All Users Block 2
          *
          * Add invalid domain to Group3 (User 2 maintains)
-         * Remove all domains from groups (User1 = -2 Groups, User2 = -1 Groups, User 1= -1 Master Group)
-         * Count log = 4
+         * Remove all domains from groups (User1 = -3 Groups, User2 = -2 Groups, User 1= -1 Master Group)
+         * Count log = 6
          * Process Logs
-         *  total 4
+         *  total 6
          *  users 2
          *  queued 1
          * Count log 0
          */
 
+        $this->mail_groups['group_1']->set('field_email_domain', []);
+        $this->mail_groups['group_1']->save();
+        $this->mail_groups['group_2']->set('field_email_domain', []);
+        $this->mail_groups['group_2']->save();
         $this->mail_groups['group_3']->set('field_email_domain', [['value' => 'gmail.com']]);
         $this->mail_groups['group_3']->save();
 
-        $this->mail_groups['group_1']->set('field_email_domain', [['value' => 'nonexisting.com']]);
-        $this->mail_groups['group_1']->save();
-
-        $this->mail_groups['group_2']->set('field_email_domain', [['value' => 'nonexisting.com']]);
-        $this->mail_groups['group_2']->save();
-
-        $this->assertCount(4, $this->EventsLog->getUnprocessedRecords());
+        $this->assertCount(6, $this->EventsLog->getUnprocessedRecords());
 
         $this->assertEqual([
-            'total' => 4,
+            'total' => 6,
             'users' => 2,
             'queued' => 1
         ], $this->EventsLog->processUnprocessedRecords());
