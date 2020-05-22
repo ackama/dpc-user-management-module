@@ -27,6 +27,7 @@ trait HandleMembershipTrait
     {
         if (!$this->inGroup($group)) {
             $group->addMember($this);
+            dpc_log_event('added', $group->id(), $this->id());
         }
     }
 
@@ -38,6 +39,7 @@ trait HandleMembershipTrait
     {
         if($this->inGroup($group)) {
             $group->removeMember($this);
+            dpc_log_event('removed', $group->id(), $this->id());
         }
     }
 
