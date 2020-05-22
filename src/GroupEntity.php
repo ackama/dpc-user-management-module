@@ -67,6 +67,48 @@ class GroupEntity extends Group
     }
 
     /**
+     * @param array $domains
+     */
+    public function addDomains(array $domains) {
+        $new = array_map(
+            function ($domain) {
+                return ['value' => $domain];
+            },
+            array_unique(
+                array_reduce(
+                    $domains,
+                    function ($c, $domain) {
+                        $c[] = $domain;
+                        return $c;
+                    },
+                    $this->domains()
+                )
+            )
+        );
+
+        $this->set('field_email_domain', $new);
+    }
+
+    /**
+     * @param array $domains_to_remove
+     */
+    public function removeDomains(array $domains_to_remove) {
+        $new = array_map(
+            function ($domain) {
+                return ['value' => $domain];
+            },
+            array_filter(
+                $this->domains(),
+                function ($domain) use ($domains_to_remove) {
+                    return !in_array($domain, $domains_to_remove);
+                }
+            )
+        );
+
+        $this->set('field_email_domain', $new);
+    }
+
+    /**
      * @inheritDoc
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      * @throws \Exception
