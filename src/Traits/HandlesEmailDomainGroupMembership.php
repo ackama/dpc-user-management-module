@@ -70,7 +70,7 @@ trait HandlesEmailDomainGroupMembership
     static function removeUsersFromGroups(UserInterface $user, $removed_emails)
     {
         // get all the verified users emails
-        $user_emails = array_filter($user->field_email_addresses->getValue(), function($email) {
+        $user_emails = array_filter($user->get('field_email_addresses')->getValue(), function($email) {
             return isset($email['status']) && $email['status'] == 'verified';
         });
 
@@ -125,7 +125,7 @@ trait HandlesEmailDomainGroupMembership
         $user_email_domains = array_map(function ($email) {
             return explode('@', $email)[1];
         }, $user_emails);
-        $group_emails       = array_column($group->field_email_domain->getValue(), 'value');
+        $group_emails       = array_column($group->get('field_email_domain')->getValue(), 'value');
 
         return count(array_intersect($user_email_domains, $group_emails)) > 0;
     }
