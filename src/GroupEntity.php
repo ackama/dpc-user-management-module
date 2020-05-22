@@ -185,25 +185,7 @@ class GroupEntity extends Group
             return [];
         }
 
-        $query = \Drupal::entityQuery('user');
-
-        $emails_to_be_kept = $query->orConditionGroup();
-        $emails_to_be_kept_main = $query->orConditionGroup();
-
-        foreach ($this->domains() as $domain) {
-            $emails_to_be_kept->condition(
-                $query->andConditionGroup()
-                    ->condition('field_email_addresses.value', '%' . $domain, 'like')
-                    ->condition('field_email_addresses.status', 'verified')
-            );
-            $emails_to_be_kept_main->condition('mail', '%' . $domain, 'like');
-        }
-
-        $users_to_be_kept = $query->andConditionGroup()
-            ->condition($emails_to_be_kept)
-            ->condition($emails_to_be_kept_main);
-
-        return $query->condition($users_to_be_kept)->execute();
+        return $this->queryUsersByDomains($this->domains());
     }
 
     /**
@@ -231,39 +213,52 @@ class GroupEntity extends Group
     }
 
     /**
+     * @param array $domains
+     * @return array|int
+     */
+    public function queryUsersByDomains(array $domains) {
+
+        if(empty($domains)){
+            return [];
+        }
+
+        $query = \Drupal::entityQuery('user');
+
+        $emails_field_query = $query->orConditionGroup();
+        $user_email_query = $query->orConditionGroup();
+
+        foreach ($domains as $domain) {
+            $emails_field_query->condition(
+                $query->andConditionGroup()
+                    ->condition('field_email_addresses.value', '%' . $domain, 'like')
+                    ->condition('field_email_addresses.status', 'verified')
+            );
+            $user_email_query->condition('mail', '%' . $domain, 'like');
+        }
+
+        $users = $query->orConditionGroup()
+            ->condition($emails_field_query)
+            ->condition($user_email_query);
+
+        return $query->condition($users)->execute();
+    }
+
+    /**
      * Gets a list of ids of user who can safely be removed based on removed domains
      *
      * @return array
      */
-    protected function discoverRemovableMembers () {
+    public function discoverRemovableMembers() {
 
         // Nothing to do here.
         if(empty($this->getDomainsToBeRemoved())){
             return [];
         }
 
-        $query = \Drupal::entityQuery('user');
-
         // First we get users to be removed based on the
         // domains provided by ($this->getDomainsToBeRemoved()
 
-        $emails_to_be_removed = $query->orConditionGroup();
-        $emails_to_be_removed_main = $query->orConditionGroup();
-
-        foreach ($this->getDomainsToBeRemoved() as $domain) {
-            $emails_to_be_removed->condition(
-                $query->andConditionGroup()
-                    ->condition('field_email_addresses.value', '%' . $domain, 'like')
-                    ->condition('field_email_addresses.status', 'verified')
-            );
-            $emails_to_be_removed_main->condition('mail', '%' . $domain, 'like');
-        }
-
-        $users_to_be_removed = $query->andConditionGroup()
-            ->condition($emails_to_be_removed)
-            ->condition($emails_to_be_removed_main);
-
-        $users_to_be_removed_uids = $query->condition($users_to_be_removed)->execute();
+        $users_to_be_removed_uids = $this->queryUsersByDomains($this->getDomainsToBeRemoved());
 
         // Early exit if we didn't find any users with these domains
         if(empty($users_to_be_removed_uids)) {
