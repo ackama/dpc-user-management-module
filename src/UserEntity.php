@@ -141,7 +141,6 @@ class UserEntity extends User
             }
         }
 
-        // @ToDo replace these with ->get('field_email_addresses')->setValue($addresses);
         $this->get('field_email_addresses')->setValue($addresses);
         if (!empty($verification_sent)) {
             \Drupal::messenger()->addMessage(t('A verification email was sent to ' . implode(',', $verification_sent)));
