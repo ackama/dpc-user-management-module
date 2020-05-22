@@ -2,7 +2,7 @@
 
 namespace Drupal\dpc_user_management\Traits;
 
-use Drupal\group\Entity\Group;
+use Drupal\dpc_user_management\GroupEntity as Group;
 
 /**
  * Class SpecialGroupsMembershipHandler
