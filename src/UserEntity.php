@@ -141,8 +141,7 @@ class UserEntity extends User
             }
         }
 
-        // @ToDo replace these with ->field_email_addresses->setValue($addresses);
-        $this->field_email_addresses->setValue($addresses);
+        $this->get('field_email_addresses')->setValue($addresses);
         if (!empty($verification_sent)) {
             \Drupal::messenger()->addMessage(t('A verification email was sent to ' . implode(',', $verification_sent)));
         }
@@ -241,8 +240,8 @@ class UserEntity extends User
         $user = \Drupal::entityManager()
             ->getStorage('user')
             ->loadUnchanged($this->id());
-        $addresses = $user->field_email_addresses->getValue();
-        $new_addresses = $this->field_email_addresses->getValue();
+        $addresses = $user->get('field_email_addresses')->getValue();
+        $new_addresses = $this->get('field_email_addresses')->getValue();
         foreach ($new_addresses as $key => $address) {
             if (array_search($address['value'], array_column($addresses, 'value')) === false) {
                 $new_addresses[$key]['status'] = 'new';
