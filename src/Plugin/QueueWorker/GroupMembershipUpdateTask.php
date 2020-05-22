@@ -77,7 +77,7 @@ class GroupMembershipUpdateTask extends QueueWorkerBase {
                 continue;
             }
 
-            $addresses = $user->field_email_addresses->getValue();
+            $addresses = $user->get('field_email_addresses')->getValue();
             if (empty($addresses)) {
                 self::addUserToGroup($user, $group);
 
