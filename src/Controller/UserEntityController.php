@@ -112,7 +112,7 @@ class UserEntityController extends ControllerBase
         // check if existing users can be added to the group
         $query = \Drupal::entityQuery('user');
 
-        $domains = $group->field_email_domain->getValue();
+        $domains = $group->get('field_email_domain')->getValue();
 
         $field_email_orgroup = $query->orConditionGroup();
         $mail_orgroup = $query->orConditionGroup();
