@@ -75,7 +75,6 @@ class AccessReminderBlock extends BlockBase implements BlockPluginInterface{
      * {@inheritdoc}
      */
     protected function blockAccess(AccountInterface $account) {
-        // @ToDo Possibly refactor after merging with PR https://github.com/ackama/dpc-user-management-module/pull/32
         $group_ids =  \Drupal::entityQuery('group')
             ->condition('label', UserEntity::$group_label)
             ->accessCheck(false)

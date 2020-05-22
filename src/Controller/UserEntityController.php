@@ -7,8 +7,8 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
+use Drupal\dpc_user_management\UserEntity as User;
 use Drupal\group\Entity\Group;
-use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -34,7 +34,7 @@ class UserEntityController extends ControllerBase
         $user = User::load($user->id());
         
         /** @var \Drupal\Core\Field\FieldItemList $addresses */
-        $addresses = $user->field_email_addresses->getValue();
+        $addresses = $user->get('field_email_addresses')->getValue();
 
         if (!empty($addresses)) {
             foreach ($addresses as $key => $address) {
@@ -47,7 +47,7 @@ class UserEntityController extends ControllerBase
                 }
             }
 
-            $user->field_email_addresses->setValue($addresses);
+            $user->get('field_email_addresses')->setValue($addresses);
             $user->save();
         }
 
@@ -74,7 +74,7 @@ class UserEntityController extends ControllerBase
         $user = User::load($user->id());
 
         /** @var \Drupal\Core\Field\FieldItemList $addresses */
-        $addresses = $user->field_email_addresses->getValue();
+        $addresses = $user->get('field_email_addresses')->getValue();
         if (!empty($addresses)) {
             foreach ($addresses as $key => $address) {
                 if ($address['value'] == $email) {
@@ -89,7 +89,7 @@ class UserEntityController extends ControllerBase
                 return new JsonResponse('Email and user do not match', 404);
             }
 
-            $user->field_email_addresses->setValue($addresses);
+            $user->get('field_email_addresses')->setValue($addresses);
             $user->save();
         }
 
