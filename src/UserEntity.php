@@ -233,7 +233,8 @@ class UserEntity extends User
         $addresses = $user->field_email_addresses->getValue();
         $new_addresses = $this->field_email_addresses->getValue();
         foreach ($new_addresses as $key => $address) {
-            if (array_search($address['value'], array_column($addresses, 'value')) === false) {
+            if (array_search($address['value'], array_column($addresses, 'value')) === false
+                && $user->getEmail() !== $address['value']) {
                 $new_addresses[$key]['status'] = 'new';
             };
         }
