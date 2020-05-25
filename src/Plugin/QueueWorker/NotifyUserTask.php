@@ -2,7 +2,6 @@
 
 namespace Drupal\dpc_user_management\Plugin\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
-use Drupal\dpc_user_management\GroupEntity as Group;
 use Drupal\dpc_user_management\UserEntity as User;
 use Drupal\dpc_user_management\Traits\HandleMembershipTrait;
 use Drupal\dpc_user_management\Traits\MembershipMailTrait;
@@ -51,10 +50,10 @@ class NotifyUserTask extends QueueWorkerBase {
         /** @var User $user */
         $user = User::load($data['user_id']);
 
-        /** @var Group[] $groups */
-        $groups = Group::loadMultiple(array_keys($data['removed']));
+        /** @var array */
+        $groups_ids = $data['removed'];
 
-        self::sendEmail($user, $groups);
+        self::sendEmail($user, $groups_ids);
         // @ToDo Hook sending sms notifications when available
 
     }
