@@ -155,12 +155,12 @@ class GroupEntity extends Group
      */
     public static function preDelete(EntityStorageInterface $storage, array $entities)
     {
-        parent::preDelete($storage, $entities);
-
         $DeletedGroupController = new DeletedGroupController();
         foreach ($entities as $group) {
             $DeletedGroupController->saveDeletedRecord($group);
         }
+
+        parent::preDelete($storage, $entities);
     }
 
     /**
