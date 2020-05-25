@@ -8,3 +8,8 @@ dpc_user_management.group_events_log:
   title: 'Group membership events log'
   route_name: dpc_user_management.group_events_log
   parent: system.admin_config_system
+dpc_user_management.user_import:
+  title: 'Import Users from CSV'
+  description: 'Import Users from uploaded CSV file'
+  route_name: dpc_user_management.user_import
+  parent: system.admin_config_system
