@@ -3,23 +3,41 @@
 namespace Drupal\dpc_user_management\Traits;
 
 use Drupal;
+use Drupal\dpc_user_management\Controller\EventsLogController;
+use Drupal\dpc_user_management\GroupEntity;
 use Drupal\dpc_user_management\UserEntity as User;
-use Drupal\dpc_user_management\GroupEntity as Group;
 
 trait MembershipMailTrait {
+
     /**
-     * @param User    $user
-     * @param Group[] $groups
+     * @param $id
+     * @return string
      */
-    static function sendEmail($user, $groups)
+    static function getGroupLabel($id) {
+        $group = GroupEntity::load($id);
+
+        if(!is_null($group)) {
+            return $group->label();
+        }
+
+        $group = (new EventsLogController())->getDeletedGroup($id);
+
+        return $group->label . ' (Deleted)';
+    }
+
+    /**
+     * @param User $user
+     * @param int[] $group_ids
+     */
+    static function sendEmail($user, $group_ids)
     {
         $config = \Drupal::config('system.site');
         $site_name = $config->get('name');
 
-        $group_names = array_map(function($g) {
-            /** @var Group $g */
-            return $g->label();
-        }, $groups);
+        $group_names = array_map(function($gid) {
+            /** @var int $gid */
+            return self::getGroupLabel($gid);
+        }, $group_ids);
 
         $user_emails = array_map(function($email) {
             return $email['value'];
