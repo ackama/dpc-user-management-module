@@ -87,6 +87,9 @@ function dpc_user_management_schema()
         ],
     ];
 
+    $schema[\Drupal\dpc_user_management\Controller\DeletedGroupController::$table_name] =
+        \Drupal\dpc_user_management\Controller\DeletedGroupController::$schema;
+
     return $schema;
 }
 
