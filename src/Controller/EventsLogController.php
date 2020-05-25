@@ -146,7 +146,7 @@ class EventsLogController extends ControllerBase
      * @param $id
      * @return array
      */
-    public function getGroupData($id) {
+    public function getDisplayGroupData($id) {
         $group = GroupEntity::load($id);
 
         if(!is_null($group)) {
@@ -194,7 +194,7 @@ class EventsLogController extends ControllerBase
             $table_items[] = [
                 'Date'   => $created,
                 'Action' => $log->name,
-                'Group'  => $this->getGroupData($log->gid)['markup'],
+                'Group'  => $this->getDisplayGroupData($log->gid)['markup'],
                 'User'   => $user_display,
                 'Status' => $log->status
             ];
