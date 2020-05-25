@@ -39,8 +39,6 @@ class NewSetupBlock extends BlockBase {
      * {@inheritdoc}
      */
     public function blockForm($form, FormStateInterface $form_state) {
-        $form = parent::blockForm($form, $form_state);
-
         $config = $this->getConfiguration();
 
         $form[$this->field_id_content] = [
@@ -59,13 +57,5 @@ class NewSetupBlock extends BlockBase {
     public function blockSubmit($form, FormStateInterface $form_state) {
         parent::blockSubmit($form, $form_state);
         $this->configuration[$this->field_id_content] = $form_state->getValue($this->field_id_content);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function blockAccess(AccountInterface $account) {
-
-        return AccessResult::allowedIf(true);//$account->getLastAccessedTime() == 0);
     }
 }
