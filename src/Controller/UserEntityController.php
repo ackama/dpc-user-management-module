@@ -5,7 +5,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\dpc_user_management\Plugin\QueueWorker\GroupMembershipUpdateTask;
+use Drupal\dpc_user_management\Event\PrimaryEmailUpdated;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
 use Drupal\dpc_user_management\UserEntity as User;
