@@ -8,7 +8,6 @@ use Drupal\Core\Render\Markup;
 use Drupal\dpc_user_management\GroupEntity;
 use Drupal\dpc_user_management\Plugin\QueueWorker\NotifyUserTask;
 use Drupal\dpc_user_management\UserEntity;
-use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
 
 class EventsLogController extends ControllerBase
