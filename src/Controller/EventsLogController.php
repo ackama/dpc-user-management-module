@@ -126,12 +126,13 @@ class EventsLogController extends ControllerBase
     /**
      * @return DeletedGroupController
      */
-    private function getDeletedGroupController() {
-        if($this->_DeletedGroupController) {
-            return $this->_DeletedGroupController;
+    private function getDeletedGroupController()
+    {
+        if (is_null($this->_DeletedGroupController)) {
+            $this->_DeletedGroupController = new DeletedGroupController();
         }
 
-        return new DeletedGroupController();
+        return new $this->_DeletedGroupController;
     }
 
     /**
