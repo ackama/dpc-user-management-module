@@ -373,6 +373,15 @@ class EventsLogController extends ControllerBase
     }
 
     /**
+     * Delete Log Records for Deleted User
+     *
+     * @param $user UserEntity
+     */
+    public function deleteRecordsForUser($user) {
+        $this->getDB()->delete($this->t)->condition('uid', $user->id())->execute();
+    }
+
+    /**
      * Processes queue and sends out notifications
      */
     public function sendNotifications() {

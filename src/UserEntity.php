@@ -4,6 +4,7 @@ namespace Drupal\dpc_user_management;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\dpc_user_management\Controller\EventsLogController;
 use Drupal\dpc_user_management\Traits\HandleMembershipTrait;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\dpc_user_management\GroupEntity;
@@ -105,6 +106,16 @@ class UserEntity extends User
 
         $this->processSpecialGroupsOnSave($update);
         $this->synchronizeMemberships($update);
+    }
+
+    public static function preDelete(EntityStorageInterface $storage, array $entities)
+    {
+        $EventLogsController = new EventsLogController();
+        foreach($entities as $user) {
+            $EventLogsController->deleteRecordsForUser($user);
+        }
+
+        parent::preDelete($storage, $entities);
     }
 
     /**
