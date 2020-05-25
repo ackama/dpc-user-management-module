@@ -6,6 +6,7 @@ dpc_user_management.invalidate_emails:
   weight: 99
 dpc_user_management.group_events_log:
   title: 'Group membership events log'
+  description: 'Displays Unprocessed membership events'
   route_name: dpc_user_management.group_events_log
   parent: system.admin_config_system
 dpc_user_management.mailchimp.admin:
