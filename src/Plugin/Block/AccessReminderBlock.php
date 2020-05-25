@@ -58,12 +58,10 @@ class AccessReminderBlock extends BlockBase implements BlockPluginInterface{
 
         $content = !empty($config[$this->field_id_content]) ? $config[$this->field_id_content] : self::$_default_text;
 
-        $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
-
         // Formats text to include user edit link
-        $text = $this->t(sprintf($content, '/user/' . $user->id() . '/edit'));
+        $text = $this->t(sprintf($content, '/user/' . \Drupal::currentUser()->id() . '/edit'));
 
-        $output = [
+        return [
             '#markup' => sprintf('<div id="%s" class="%s">%s</div>', self::$_div_id, self::$_div_class, $text),
             '#attached' => [
                 'library' => [
@@ -71,10 +69,6 @@ class AccessReminderBlock extends BlockBase implements BlockPluginInterface{
                 ],
             ],
         ];
-
-        \Drupal\Core\Cache\CacheableMetadata::createFromObject($user)->applyTo($output);
-
-        return $output;
     }
 
     /**
