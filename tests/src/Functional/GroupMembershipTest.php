@@ -112,7 +112,7 @@ class GroupMembershipTest extends BrowserTestBase
 
         // get the verification email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
@@ -139,7 +139,7 @@ class GroupMembershipTest extends BrowserTestBase
 
         // verify the new email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
@@ -173,7 +173,7 @@ class GroupMembershipTest extends BrowserTestBase
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         // verify the new email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
