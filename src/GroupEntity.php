@@ -2,6 +2,7 @@
 namespace Drupal\dpc_user_management;
 
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\dpc_user_management\Controller\DeletedGroupController;
 use Drupal\group\Entity\Group;
 
 class GroupEntity extends Group
@@ -143,6 +144,22 @@ class GroupEntity extends Group
 
         if ($this->getGroupType()->id() == UserEntity::$group_type_email_domain_id) {
             $this->processGroupMemberships();
+        }
+    }
+
+    /**
+     * @inheritDoc
+     * @param EntityStorageInterface $storage
+     * @param array $entities
+     * @throws \Exception
+     */
+    public static function preDelete(EntityStorageInterface $storage, array $entities)
+    {
+        parent::preDelete($storage, $entities);
+
+        $DeletedGroupController = new DeletedGroupController();
+        foreach ($entities as $group) {
+            $DeletedGroupController->saveDeletedRecord($group);
         }
     }
 
