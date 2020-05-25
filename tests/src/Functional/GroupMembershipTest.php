@@ -155,7 +155,7 @@ class GroupMembershipTest extends BrowserTestBase
         $site_name = \Drupal::config('system.site')->get('name');
         $captured_emails = $this->drupalGetMails();
 
-        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[2]['subject']);
+        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[1]['subject']);
     }
 
     /**
