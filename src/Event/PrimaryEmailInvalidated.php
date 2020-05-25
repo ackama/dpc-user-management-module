@@ -6,7 +6,7 @@ use Drupal\user\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Event that is fired when a user logs in.
+ * Event that is fired when a user's primary email is invalidated
  */
 class PrimaryEmailInvalidated extends Event {
 
