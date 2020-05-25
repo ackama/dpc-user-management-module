@@ -9,7 +9,6 @@ use Drupal\dpc_user_management\Plugin\QueueWorker\GroupMembershipUpdateTask;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
 use Drupal\dpc_user_management\UserEntity as User;
-use Drupal\group\Entity\Group;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
