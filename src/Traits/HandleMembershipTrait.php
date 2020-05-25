@@ -2,6 +2,7 @@
 
 namespace Drupal\dpc_user_management\Traits;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\dpc_user_management\GroupEntity as Group;
 
 /**
@@ -63,5 +64,19 @@ trait HandleMembershipTrait
         $group = Group::load($_id);
 
         $this->removeFromGroup($group);
+    }
+
+    /**
+     * @param string $type
+     * @return Group[]|EntityInterface[]
+     */
+    public static function getGroupsByType(string $type)
+    {
+        $group_ids = \Drupal::entityQuery('group')
+            ->condition('type', $type)
+            ->accessCheck(false)
+            ->execute();
+
+        return Group::loadMultiple($group_ids);
     }
 }

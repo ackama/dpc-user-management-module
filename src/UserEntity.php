@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\dpc_user_management\Traits\HandleMembershipTrait;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
+use Drupal\dpc_user_management\GroupEntity;
 use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
@@ -113,7 +114,7 @@ class UserEntity extends User
      * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
      */
-    protected function verify_email_addresses()
+    public function verify_email_addresses()
     {
         $verification_sent = [];
         $user = User::load($this->id());
@@ -140,21 +141,26 @@ class UserEntity extends User
             }
         }
 
-        $this->field_email_addresses->setValue($addresses);
+        $this->get('field_email_addresses')->setValue($addresses);
         if (!empty($verification_sent)) {
             \Drupal::messenger()->addMessage(t('A verification email was sent to ' . implode(',', $verification_sent)));
         }
     }
 
-    protected function accessGroup() {
+    /**
+     * Returns Main Access Group
+     *
+     * @return \Drupal\dpc_user_management\GroupEntity
+     */
+    public function accessGroup() {
         // Toggles user access to content group
         $group_ids =  \Drupal::entityQuery('group')
             ->condition('label', UserEntity::$group_label)
             ->accessCheck(false)
             ->execute();
 
-        /** @var Group $group */
-        $group = Group::load(array_pop($group_ids));
+        /** @var GroupEntity $group */
+        $group = GroupEntity::load(array_pop($group_ids));
 
         return $group;
     }
@@ -210,11 +216,15 @@ class UserEntity extends User
         /** @var $safe_groups Group[] */
         $safe_groups = array_filter(
             self::getGroupsByType(self::$group_special_type_id),
-            function (Group $g) {
+            function (GroupEntity $g) {
                 if (in_array($g->id(), $this->_get_target_ids('special_groups'))) {
-                    $g->addMember($this);
+                    $this->addToGroup($g);
+
                     return true;
                 }
+
+                $this->removeFromGroup($g);
+
                 return false;
             }
         );
@@ -230,8 +240,8 @@ class UserEntity extends User
         $user = \Drupal::entityManager()
             ->getStorage('user')
             ->loadUnchanged($this->id());
-        $addresses = $user->field_email_addresses->getValue();
-        $new_addresses = $this->field_email_addresses->getValue();
+        $addresses = $user->get('field_email_addresses')->getValue();
+        $new_addresses = $this->get('field_email_addresses')->getValue();
         foreach ($new_addresses as $key => $address) {
             if (array_search($address['value'], array_column($addresses, 'value')) === false) {
                 $new_addresses[$key]['status'] = 'new';
@@ -242,17 +252,130 @@ class UserEntity extends User
     }
 
     /**
-     * @param string $type
-     * @return \Drupal\group\Entity\Group[]|\Drupal\Core\Entity\EntityInterface[]
+     * Checks if user already has that email in their information
+     *
+     * @param $email
+     * @return bool
+     * @throws \Drupal\Core\Entity\EntityStorageException
      */
-    public static function getGroupsByType(string $type)
-    {
-        $group_ids = \Drupal::entityQuery('group')
-            ->condition('type', $type)
-            ->accessCheck(false)
-            ->execute();
+    public function emailExists($email) {
+        return in_array($email, array_map(function ($x) {
+            return $x['value'];
+        }, $this->get('field_email_addresses')->getValue()));
+    }
 
-        return Group::loadMultiple($group_ids);
+    /**
+     * Adds email address to user object
+     *
+     * @param $email
+     * @return int|null
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
+    public function addEmailAddress($email) {
+        if ($this->emailExists($email)) {
+            return null;
+        }
+
+        $addresses = $this->get('field_email_addresses')->getValue();
+        $addresses[] = [
+            'value' => $email,
+            'is_primary' => 0,
+            'status' => 'new'
+        ];
+        $this->set('field_email_addresses', $addresses);
+
+        return true;
+    }
+
+    /**
+     * Remove Email Address form User
+     *
+     * @param $email
+     * @return int|null
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     * @throws \Exception
+     */
+    public function removeEmailAddress($email) {
+        if (!$this->emailExists($email)) {
+            return null;
+        }
+
+        $addresses = $this->get('field_email_addresses')->getValue();
+        $addresses = array_filter($addresses, function($email_address) use ($email) {
+            return $email != $email_address['value'];
+        });
+        $this->set('field_email_addresses', $addresses);
+
+        self::removeUsersFromGroups($this, [$email]);
+
+        return true;
+    }
+
+    /**
+     * @param $email
+     * @return bool|null
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     * @throws \Exception
+     */
+    public function makeEmailVerified($email) {
+        if (!$this->emailExists($email)) {
+            return null;
+        }
+
+        $addresses = $this->get('field_email_addresses')->getValue();
+        $addresses = array_map(function($email_address) use ($email) {
+            if($email_address['value'] == $email) {
+                $email_address['status'] = 'verified';
+                $email_address['verification_token'] = null;
+            }
+
+            return $email_address;
+        }, $addresses);
+        $this->set('field_email_addresses', $addresses);
+
+        self::addUserToGroups($this, $email);
+
+        return true;
+    }
+
+    /**
+     * @param $email
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
+    public function addEmailAndVerify($email) {
+        $this->addEmailAddress($email);
+        $this->save();
+
+        $this->makeEmailVerified($email);
+        $this->save();
+    }
+
+    /**
+     * @param $email
+     * @return |null
+     * @throws \Drupal\Core\Entity\EntityStorageException
+     */
+    public function makeEmailPrimary($email) {
+        if (!$this->emailExists($email)) {
+            return null;
+        }
+
+        $addresses = $this->get('field_email_addresses')->getValue();
+        $addresses = array_map(function($email_address) use ($email) {
+            if($email_address['value'] == $email) {
+                $email_address['is_primary'] = 1;
+
+                return $email_address;
+            }
+
+            $email_address['is_primary'] = 0;
+
+            return $email_address;
+        }, $addresses);
+
+        $this->set('field_email_addresses', $addresses);
+
+        return true;
     }
 
     /**
@@ -315,6 +438,7 @@ class UserEntity extends User
      * decide if the user should be in the Access Group
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+     * @throws \Exception
      */
     private function synchronizeMemberships($update) {
 
@@ -337,12 +461,12 @@ class UserEntity extends User
 
         // Provide access after all calculations have been done
         if( $grantAccess ) {
-            $this->accessGroup()->addMember($this);
+            $this->addToGroup($this->accessGroup());
 
             return;
         }
 
-        $this->accessGroup()->removeMember($this);
+        $this->removeFromGroup($this->accessGroup());
 
         return;
 
