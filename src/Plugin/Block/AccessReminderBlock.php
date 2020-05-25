@@ -80,6 +80,13 @@ class AccessReminderBlock extends BlockBase implements BlockPluginInterface{
     /**
      * {@inheritdoc}
      */
+    public function getCacheMaxAge() {
+        return 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function blockAccess(AccountInterface $account) {
         $group_ids =  \Drupal::entityQuery('group')
             ->condition('label', UserEntity::$group_label)
