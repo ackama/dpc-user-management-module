@@ -79,7 +79,7 @@ class InvalidateEmailsForm extends ConfigFormBase
             }
 
             $user      = User::load(current($user_id));
-            $addresses = $user->field_email_addresses->getValue();
+            $addresses = $user->get('field_email_addresses')->getValue();
             $event_dispatcher = \Drupal::service('event_dispatcher');
 
             if (!empty($addresses)) {
@@ -94,7 +94,7 @@ class InvalidateEmailsForm extends ConfigFormBase
                     }
                 }
                 $users_updated[] = $user->getDisplayName();
-                $user->field_email_addresses->setValue($addresses);
+                $user->get('field_email_addresses')->setValue($addresses);
                 $user->save();
             }
         }

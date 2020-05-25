@@ -16,7 +16,6 @@ use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * TODO: add helpful content or remove this hook
  * Implements hook_help().
  *
  * @param                     $route_name

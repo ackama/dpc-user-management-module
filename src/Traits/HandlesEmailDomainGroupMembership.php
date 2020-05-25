@@ -12,7 +12,8 @@ trait HandlesEmailDomainGroupMembership
 {
     /**
      * @param EntityInterface $user
-     * @param string          $email
+     * @param string $email
+     * @throws \Exception
      */
     static function addUserToGroups(EntityInterface $user, $email)
     {
@@ -69,7 +70,7 @@ trait HandlesEmailDomainGroupMembership
     static function removeUsersFromGroups(UserInterface $user, $removed_emails)
     {
         // get all the verified users emails
-        $user_emails = array_filter($user->field_email_addresses->getValue(), function($email) {
+        $user_emails = array_filter($user->get('field_email_addresses')->getValue(), function($email) {
             return isset($email['status']) && $email['status'] == 'verified';
         });
 
@@ -93,10 +94,6 @@ trait HandlesEmailDomainGroupMembership
                 array_push($groups_removed_from, $group->get('label')->getValue()[0]['value']);
                 dpc_log_event('removed', $group->id(), $user->id());
             };
-        }
-
-        if (!empty($groups_removed_from)) {
-            self::sendNotificationUserIsRemovedFromGroup($user_emails, $groups_removed_from, $user->getPreferredLangcode());
         }
     }
 
@@ -124,33 +121,8 @@ trait HandlesEmailDomainGroupMembership
         $user_email_domains = array_map(function ($email) {
             return explode('@', $email)[1];
         }, $user_emails);
-        $group_emails       = array_column($group->field_email_domain->getValue(), 'value');
+        $group_emails       = array_column($group->get('field_email_domain')->getValue(), 'value');
 
         return count(array_intersect($user_email_domains, $group_emails)) > 0;
-    }
-
-    /**
-     * @param               $user_emails
-     * @param Group[]|array $groups
-     * @param               $langcode
-     */
-    static function sendNotificationUserIsRemovedFromGroup($user_emails, $groups, $langcode)
-    {
-        $config = \Drupal::config('system.site');
-        $site_name = $config->get('name');
-
-        $message = "Changes were made to you account which has affected your group membership. \n\r";
-        $message .= sprintf(
-            "You have been removed from the following %s: %s",
-            (count($groups) > 1 ? 'groups' : 'group'),
-            implode(', ', $groups)
-        );
-        $params['context']['subject'] = "$site_name: You have been removed from a group" ;
-        $params['context']['message'] = $message;
-
-        $mailManager = \Drupal::service('plugin.manager.mail');
-        foreach ($user_emails as $email) {
-            $mailManager->mail('system', 'mail', $email, $langcode, $params);
-        }
     }
 }

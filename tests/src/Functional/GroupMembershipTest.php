@@ -2,6 +2,7 @@
 namespace Drupal\Tests\dpc_user_management\Functional;
 
 use Drupal\Core\Test\AssertMailTrait;
+use Drupal\dpc_user_management\Controller\EventsLogController;
 use Drupal\dpc_user_management\UserEntity;
 use Drupal\group\Entity\Group;
 use Drupal\Tests\BrowserTestBase;
