@@ -6,6 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\dpc_user_management\Event\PrimaryEmailInvalidated;
 use Drupal\user\Entity\User;
 
 class InvalidateEmailsForm extends ConfigFormBase
@@ -79,12 +80,17 @@ class InvalidateEmailsForm extends ConfigFormBase
 
             $user      = User::load(current($user_id));
             $addresses = $user->get('field_email_addresses')->getValue();
+            $event_dispatcher = \Drupal::service('event_dispatcher');
 
             if (!empty($addresses)) {
                 foreach ($addresses as $key => $address) {
                     if ($address['value'] == $email) {
                         $addresses[$key]['status']             = 'unverified';
                         $addresses[$key]['verification_token'] = null;
+                        if ($address['is_primary']) {
+                            $event = new PrimaryEmailInvalidated($user);
+                            $event_dispatcher->dispatch('primaryEmailInvalidated', $event);
+                        }
                     }
                 }
                 $users_updated[] = $user->getDisplayName();
