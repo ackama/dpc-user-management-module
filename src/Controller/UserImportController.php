@@ -294,6 +294,7 @@ class UserImportController extends ControllerBase
     /**
      * @param File $file
      * @return bool
+     * @throws \Exception
      */
     public function parseCSVFile(File $file) {
 
@@ -307,7 +308,7 @@ class UserImportController extends ControllerBase
             $record = $this->parseImportUserRecord($data);
 
             if($record) {
-                // $this->saveRecordInDB($record);
+                $this->insertRecord($record);
             }
         }
 
