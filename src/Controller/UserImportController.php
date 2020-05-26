@@ -87,7 +87,7 @@ class UserImportController extends ControllerBase
                 'not null'    => true,
                 'default'     => '',
             ],
-            'pre_import_outcome' => [
+            'outcome' => [
                 'description' => 'Pre Import Outcome',
                 'type'        => 'varchar',
                 'length'      => 255,
@@ -201,21 +201,49 @@ class UserImportController extends ControllerBase
     const ERR_CONTAINS_COLUMN_NAME = false;
     const ERR_INVALID_RDATE = false;
 
-    const OUT_SUCCESS = 'import';
-    const OUT_FAILED = 'failed';
-    const OUT_MAIL_EXISTS = 'mail exists';
+    const OUT_VALID = 'valid to import';
+    const OUT_MAIL_EXISTS = 'e-mail exists';
+    const OUT_MAIL_DOMAIN_INVALID = 'e-mail domain not whitelisted';
     const OUT_USERNAME_EXISTS = 'username exists';
-    const OUT_INVALID = 'invalid';
+    const OUT_UNKNOWN = 'unknown';
 
     const ST_NEW = 'new';
     const ST_IMPORTED = 'imported';
     const ST_NOT_ALLOWED = 'not allowed';
+    const ST_UNKNOWN = 'unknown';
 
     /**
      * @param $record
      * @return bool|mixed
      */
     public function validateImportRecord($record) {
+        $record['outcome'] = self::OUT_UNKNOWN;
+        $record['status'] = self::ST_UNKNOWN;
+
+        if (!$this->validateEmailUnique($record)) {
+            $record['outcome'] = self::OUT_MAIL_EXISTS;
+            $record['status']  = self::ST_NOT_ALLOWED;
+
+            return false;
+        }
+
+        if (!$this->validateEmailDomain($record)) {
+            $record['outcome'] = self::OUT_MAIL_DOMAIN_INVALID;
+            $record['status']  = self::ST_NOT_ALLOWED;
+
+            return false;
+        }
+
+        if (!$this->validateUsername($record)) {
+            $record['outcome'] = self::OUT_USERNAME_EXISTS;
+            $record['status']  = self::ST_NOT_ALLOWED;
+
+            return false;
+        }
+
+        $record['outcome'] = self::OUT_VALID;
+        $record['status']  = self::ST_NEW;
+
         return $record;
     }
 
@@ -234,9 +262,21 @@ class UserImportController extends ControllerBase
     }
 
     public function validateUsername($record) {
+        // Find in Database and check if it's unique
 
+        return false;
+    }
 
-        return $record;
+    public function validateEmailUnique($record) {
+        // Find in Database and check if it's unique
+
+        return false;
+    }
+
+    public function validateEmailDomain($record) {
+        // Find in Database and check if it's unique
+
+        return false;
     }
 
     public function validateDate($date) {
