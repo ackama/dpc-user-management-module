@@ -12,4 +12,4 @@ dpc_user_management.user_import:
   title: 'Import Users from CSV'
   description: 'Import Users from uploaded CSV file'
   route_name: dpc_user_management.user_import
-  parent: system.admin_config_system
+  parent: user.admin_index
