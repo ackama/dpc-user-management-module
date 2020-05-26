@@ -39,7 +39,7 @@ dpc_user_management.group_events_log:
   options:
     _admin_route: TRUE
 dpc_user_management.user_import:
-  path: '/admin/config/content/user_import'
+  path: '/admin/config/people/user_import'
   defaults:
     _form: 'Drupal\dpc_user_management\Form\UserImportForm'
     _title: 'User Import'
