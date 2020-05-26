@@ -156,6 +156,18 @@ class UserImportController extends ControllerBase
     }
 
     /**
+     * @param $record
+     * @return Drupal\Core\Database\StatementInterface|int|null
+     * @throws \Exception
+     */
+    public function insertRecord($record) {
+        return $this->getDB()
+            ->insert(self::$t)
+            ->fields($record)
+            ->execute();
+    }
+
+    /**
      * Returns records that have not been processed
      *
      * @param array $record
