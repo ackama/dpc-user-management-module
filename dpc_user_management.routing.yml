@@ -44,4 +44,11 @@ dpc_user_management.user_import:
     _form: 'Drupal\dpc_user_management\Form\UserImportForm'
     _title: 'User Import'
   requirements:
-    _permission: 'administer bulk user import'
+    _permission: 'administer user import'
+dpc_user_management.user_import_commit:
+  path: '/admin/config/people/user_import/commit'
+  defaults:
+    _form: 'Drupal\dpc_user_management\Form\UserImportCommitForm'
+    _title: 'User Import Confirmation'
+  requirements:
+    _permission: 'administer user import'
