@@ -78,6 +78,14 @@ function dpc_user_management_install()
                     'settings' => []
                 ])->save();
             }
+
+            if (!$view->getComponent('field_mailchimp_audience_status')) {
+                /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
+                $view->setComponent('field_mailchimp_audience_status', [
+                    'type' => 'text_default',
+                    'settings' => []
+                ])->save();
+            }
         }
     };
 
@@ -102,6 +110,14 @@ function dpc_user_management_install()
                 /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
                 $view->setComponent('jse_access', [
                     'type' => 'boolean_checkbox',
+                    'settings' => []
+                ])->save();
+            }
+
+            if (!$view->getComponent('field_mailchimp_audience_status')) {
+                /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
+                $view->setComponent('field_mailchimp_audience_status', [
+                    'type' => 'string_textfield',
                     'settings' => []
                 ])->save();
             }

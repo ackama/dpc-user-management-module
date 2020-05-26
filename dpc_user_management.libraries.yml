@@ -13,3 +13,13 @@ user_frontend:
   css:
     theme:
       css/frontend.css: {}
+
+mailchimp:
+  version: 'VERSION'
+  css:
+    theme:
+      css/backend.css: {}
+  js:
+    js/mailchimp.js: {}
+  dependencies:
+    - 'core/jquery'

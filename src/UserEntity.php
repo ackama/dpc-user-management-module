@@ -4,6 +4,7 @@ namespace Drupal\dpc_user_management;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\dpc_user_management\Controller\EventsLogController;
 use Drupal\dpc_user_management\Traits\HandleMembershipTrait;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\dpc_user_management\GroupEntity;
@@ -76,6 +77,7 @@ class UserEntity extends User
 
     /**
      * @param EntityStorageInterface $storage
+     *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
      * @throws \Exception
@@ -107,6 +109,16 @@ class UserEntity extends User
         $this->synchronizeMemberships($update);
     }
 
+    public static function preDelete(EntityStorageInterface $storage, array $entities)
+    {
+        $EventLogsController = new EventsLogController();
+        foreach($entities as $user) {
+            $EventLogsController->deleteRecordsForUser($user);
+        }
+
+        parent::preDelete($storage, $entities);
+    }
+
     /**
      * Verifies Email Addresses
      *
@@ -117,18 +129,18 @@ class UserEntity extends User
     public function verify_email_addresses()
     {
         $verification_sent = [];
-        $user = User::load($this->id());
+        $user              = User::load($this->id());
         // Check email addresses
         $addresses = $this->getDirtyAddresses();
         foreach ($addresses as $key => $address) {
             // If there is no status assume this is new, send a verification email
             if (empty($address['status']) || $address['status'] === 'new') {
-                $token      = Crypt::randomBytesBase64(55);
-                $email      = $address['value'];
+                $token = Crypt::randomBytesBase64(55);
+                $email = $address['value'];
                 $this->sendVerificationNotification($email, $token, $user);
                 $addresses[$key]['status']             = 'pending';
                 $addresses[$key]['verification_token'] = $token;
-                $verification_sent[] = $email;
+                $verification_sent[]                   = $email;
             }
             // If a primary email flag has been set then override the mail setting
             if ($address['is_primary']) {
@@ -166,12 +178,22 @@ class UserEntity extends User
     }
 
     /**
+     * Is the user in the master 'Access' group
+     *
+     * @return bool
+     */
+    public function hasGroupContentAccess() {
+        return $this->accessGroup()->getMember($this) ? true : false;
+    }
+
+    /**
      * Because drupal can't handle adding default values to old records (ie existing users)
      * when creating these fields, we need to check for unset values first
      * We use this helper function to keep things DRY
      *
      * @param string $field_name
-     * @param bool $original
+     * @param bool   $original
+     *
      * @return bool
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
      */
@@ -179,7 +201,7 @@ class UserEntity extends User
     {
         $value = !$original ? $this->get($field_name)->getValue() : $this->original->get($field_name)->getValue();
 
-        return empty($value) ? false : (bool) $value[0]['value'];
+        return empty($value) ? false : (bool)$value[0]['value'];
     }
 
     /**
@@ -237,13 +259,14 @@ class UserEntity extends User
      */
     private function getDirtyAddresses()
     {
-        $user = \Drupal::entityManager()
+        $user          = \Drupal::entityManager()
             ->getStorage('user')
             ->loadUnchanged($this->id());
         $addresses = $user->get('field_email_addresses')->getValue();
         $new_addresses = $this->get('field_email_addresses')->getValue();
         foreach ($new_addresses as $key => $address) {
-            if (array_search($address['value'], array_column($addresses, 'value')) === false) {
+            if (array_search($address['value'], array_column($addresses, 'value')) === false
+                && $user->getEmail() !== $address['value']) {
                 $new_addresses[$key]['status'] = 'new';
             };
         }

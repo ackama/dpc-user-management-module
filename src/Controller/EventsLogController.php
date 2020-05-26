@@ -5,9 +5,9 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Pager\PagerManager;
 use Drupal\Core\Render\Markup;
+use Drupal\dpc_user_management\GroupEntity;
 use Drupal\dpc_user_management\Plugin\QueueWorker\NotifyUserTask;
 use Drupal\dpc_user_management\UserEntity;
-use Drupal\group\Entity\Group;
 use Drupal\user\Entity\User;
 
 class EventsLogController extends ControllerBase
@@ -47,6 +47,11 @@ class EventsLogController extends ControllerBase
      * @var NotifyUserTask
      */
     private $_queue_worker;
+
+    /**
+     * @var DeletedGroupController
+     */
+    private $_DeletedGroupController;
 
     /**
      * @return \Drupal\Core\Database\Connection
@@ -119,6 +124,50 @@ class EventsLogController extends ControllerBase
     }
 
     /**
+     * @return DeletedGroupController
+     */
+    private function getDeletedGroupController()
+    {
+        if (is_null($this->_DeletedGroupController)) {
+            $this->_DeletedGroupController = new DeletedGroupController();
+        }
+
+        return new $this->_DeletedGroupController;
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function getDeletedGroup($id) {
+        return $this->getDeletedGroupController()->getRecord($id);
+    }
+
+    /**
+     * @param $id
+     * @return array
+     */
+    public function getDisplayGroupData($id) {
+        $group = GroupEntity::load($id);
+
+        if(!is_null($group)) {
+            return [
+                'id' => $group->id(),
+                'label' => $group->getName(),
+                'markup' => Markup::create(sprintf('<a href="/group/%s">%s</a>', $group->id(), $group->getName()))
+            ];
+        }
+
+        $group = $this->getDeletedGroup($id);
+
+        return [
+            'id' => $group->id,
+            'label' => $group->label,
+            'markup' => Markup::create(sprintf('%s (Deleted)', $group->label))
+        ];
+    }
+
+    /**
      * Displays all event records
      *
      * @return array
@@ -132,20 +181,22 @@ class EventsLogController extends ControllerBase
         $uids   = array_map(function ($log) {
             return $log->uid;
         }, $logs);
-        $groups = Group::loadMultiple(array_unique($gids));
         $users  = User::loadMultiple(array_unique($uids));
 
         $table_items = [];
         foreach ($logs as $log) {
             $created       = DrupalDateTime::createFromTimestamp($log->created, \Drupal::currentUser()->getTimeZone())
                 ->format('Y-m-d H:i:s');
-            $group         = $groups[$log->gid]->getName();
-            $user          = $users[$log->uid]->getDisplayName();
+
+            $user_display = isset($users[$log->uid])
+                ? Markup::create(sprintf('<a href="/user/%s">%s</a>', $log->uid, $users[$log->uid]->getDisplayName()))
+                : 'Unavailable';
+
             $table_items[] = [
                 'Date'   => $created,
                 'Action' => $log->name,
-                'Group'  => Markup::create("<a href='/group/$log->gid'>$group</a>"),
-                'User'   => Markup::create("<a href='/user/$log->uid'>$user</a>"),
+                'Group'  => $this->getDisplayGroupData($log->gid)['markup'],
+                'User'   => $user_display,
                 'Status' => $log->status
             ];
         }
@@ -319,6 +370,15 @@ class EventsLogController extends ControllerBase
             'users' => count($user_logs),
             'queued' => $this->queue()->numberOfItems()
         ];
+    }
+
+    /**
+     * Delete Log Records for Deleted User
+     *
+     * @param $user UserEntity
+     */
+    public function deleteRecordsForUser($user) {
+        $this->getDB()->delete($this->t)->condition('uid', $user->id())->execute();
     }
 
     /**

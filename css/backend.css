@@ -84,4 +84,10 @@
   #main-wrapper #edit-field-email-addresses-wrapper .form-item .form-type-checkbox label:after {
     top: 3px; }
 
+#mc-sync-result {
+  background: #f6f6f6;
+  margin: 1em 0;
+  padding: 1em;
+  display: none; }
+
 /*# sourceMappingURL=backend.css.map */
