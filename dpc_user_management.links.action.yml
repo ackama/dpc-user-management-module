@@ -1,0 +1,5 @@
+dpc_user_management.group_events_log.process:
+  route_name: dpc_user_management.group_events_log.process
+  title: 'Process Event Logs'
+  appears_on:
+    - dpc_user_management.group_events_log
