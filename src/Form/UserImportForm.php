@@ -36,14 +36,14 @@ class UserImportForm extends ConfigFormBase
     {
         $form = parent::buildForm($form, $form_state);
         $form['csv_file'] = [
-            '#type'        => 'textarea',
+            '#type'        => 'file',
             '#title'       => $this->t('Upload a CSV file with users records'),
             '#description' => $this->t('The file has 4 columns: "FIRST NAME","SURNAME","EMAIL","REGISTRATION DATE". Fields needs to be quoted and the date needs to be in the format "YYYY/MM/DD"')
         ];
         $form['invalid_domains'] = [
             '#type'        => 'textarea',
-            '#title'       => $this->t('List the domains you want to remove from the file when importing'),
-            '#description' => $this->t('The users will still have access to their account and will be prompted to remove or re-verify the email address.')
+            '#title'       => $this->t('Allowed Domains'),
+            '#description' => $this->t('A list of domains that white lists users in the CSV import file. The rest of the users will be ignored')
         ];
         $form['actions']['submit'] = [
             '#type' => 'submit',
