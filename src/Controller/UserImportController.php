@@ -319,7 +319,6 @@ class UserImportController extends ControllerBase
 
     /**
      * @param FormStateInterface $form_state
-     * @return bool
      * @throws \Exception
      */
     public function processImport(FormStateInterface $form_state)
@@ -335,8 +334,9 @@ class UserImportController extends ControllerBase
 
         $csv_file = $this->getCSVfile($form_state);
         if( !$csv_file) {
-            return false;
+            return;
         }
+
         $results = $this->parseCSVFile($csv_file);
     }
 
