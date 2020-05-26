@@ -219,6 +219,32 @@ class UserImportController extends ControllerBase
         return $record;
     }
 
+    public function generateUsername($record, $attempt = 0) {
+        $name = strtolower($record['first_name']);
+        $surname = strtolower($record['surname']);
+
+        $username = sprintf('%s_%s',
+            substr($name,0,3),
+            substr($surname, 0)
+        );
+
+        $record['username'] = $record;
+
+        return $record;
+    }
+
+    public function validateUsername($record) {
+
+
+        return $record;
+    }
+
+    public function validateDate($date) {
+        $dt = \DateTime::createFromFormat("Y-m-d", $date);
+
+        return $dt !== false && !array_sum($dt::getLastErrors());
+    }
+
     /**
      * @param $data
      * @return bool|mixed
@@ -243,6 +269,24 @@ class UserImportController extends ControllerBase
 
         // We create a record like array with the keys and data
         $record = array_combine($column_keys, $data);
+
+        if(!$this->validateDate($record['registration_date'])) {
+            return self::ERR_INVALID_RDATE;
+        }
+
+        // generates valid username
+        $username_attempts = 0;
+        do {
+            $record['username'] = $this->generateUsername($record, $username_attempts);
+            $username_attempts++;
+        } while (!$this->validateUsername($record));
+
+        // Capitalise Names
+        $record['first_name'] = ucfirst($record['first_name']);
+        $record['surname'] = ucfirst($record['surname']);
+
+        // Have a Full Name
+        $record['name'] = sprintf('%s %s', $record['first_name'], $record['surname']);
 
         return $this->validateImportRecord($record);
     }
