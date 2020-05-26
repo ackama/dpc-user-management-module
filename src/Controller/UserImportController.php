@@ -187,6 +187,17 @@ class UserImportController extends ControllerBase
 
     const ERR_INVALID_RECORD = false;
     const ERR_CONTAINS_COLUMN_NAME = false;
+    const ERR_INVALID_RDATE = false;
+
+    const OUT_SUCCESS = 'import';
+    const OUT_FAILED = 'failed';
+    const OUT_MAIL_EXISTS = 'mail exists';
+    const OUT_USERNAME_EXISTS = 'username exists';
+    const OUT_INVALID = 'invalid';
+
+    const ST_NEW = 'new';
+    const ST_IMPORTED = 'imported';
+    const ST_NOT_ALLOWED = 'not allowed';
 
     /**
      * @param $record
