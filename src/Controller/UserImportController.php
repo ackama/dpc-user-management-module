@@ -296,7 +296,7 @@ class UserImportController extends ControllerBase
      * @return bool
      * @throws \Exception
      */
-    public function parseCSVFile(File $file) {
+    public function importCSVFile(File $file) {
 
         $handle = fopen($file->getFilename(),'r');
 
@@ -337,7 +337,7 @@ class UserImportController extends ControllerBase
             return;
         }
 
-        $results = $this->parseCSVFile($csv_file);
+        $results = $this->importCSVFile($csv_file);
     }
 
     public function processCommit()
