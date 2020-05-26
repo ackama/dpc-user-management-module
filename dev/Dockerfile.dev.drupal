@@ -73,6 +73,7 @@ RUN docker-php-ext-install pdo pdo_mysql
 # Install and setup opcache
 RUN docker-php-ext-install opcache
 COPY config/services/drupal/usr/local/etc/php/conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY config/services/drupal/usr/local/etc/php/conf.d/core.ini /usr/local/etc/php/conf.d/core.ini
 
 # Clean up a file which could cause confusion in the context of our app
 RUN rm /var/www/html/index.nginx-debian.html
