@@ -108,6 +108,15 @@ class UserImportController extends ControllerBase
     ];
 
     /**
+     * @var FormStateInterface
+     */
+    private $form_state;
+
+    public function _construct(FormStateInterface $form_state) {
+        $this->form_state = $form_state;
+    }
+
+    /**
      * @return Connection
      */
     private function getDB() {
@@ -181,20 +190,6 @@ class UserImportController extends ControllerBase
         // Update User Record with outcome and status
 
         return true;
-    }
-
-    /**
-     * @param FormStateInterface $state
-     * @return EntityInterface|File|null
-     */
-    public function getCSVfile(FormStateInterface $state) {
-        $file_array = $state->getValue('csv_file');
-
-        if (!is_array($file_array) || !isset($file_array[0])) {
-            return null;
-        }
-
-        return File::load($file_array[0]);
     }
 
     const ERR_INVALID_RECORD = false;
@@ -344,10 +339,11 @@ class UserImportController extends ControllerBase
 
     /**
      * @param File $file
+     * @param array $whitelist
      * @return bool
      * @throws \Exception
      */
-    public function importCSVFile(File $file) {
+    public function importCSVFile(File $file, array $whitelist) {
 
         $handle = fopen($file->getFilename(),'r');
 
@@ -357,6 +353,11 @@ class UserImportController extends ControllerBase
 
         while (!($data = fgetcsv($handle))) {
             $record = $this->parseImportUserRecord($data);
+
+            // if record is not in the white list, skip
+            if(!in_array($record['email'], $whitelist)) {
+                continue;
+            }
 
             if($record) {
                 $this->insertRecord($record);
@@ -369,19 +370,19 @@ class UserImportController extends ControllerBase
     }
 
     /**
-     * @param FormStateInterface $form_state
+     * @param File $file
+     * @param array $whitelist
      * @throws \Exception
      */
-    public function processImport(FormStateInterface $form_state)
+    public function processImport(File $file, array $whitelist)
     {
         drupal_flush_all_caches();
 
-        $csv_file = $this->getCSVfile($form_state);
-        if( !$csv_file) {
+        if(!$file || empty($whitelist)) {
             return;
         }
 
-        $results = $this->importCSVFile($csv_file);
+        $results = $this->importCSVFile($file, $whitelist);
     }
 
     public function processCommit()

@@ -2,11 +2,13 @@
 
 namespace Drupal\dpc_user_management\Form;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\dpc_user_management\Controller\UserImportController;
+use Drupal\file\Entity\File;
 
 class UserImportForm extends ConfigFormBase
 {
@@ -46,7 +48,7 @@ class UserImportForm extends ConfigFormBase
             ),
             '#required'    => true
         ];
-        $form['invalid_domains'] = [
+        $form['whitelist'] = [
             '#type'        => 'textarea',
             '#title'       => $this->t('Allowed Domains'),
             '#description' => $this->t('A list of domains that white lists users in the CSV import file. The rest of the users will be ignored')
@@ -61,6 +63,25 @@ class UserImportForm extends ConfigFormBase
     }
 
     /**
+     * @param FormStateInterface $form_state
+     * @return EntityInterface|File|null
+     */
+    public function getCSVfile(FormStateInterface $form_state) {
+        $file_array = $form_state->getValue('csv_file');
+
+        if (!is_array($file_array) || !isset($file_array[0])) {
+            return null;
+        }
+
+        return File::load($file_array[0]);
+    }
+
+    public function getWhitelistDomains(FormStateInterface$form_state) {
+        return $form_state->getValue('whitelist');
+    }
+
+
+    /**
      * {@inheritdoc}
      * @throws \Exception
      */
@@ -68,7 +89,13 @@ class UserImportForm extends ConfigFormBase
     {
         $controller = new UserImportController();
 
-        $controller->processImport($form_state);
+        $csv = $this->getCSVfile($form_state);
+
+        $whitelist = $this->getWhitelistDomains($form_state);
+
+        $controller->processImport($csv, $whitelist);
+
+        $csv->delete();
     }
 
     /**
