@@ -267,10 +267,21 @@ class UserImportController extends ControllerBase
         return false;
     }
 
+    /**
+     * @param $record
+     * @return boolean
+     */
     public function validateEmailUnique($record) {
-        // Find in Database and check if it's unique
+        $query = \Drupal::entityQuery('user');
 
-        return false;
+        $email = $record['email'];
+
+        return !!$query->condition(
+                $query->orConditionGroup()->condition('field_email_addresses.value', $email)
+                    ->condition('mail', $email)
+            )
+            ->count()
+            ->execute();
     }
 
     public function validateEmailDomain($record) {
