@@ -6,6 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\dpc_user_management\Controller\UserImportController;
 
 class UserImportForm extends ConfigFormBase
 {
@@ -59,7 +60,9 @@ class UserImportForm extends ConfigFormBase
      */
     public function submitForm(array &$form, FormStateInterface $form_state)
     {
-        // Stub
+        $controller = new UserImportController();
+
+        $controller->processCSVFile();
     }
 
     /**

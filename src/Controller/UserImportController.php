@@ -164,4 +164,28 @@ class UserImportController extends ControllerBase
 
         return true;
     }
+
+    public function processCSVFile() {
+
+    }
+
+    public function processImport()
+    {
+        /**
+         * 1. Get Users from Data
+         * 2. Get Domains from Data
+         * 3. Validate Users
+         * 4. Process each user and save record
+         * 5. Report / Forward to Commit with Report
+         **/
+    }
+
+    public function processCommit()
+    {
+        /**
+         * 1. Process Records in Batches of 10
+         * 2. Create User from Records in DB
+         * 3. Capture final outcome in Database
+         */
+    }
 }
