@@ -382,6 +382,15 @@ class EventsLogController extends ControllerBase
     }
 
     /**
+     * Triggers Processing of Logs and redirects back to the Events Log page
+     */
+    public function triggerProcessing() {
+        $this->processUnprocessedRecords();
+
+        return $this->redirect('dpc_user_management.group_events_log');
+    }
+
+    /**
      * Processes queue and sends out notifications
      */
     public function sendNotifications() {

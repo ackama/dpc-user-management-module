@@ -59,3 +59,12 @@ dpc_user_management.group_events_log:
     _permission: 'access administration pages'
   options:
     _admin_route: TRUE
+dpc_user_management.group_events_log.process:
+  path: '/admin/config/system/group-events-log/process'
+  defaults:
+    _controller: '\Drupal\dpc_user_management\Controller\EventsLogController::triggerProcessing'
+    _title: 'Process events log entries'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
