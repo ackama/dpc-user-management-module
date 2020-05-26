@@ -317,6 +317,11 @@ class UserImportController extends ControllerBase
         return true;
     }
 
+    /**
+     * @param FormStateInterface $form_state
+     * @return bool
+     * @throws \Exception
+     */
     public function processImport(FormStateInterface $form_state)
     {
         drupal_flush_all_caches();
