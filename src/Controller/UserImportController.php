@@ -364,13 +364,6 @@ class UserImportController extends ControllerBase
     public function processImport(FormStateInterface $form_state)
     {
         drupal_flush_all_caches();
-        /**
-         * 1. Get Users from Data
-         * 2. Get Domains from Data
-         * 3. Validate Users
-         * 4. Process each user and save record
-         * 5. Report / Forward to Commit with Report
-         **/
 
         $csv_file = $this->getCSVfile($form_state);
         if( !$csv_file) {
