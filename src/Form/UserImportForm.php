@@ -39,7 +39,7 @@ class UserImportForm extends ConfigFormBase
         $form['csv_file'] = [
             '#type'        => 'managed_file',
             '#title'       => $this->t('Upload a CSV file with users records'),
-            '#description' => $this->t('The file has 4 columns: "FIRST NAME","SURNAME","EMAIL" and "REGISTRATION DATE". Use these exact headers. Fields needs to be quoted and the date needs to be in the format "YYYY/MM/DD". Max file size 8MB.'),
+            '#description' => $this->t('The file has 4 columns: "FIRST NAME","SURNAME","EMAIL" and "REGISTRATION DATE". Use these exact headers. Fields needs to be quoted and the date needs to be in the format "YYYY-MM-DD". Max file size 8MB.'),
             '#upload_validators'  => array(
                 'file_validate_extensions' => array('csv'),
                 'file_validate_size' => array(8*1024*1024),
