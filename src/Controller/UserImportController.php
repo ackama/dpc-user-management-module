@@ -164,6 +164,20 @@ class UserImportController extends ControllerBase
             ->fetchObject();
     }
 
+    public function inProgressRaw() {
+        return !!$this->query()
+            ->condition('status', self::ST_RAW)
+            ->countQuery()
+            ->execute();
+    }
+
+    public function inProgressValidated() {
+        return !!$this->query()
+            ->condition('status', self::ST_NEW)
+            ->countQuery()
+            ->execute();
+    }
+
     /**
      * @param $record
      * @return Drupal\Core\Database\StatementInterface|int|null
@@ -519,5 +533,38 @@ class UserImportController extends ControllerBase
          * 2. Create User from Records in DB
          * 3. Capture final outcome in Database
          */
+    }
+
+    public function statusStep() {
+        $element = [];
+
+        $element['hello'] = [
+            '#type' => 'html_tag',
+            '#tag' => 'p',
+            '#value' => 'Is this a meme?'
+        ];
+
+        $element['test_table'] = [
+            '#type' => 'table',
+            '#header' => [
+                'Date',
+                'Action',
+                'Group',
+                'User',
+                'Status'
+            ],
+            '#rows' => [],
+            '#attributes' => array('class'=>array('my-table')),
+            '#header_columns' => 4,
+        ];
+
+        return $element;
+    }
+
+    public function validateStep() {
+
+    }
+    public function commitStep() {
+
     }
 }

@@ -1,0 +1,5 @@
+dpc_user_management.user_import.upload:
+  route_name: dpc_user_management.user_import.upload
+  title: 'Upload CSV File with Records'
+  appears_on:
+    - dpc_user_management.user_import
