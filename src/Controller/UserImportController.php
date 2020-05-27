@@ -91,15 +91,15 @@ class UserImportController extends ControllerBase
                 'description' => 'Pre Import Outcome',
                 'type'        => 'varchar',
                 'length'      => 255,
-                'not null' => false,
-                'default'  => ''
+                'not null'    => false,
+                'default'     => 'unknown'
             ],
             'status' => [
                 'description' => 'Import Status',
                 'type'        => 'varchar',
                 'length'      => 255,
                 'not null'    => true,
-                'default'     => 'invalid'
+                'default'     => 'unknown'
             ]
         ],
         'primary key' => [
@@ -387,7 +387,7 @@ class UserImportController extends ControllerBase
      * @param $data
      * @return bool|mixed
      */
-    public function parseImportUserRecord($data) {
+    public function parseImportUserRecord($data, $whitelist) {
         $column_names = ['FIRST NAME', 'SURNAME', 'EMAIL', 'REGISTRATION DATE'];
         $column_keys = ['first_name', 'surname', 'email', 'registration_date'];
 
@@ -407,12 +407,17 @@ class UserImportController extends ControllerBase
 
         // We create a record like array with the keys and data
         $record = array_combine($column_keys, $data);
+        $record['status'] = self::ST_RAW;
 
         if(!$this->validateDate($record['registration_date'])) {
             return self::ERR_INVALID_RDATE;
         }
 
-        $record['status'] = self::ST_RAW;
+        // Mark record as not in whitelist early in the process
+        if (!$this->validateEmailDomain($record, $whitelist)) {
+            $record['outcome'] = self::OUT_MAIL_DOMAIN_INVALID;
+            $record['status'] = self::ST_NOT_ALLOWED;
+        }
 
         return $record;
     }
@@ -457,7 +462,7 @@ class UserImportController extends ControllerBase
         }
 
         while ($data = fgetcsv($handle)) {
-            $record = $this->parseImportUserRecord($data);
+            $record = $this->parseImportUserRecord($data, $whitelist);
 
             if(!$record) {
                 continue;
