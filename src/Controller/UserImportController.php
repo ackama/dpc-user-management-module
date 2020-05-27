@@ -177,6 +177,24 @@ class UserImportController extends ControllerBase
     }
 
     /**
+     * @param $records
+     * @return Drupal\Core\Database\StatementInterface|int|null
+     * @throws \Exception
+     */
+    public function insertRecords($records)
+    {
+        $query = $this->getDB()
+            ->insert(self::$t)
+            ->fields(array_keys($records[0]));
+
+        foreach ($records as $r) {
+            $query->values(array_values($r));
+        }
+
+        return $query->execute();
+    }
+
+    /**
      * Returns records that have not been processed
      *
      * @param array $record
@@ -203,6 +221,7 @@ class UserImportController extends ControllerBase
     const OUT_USERNAME_EXISTS = 'username exists';
     const OUT_UNKNOWN = 'unknown';
 
+    const ST_RAW = 'raw';
     const ST_NEW = 'new';
     const ST_IMPORTED = 'imported';
     const ST_NOT_ALLOWED = 'not allowed';
@@ -393,16 +412,28 @@ class UserImportController extends ControllerBase
             return self::ERR_INVALID_RDATE;
         }
 
+        $record['status'] = self::ST_RAW;
+
+        return $record;
+    }
+
+    /**
+     * @param $record
+     * @param $whitelist
+     * @return mixed
+     */
+    public function populateImportedRecord($record, $whitelist) {
+
+        // Capitalise Names
+        $record['first_name'] = ucfirst($record['first_name']);
+        $record['surname'] = ucfirst($record['surname']);
+
         // generates valid username
         $username_attempts = 0;
         do {
             $record['username'] = $this->generateUsername($record, $username_attempts);
             $username_attempts++;
         } while (!$this->validateUsername($record));
-
-        // Capitalise Names
-        $record['first_name'] = ucfirst($record['first_name']);
-        $record['surname'] = ucfirst($record['surname']);
 
         // Have a Full Name
         $record['name'] = sprintf('%s %s', $record['first_name'], $record['surname']);
@@ -419,6 +450,7 @@ class UserImportController extends ControllerBase
     public function importCSVFile(File $file, array $whitelist) {
 
         $handle = fopen($file->getFileUri(),'r');
+        $records = [];
 
         if(!$handle) {
             return false;
@@ -431,18 +463,29 @@ class UserImportController extends ControllerBase
                 continue;
             }
 
-            $record = $this->validateImportRecord($record, $whitelist);
-
-            if(!$this->validOutcome($record['outcome'])) {
-                continue;
+            $records[] = $record;
+            if(count($records) > 200) {
+                $this->insertRecords($records);
+                $records = [];
             }
+        }
 
-            $this->insertRecord($record);
+        if(count($records)) {
+            $this->insertRecords($records);
         }
 
         fclose($handle);
 
+
         return true;
+    }
+
+    public function processAndValidateRecords() {
+//        $record = $this->validateImportRecord($record, $whitelist);
+//
+//        if(!$this->validOutcome($record['outcome'])) {
+//            continue;
+//        }
     }
 
     /**
@@ -459,6 +502,9 @@ class UserImportController extends ControllerBase
         }
 
         $results = $this->importCSVFile($file, $whitelist);
+        // Populate Records
+        // Validate Records
+        // Import Users
     }
 
     public function processCommit()
