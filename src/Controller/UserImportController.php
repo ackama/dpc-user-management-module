@@ -243,6 +243,13 @@ class UserImportController extends ControllerBase
         return $record;
     }
 
+    /**
+     * Returns a valid username
+     *
+     * @param $record
+     * @param int $attempt
+     * @return string
+     */
     public function generateUsername($record, $attempt = 0) {
         $name = strtolower($record['first_name']);
         $surname = strtolower($record['surname']);
@@ -265,6 +272,12 @@ class UserImportController extends ControllerBase
         return $username;
     }
 
+    /**
+     * Validates inqueness of username against existing user database
+     *
+     * @param $record
+     * @return bool
+     */
     public function validateUsername($record) {
         $query = \Drupal::entityQuery('user');
 
