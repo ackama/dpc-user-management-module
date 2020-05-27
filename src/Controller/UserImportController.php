@@ -273,7 +273,7 @@ class UserImportController extends ControllerBase
 
         $email = $record['email'];
 
-        return !!$query->condition(
+        return !$query->condition(
                 $query->orConditionGroup()->condition('field_email_addresses.value', $email)
                     ->condition('mail', $email)
             )
