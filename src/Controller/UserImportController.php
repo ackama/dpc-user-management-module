@@ -198,6 +198,7 @@ class UserImportController extends ControllerBase
 
     const OUT_VALID = 'valid to import';
     const OUT_MAIL_EXISTS = 'e-mail exists';
+    const OUT_MAIL_REPEATED = 'email exists in import';
     const OUT_MAIL_DOMAIN_INVALID = 'e-mail domain not whitelisted';
     const OUT_USERNAME_EXISTS = 'username exists';
     const OUT_UNKNOWN = 'unknown';
@@ -218,6 +219,13 @@ class UserImportController extends ControllerBase
 
         if (!$this->validateEmailUnique($record)) {
             $record['outcome'] = self::OUT_MAIL_EXISTS;
+            $record['status']  = self::ST_NOT_ALLOWED;
+
+            return $record;
+        }
+
+        if (!$this->validateEmailUniqueInImport($record)) {
+            $record['outcome'] = self::OUT_MAIL_REPEATED;
             $record['status']  = self::ST_NOT_ALLOWED;
 
             return $record;
@@ -306,6 +314,19 @@ class UserImportController extends ControllerBase
     }
 
     /**
+     * Validates if record is not being imported twice
+     *
+     * @param $record
+     * @return boolean
+     */
+    public function validateEmailUniqueInImport($record) {
+        return !$this->query()
+            ->condition('email', $record['email'])
+            ->countQuery()
+            ->execute();
+    }
+
+    /**
      * @param $record
      * @param $whitelist
      * @return bool
@@ -335,7 +356,8 @@ class UserImportController extends ControllerBase
                 self::OUT_VALID,
                 self::OUT_USERNAME_EXISTS,
                 self::OUT_MAIL_DOMAIN_INVALID,
-                self::OUT_MAIL_EXISTS
+                self::OUT_MAIL_EXISTS,
+                self::OUT_MAIL_REPEATED
             ]
         );
     }
