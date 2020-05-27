@@ -299,6 +299,24 @@ class UserImportController extends ControllerBase
     }
 
     /**
+     * Return if the record has an outcome that is allowed to be stored
+     *
+     * @param $record
+     * @return bool
+     */
+    public function validOutcome($record)
+    {
+        return in_array($record,
+            [
+                self::OUT_VALID,
+                self::OUT_USERNAME_EXISTS,
+                self::OUT_MAIL_DOMAIN_INVALID,
+                self::OUT_MAIL_EXISTS
+            ]
+        );
+    }
+
+    /**
      * @param $data
      * @return bool|mixed
      */
@@ -367,7 +385,7 @@ class UserImportController extends ControllerBase
 
             $record = $this->validateImportRecord($record, $whitelist);
 
-            if($record['outcome'] !== self::OUT_VALID) {
+            if(!$this->validOutcome($record['outcome'])) {
                 continue;
             }
 
