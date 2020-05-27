@@ -570,31 +570,57 @@ class UserImportController extends ControllerBase
         $statuses[self::ST_RAW] = [
             'name' => 'Parsed records without validation or preprocessing',
             'count' => 0,
-            'action' => '',
+            'actions' => [
+                'data' => [
+                    'actions' => [
+                        '#type' => 'link',
+                        '#title' => $this->t('Validate and Preprocess'),
+                        '#url' => \Drupal\Core\Url::fromRoute('dpc_user_management.user_import.validate'),
+                        '#options' => [
+                            'attributes' => [
+                                'class' => 'button button--small'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
         ];
 
         $statuses[self::ST_NEW] = [
             'name' => 'Records that have been validated and preprocessed, and can be imported',
             'count' => 0,
-            'action' => '',
+            'actions' => [
+                'data' => [
+                    'actions' => [
+                        '#type' => 'link',
+                        '#title' => $this->t('Execute Import'),
+                        '#url' => \Drupal\Core\Url::fromRoute('dpc_user_management.user_import.commit'),
+                        '#options' => [
+                            'attributes' => [
+                                'class' => 'button button--small'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
         ];
 
         $statuses[self::ST_NOT_ALLOWED] = [
             'name' => 'Records that were parsed but will not be imported due to various reasons',
             'count' => 0,
-            'action' => '',
+            'actions' => '',
         ];
 
         $statuses[self::ST_IMPORTED] = [
             'name' => 'Records that have been imported already.',
             'count' => 0,
-            'action' => '',
+            'actions' => '',
         ];
 
         $statuses[self::ST_UNKNOWN] = [
             'name' => 'Records with unknown status. This should always be 0.',
             'count' => 0,
-            'action' => '',
+            'actions' => '',
         ];
 
         foreach ($this->getRecordsCount() as $row) {
