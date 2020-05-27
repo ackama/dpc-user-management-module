@@ -89,6 +89,8 @@ class UserImportForm extends ConfigFormBase
                 function ($domain) {
                     return trim($domain);
                 },
+                // This ensure we get a properly exploded array. Remove first \r characters
+                // and then explode by \n to support different linefeed formats
                 explode("\n", str_replace("\r", '', $form_state->getValue('whitelist')))
             ),
             function ($domain) use ($pattern){
@@ -103,15 +105,22 @@ class UserImportForm extends ConfigFormBase
      */
     public function submitForm(array &$form, FormStateInterface $form_state)
     {
+        // Initialise Controller
         $controller = new UserImportController();
 
+        // Get File Entity from upload and whitelist domains
         $csv = $this->getCSVfile($form_state);
-
         $whitelist = $this->getWhitelistDomains($form_state);
 
+        // Import Raw records and validates simple thigns like formats,
+        // columns and whitelist domain
         $controller->processImport($csv, $whitelist);
 
+        // Deletes uploaded file
         $csv->delete();
+
+        // Redirects to Import Users
+        return $this->redirect('dpc_user_management.user_import');
     }
 
     /**
