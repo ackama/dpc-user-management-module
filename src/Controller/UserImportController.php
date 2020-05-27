@@ -7,6 +7,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\dpc_user_management\UserEntity;
 use Drupal\file\Entity\File;
 
@@ -246,10 +247,20 @@ class UserImportController extends ControllerBase
         $name = strtolower($record['first_name']);
         $surname = strtolower($record['surname']);
 
-        $username = sprintf('%s_%s',
-            substr($name,0,3),
-            substr($surname, 0)
-        );
+        // join surname with a space
+        $username = sprintf('%s.%s', $name, $surname);
+
+        // Clean as a machine name
+        $username = \Drupal::transliteration()->transliterate($username, LanguageInterface::LANGCODE_DEFAULT, '_', 60);
+        $username = mb_strtolower($username);
+        $username = preg_replace('@[^a-z0-9_.]+@', '_', $username);
+
+        // If not first attempt at creating a valid username,
+        // use the $attempt number to append into the surname
+        // number is padded by a zero and a dot
+        if($attempt) {
+            $username = sprintf("%s.%02d", substr($username,0,57), $attempt);
+        }
 
         return $username;
     }
