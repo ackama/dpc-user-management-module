@@ -421,6 +421,7 @@ class UserImportController extends ControllerBase
 
         // We create a record like array with the keys and data
         $record = array_combine($column_keys, $data);
+        $record['outcome'] = self::OUT_UNKNOWN;
         $record['status'] = self::ST_RAW;
 
         if(!$this->validateDate($record['registration_date'])) {
