@@ -41,8 +41,7 @@ class UserImportController extends ControllerBase
         'fields'      => [
             'id'      => [
                 'description' => 'Primary Key of the User',
-                'type'        => 'int',
-                'unsigned'    => true,
+                'type'        => 'serial',
                 'not null'    => true,
             ],
             'first_name' => [
