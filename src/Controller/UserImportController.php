@@ -209,9 +209,10 @@ class UserImportController extends ControllerBase
 
     /**
      * @param $record
-     * @return bool|mixed
+     * @param $whitelist
+     * @return array
      */
-    public function validateImportRecord($record) {
+    public function validateImportRecord($record, $whitelist) {
         $record['outcome'] = self::OUT_UNKNOWN;
         $record['status'] = self::ST_UNKNOWN;
 
@@ -219,21 +220,21 @@ class UserImportController extends ControllerBase
             $record['outcome'] = self::OUT_MAIL_EXISTS;
             $record['status']  = self::ST_NOT_ALLOWED;
 
-            return false;
+            return $record;
         }
 
-        if (!$this->validateEmailDomain($record)) {
+        if (!$this->validateEmailDomain($record, $whitelist)) {
             $record['outcome'] = self::OUT_MAIL_DOMAIN_INVALID;
             $record['status']  = self::ST_NOT_ALLOWED;
 
-            return false;
+            return $record;
         }
 
         if (!$this->validateUsername($record)) {
             $record['outcome'] = self::OUT_USERNAME_EXISTS;
             $record['status']  = self::ST_NOT_ALLOWED;
 
-            return false;
+            return $record;
         }
 
         $record['outcome'] = self::OUT_VALID;
@@ -251,15 +252,17 @@ class UserImportController extends ControllerBase
             substr($surname, 0)
         );
 
-        $record['username'] = $record;
-
-        return $record;
+        return $username;
     }
 
     public function validateUsername($record) {
-        // Find in Database and check if it's unique
+        $query = \Drupal::entityQuery('user');
 
-        return false;
+        $username = $record['username'];
+
+        return !$query->condition('name', $username)
+            ->count()
+            ->execute();
     }
 
     /**
@@ -279,10 +282,15 @@ class UserImportController extends ControllerBase
             ->execute();
     }
 
-    public function validateEmailDomain($record) {
-        // Find in Database and check if it's unique
+    /**
+     * @param $record
+     * @param $whitelist
+     * @return bool
+     */
+    public function validateEmailDomain($record, $whitelist) {
+        $parsed_data = explode('@', $record['email']);
 
-        return false;
+        return in_array($parsed_data[0], $whitelist);
     }
 
     public function validateDate($date) {
@@ -334,7 +342,7 @@ class UserImportController extends ControllerBase
         // Have a Full Name
         $record['name'] = sprintf('%s %s', $record['first_name'], $record['surname']);
 
-        return $this->validateImportRecord($record);
+        return $record;
     }
 
     /**
@@ -345,23 +353,26 @@ class UserImportController extends ControllerBase
      */
     public function importCSVFile(File $file, array $whitelist) {
 
-        $handle = fopen($file->getFilename(),'r');
+        $handle = fopen($file->getFileUri(),'r');
 
         if(!$handle) {
             return false;
         }
 
-        while (!($data = fgetcsv($handle))) {
+        while ($data = fgetcsv($handle)) {
             $record = $this->parseImportUserRecord($data);
 
-            // if record is not in the white list, skip
-            if(!in_array($record['email'], $whitelist)) {
+            if(!$record) {
                 continue;
             }
 
-            if($record) {
-                $this->insertRecord($record);
+            $record = $this->validateImportRecord($record, $whitelist);
+
+            if($record['outcome'] !== self::OUT_VALID) {
+                continue;
             }
+
+            $this->insertRecord($record);
         }
 
         fclose($handle);
