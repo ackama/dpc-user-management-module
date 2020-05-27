@@ -114,13 +114,27 @@ class UserImportForm extends ConfigFormBase
 
         // Import Raw records and validates simple thigns like formats,
         // columns and whitelist domain
-        $controller->processImport($csv, $whitelist);
+        $results = $controller->processImport($csv, $whitelist);
 
         // Deletes uploaded file
         $csv->delete();
 
+        if(!$results) {
+            $results = [
+                'total' => 0,
+                'parsed' => 0
+            ];
+        }
+
+        // Report and go on
+        \Drupal::messenger()->addStatus(t('Successfully uploaded a CSV file.'));
+        \Drupal::messenger()->addStatus(t('File contained @total records. @parsed records were parsed and saved', [
+            '@total' => $results['total'],
+            '@parsed' => $results['parsed']
+        ]));
+
         // Redirects to Import Users
-        return $this->redirect('dpc_user_management.user_import');
+        return $form_state->setRedirect('dpc_user_management.user_import');
     }
 
     /**

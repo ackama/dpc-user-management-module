@@ -464,13 +464,15 @@ class UserImportController extends ControllerBase
     /**
      * @param File $file
      * @param array $whitelist
-     * @return bool
+     * @return array|bool
      * @throws \Exception
      */
     public function importCSVFile(File $file, array $whitelist) {
 
         $handle = fopen($file->getFileUri(),'r');
         $records = [];
+        $r_total = 0;
+        $r_parsed = 0;
 
         if(!$handle) {
             return false;
@@ -479,11 +481,16 @@ class UserImportController extends ControllerBase
         while ($data = fgetcsv($handle)) {
             $record = $this->parseImportUserRecord($data, $whitelist);
 
+            $r_total++;
+
             if(!$record) {
                 continue;
             }
 
+            $r_parsed++;
+
             $records[] = $record;
+
             if(count($records) > 200) {
                 $this->insertRecords($records);
                 $records = [];
@@ -496,8 +503,10 @@ class UserImportController extends ControllerBase
 
         fclose($handle);
 
-
-        return true;
+        return [
+            'total' => $r_total,
+            'parsed' => $r_parsed
+        ];
     }
 
     public function processAndValidateRecords() {
@@ -511,6 +520,7 @@ class UserImportController extends ControllerBase
     /**
      * @param File $file
      * @param array $whitelist
+     * @return array|bool
      * @throws \Exception
      */
     public function processImport(File $file, array $whitelist)
@@ -518,13 +528,16 @@ class UserImportController extends ControllerBase
         drupal_flush_all_caches();
 
         if(!$file || empty($whitelist)) {
-            return;
+            return false;
         }
 
         $results = $this->importCSVFile($file, $whitelist);
-        // Populate Records
-        // Validate Records
-        // Import Users
+
+        if (!$results) {
+            return false;
+        }
+
+        return $results;
     }
 
     public function processCommit()
