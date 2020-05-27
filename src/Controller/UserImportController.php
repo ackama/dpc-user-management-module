@@ -164,6 +164,20 @@ class UserImportController extends ControllerBase
             ->fetchObject();
     }
 
+    public function getRecordsCount()
+    {
+        $records = $this->query()
+            ->fields(self::$t, [
+                'status'
+            ]);
+        $records->addExpression(sprintf('count(%s.status)',self::$t), 'count');
+
+        return $records
+            ->groupBy(self::$t . '.status')
+            ->execute()
+            ->fetchAll();
+    }
+
     public function inProgressRaw() {
         return !!$this->query()
             ->condition('status', self::ST_RAW)
@@ -550,26 +564,55 @@ class UserImportController extends ControllerBase
     }
 
     public function statusStep() {
-        $element = [];
 
-        $element['hello'] = [
-            '#type' => 'html_tag',
-            '#tag' => 'p',
-            '#value' => 'Is this a meme?'
+        $statuses = [];
+
+        $statuses[self::ST_RAW] = [
+            'name' => 'Parsed records without validation or preprocessing',
+            'count' => 0,
+            'action' => '',
         ];
+
+        $statuses[self::ST_NEW] = [
+            'name' => 'Records that have been validated and preprocessed, and can be imported',
+            'count' => 0,
+            'action' => '',
+        ];
+
+        $statuses[self::ST_NOT_ALLOWED] = [
+            'name' => 'Records that were parsed but will not be imported due to various reasons',
+            'count' => 0,
+            'action' => '',
+        ];
+
+        $statuses[self::ST_IMPORTED] = [
+            'name' => 'Records that have been imported already.',
+            'count' => 0,
+            'action' => '',
+        ];
+
+        $statuses[self::ST_UNKNOWN] = [
+            'name' => 'Records with unknown status. This should always be 0.',
+            'count' => 0,
+            'action' => '',
+        ];
+
+        foreach ($this->getRecordsCount() as $row) {
+            $statuses[$row->status]['count'] = $row->count;
+        }
+
+        $element = [];
 
         $element['test_table'] = [
             '#type' => 'table',
             '#header' => [
-                'Date',
-                'Action',
-                'Group',
-                'User',
-                'Status'
+                'Status',
+                'Number of Records',
+                'Actions',
             ],
-            '#rows' => [],
-            '#attributes' => array('class'=>array('my-table')),
-            '#header_columns' => 4,
+            '#rows' => $statuses,
+            '#attributes' => array('class'=>array('import-report-table')),
+            '#header_columns' => 3,
         ];
 
         return $element;
