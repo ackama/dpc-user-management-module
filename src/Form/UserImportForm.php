@@ -76,10 +76,26 @@ class UserImportForm extends ConfigFormBase
         return File::load($file_array[0]);
     }
 
-    public function getWhitelistDomains(FormStateInterface$form_state) {
-        return $form_state->getValue('whitelist');
-    }
+    /**
+     * @param FormStateInterface $form_state
+     * @return array
+     */
+    public function getWhitelistDomains(FormStateInterface $form_state)
+    {
+        $pattern = '/^(?!\-)(?:(?:[a-zA-Z\d][a-zA-Z\d\-]{0,61})?[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}$/';
 
+        return array_filter(
+            array_map(
+                function ($domain) {
+                    return trim($domain);
+                },
+                explode("\n", str_replace("\r", '', $form_state->getValue('whitelist')))
+            ),
+            function ($domain) use ($pattern){
+                return !!preg_match($pattern, $domain);
+            }
+        );
+    }
 
     /**
      * {@inheritdoc}
