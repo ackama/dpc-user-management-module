@@ -289,7 +289,7 @@ class UserImportController extends ControllerBase
     public function validateEmailDomain($record, $whitelist) {
         $parsed_data = explode('@', $record['email']);
 
-        return in_array($parsed_data[0], $whitelist);
+        return in_array($parsed_data[1], $whitelist);
     }
 
     public function validateDate($date) {
