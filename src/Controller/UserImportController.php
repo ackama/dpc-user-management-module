@@ -179,6 +179,15 @@ class UserImportController extends ControllerBase
             ->fetchAll();
     }
 
+    public function getRecordsIDsByStatus($status) {
+        return $this->query()
+            ->fields(self::$t, ['id'])
+            ->condition('status', $status)
+            ->range(0,10)
+            ->execute()
+            ->fetchAll();
+    }
+
     public function getCountByStatus($status) {
         return $this->query()
             ->condition('status', $status)
@@ -517,12 +526,19 @@ class UserImportController extends ControllerBase
         ];
     }
 
-    public function processAndValidateRecords() {
+    public function processAndValidateRecords($id, &$context) {
 //        $record = $this->validateImportRecord($record, $whitelist);
 //
 //        if(!$this->validOutcome($record['outcome'])) {
 //            continue;
 //        }
+
+        $context['results'][] = $id;
+        $context['message'] = t('Created @id', array('@id' => $id));
+    }
+
+    public function processAndValidateRecordsFinishedCallback() {
+        return 'The End';
     }
 
     /**

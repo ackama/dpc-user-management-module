@@ -12,10 +12,6 @@ use Symfony\Component\Console\Helper\ProgressBar;
 class UserImportValidateForm extends ConfigFormBase
 {
     /**
-     * @var UserImportController
-     */
-    public $_controller;
-    /**
      * Gets the configuration names that will be editable.
      *
      * @return array
@@ -35,12 +31,22 @@ class UserImportValidateForm extends ConfigFormBase
         return 'dpc_user_import_commit_form';
     }
 
-    public function getController() {
-        if (!$this->_controller) {
-            $this->_controller = new UserImportController();
+    private $record_ids = [];
+
+    public function getPendingRecords() {
+
+        if(empty($this->record_ids)) {
+            $this->record_ids = array_map(
+                function($r) { return $r->id; },
+                $this->getController()->getRecordsIDsByStatus(UserImportController::ST_RAW)
+            );
         }
 
-        return $this->_controller;
+        return $this->record_ids;
+    }
+
+    public function getController() {
+        return new UserImportController();
     }
 
     /**
@@ -51,6 +57,8 @@ class UserImportValidateForm extends ConfigFormBase
         $form = parent::buildForm($form, $form_state);
 
         $records_raw_current = $this->getController()->getCountByStatus($this->getController()::ST_RAW);
+
+        $form['#prefix'] = sprintf('<p>There are %s records pending processing and validation</p>', $records_raw_current);
 
         $form['records_raw_current'] = [
             '#type' => 'value',
@@ -67,24 +75,57 @@ class UserImportValidateForm extends ConfigFormBase
             '#value' => $records_raw_start,
         ];
 
-//
-//        $sadf = '<div id="ajax-progress-edit-button" class="progress ajax-progress ajax-progress-bar" aria-live="polite">
-//                    <div class="progress__label">&nbsp;</div>
-//                    <div class="progress__track">
-//                        <div class="progress__bar"></div>
-//                    </div>
-//                    <div class="progress__percentage"></div>
-//                    <div class="progress__description">Validating...</div>
-//                </div>';
+        $message = ($records_raw_current == $records_raw_start)
+            ? $this->t('Start Validating')
+            : $this->t('Continue Validating');
 
         $form['actions']['submit'] = [
             '#type' => 'submit',
-            '#value' => $this->t('Start Validating'),
+            '#value' => $message,
             '#button_type' => 'primary'
         ];
 
         return $form;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateForm(array &$form, FormStateInterface $form_state) {
+
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function submitForm(array &$form, FormStateInterface $form_state)
+    {
+        $batch = array(
+            'title' => t('Validating and Processing Records...'),
+            'operations' => [],
+            'init_message'     => t('Commencing'),
+            'progress_message' => t('Processed @current out of @total.'),
+            'error_message'    => t('An error occurred during processing'),
+            'finished' => '\Drupal\dpc_user_management\UserImportController::processAndValidateRecordsFinishedCallback',
+        );
+
+        $batch['operations'] = array_map(
+            function($record){
+                return [
+                    '\Drupal\dpc_user_management\UserImportController::processAndValidateRecords',
+                    [$record->id]
+                ];
+            },
+            $this->getPendingRecords()
+        );
+
+        batch_set($batch);
+
+        \Drupal::messenger()->addMessage('Processed!');
+
+        $form_state->setRebuild(TRUE);
+    }
+
 
     public function validateChunk() {
 
@@ -96,27 +137,4 @@ class UserImportValidateForm extends ConfigFormBase
         return [100];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function submitForm(array &$form, FormStateInterface $form_state)
-    {
-        dpm($form_state->getValue('available_records'));
-    }
-
-    /**
-     * @param array $users
-     * @param string $message
-     * @return TranslatableMarkup
-     */
-    private function buildHTMLList(array $users, $message = '')
-    {
-        $output = $message;
-
-        // Stub, create markup for output
-
-        $rendered_output = Markup::create($output);
-
-        return new TranslatableMarkup ('@message', ['@message' => $rendered_output]);
-    }
 }
