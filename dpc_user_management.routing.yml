@@ -69,14 +69,14 @@ dpc_user_management.user_import:
 dpc_user_management.user_import.validate:
   path: '/admin/config/people/user_import/validate'
   defaults:
-    _controller: 'Drupal\dpc_user_management\Controller\UserImportController::validateStep'
-    _title: 'Validate User Import'
+    _form: 'Drupal\dpc_user_management\Form\UserImportValidateForm'
+    _title: 'Validate Users for Import'
   requirements:
     _permission: 'administer user import'
 dpc_user_management.user_import.commit:
   path: '/admin/config/people/user_import/commit'
   defaults:
-    _controller: 'Drupal\dpc_user_management\Controller\UserImportController::commitStep'
+    _form: 'Drupal\dpc_user_management\Form\UserImportCommitForm'
     _title: 'Execute User Import'
   requirements:
     _permission: 'administer user import'

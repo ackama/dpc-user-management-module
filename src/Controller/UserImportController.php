@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\dpc_user_management\UserEntity;
 use Drupal\file\Entity\File;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class UserImportController extends ControllerBase
 {
@@ -178,11 +179,12 @@ class UserImportController extends ControllerBase
             ->fetchAll();
     }
 
-    public function inProgressRaw() {
-        return !!$this->query()
-            ->condition('status', self::ST_RAW)
+    public function getCountByStatus($status) {
+        return $this->query()
+            ->condition('status', $status)
             ->countQuery()
-            ->execute();
+            ->execute()
+            ->fetchField();
     }
 
     public function inProgressValidated() {
@@ -257,10 +259,9 @@ class UserImportController extends ControllerBase
 
     /**
      * @param $record
-     * @param $whitelist
      * @return array
      */
-    public function validateImportRecord($record, $whitelist) {
+    public function validateImportRecord($record) {
         $record['outcome'] = self::OUT_UNKNOWN;
         $record['status'] = self::ST_UNKNOWN;
 
@@ -273,13 +274,6 @@ class UserImportController extends ControllerBase
 
         if (!$this->validateEmailUniqueInImport($record)) {
             $record['outcome'] = self::OUT_MAIL_REPEATED;
-            $record['status']  = self::ST_NOT_ALLOWED;
-
-            return $record;
-        }
-
-        if (!$this->validateEmailDomain($record, $whitelist)) {
-            $record['outcome'] = self::OUT_MAIL_DOMAIN_INVALID;
             $record['status']  = self::ST_NOT_ALLOWED;
 
             return $record;
@@ -413,6 +407,7 @@ class UserImportController extends ControllerBase
 
     /**
      * @param $data
+     * @param $whitelist
      * @return bool|mixed
      */
     public function parseImportUserRecord($data, $whitelist) {
@@ -453,10 +448,9 @@ class UserImportController extends ControllerBase
 
     /**
      * @param $record
-     * @param $whitelist
      * @return mixed
      */
-    public function populateImportedRecord($record, $whitelist) {
+    public function populateImportedRecord($record) {
 
         // Capitalise Names
         $record['first_name'] = ucfirst($record['first_name']);
@@ -644,8 +638,22 @@ class UserImportController extends ControllerBase
         return $element;
     }
 
-    public function validateStep() {
+    public function validateChunk() {
 
+        $records = $this->getRecordsByStatus();
+
+        foreach($records as $record) {
+            $record = $this->populateImportedRecord($record);
+            $record = $this->validateImportRecord($record);
+
+            $this->updateRecord($record);
+
+            if(!$this->validOutcome($record['outcome'])) {
+                continue;
+            }
+        }
+
+        return $elements;
     }
     public function commitStep() {
 
