@@ -62,7 +62,7 @@ dpc_user_management.group_events_log:
 dpc_user_management.user_import:
   path: '/admin/config/people/user_import'
   defaults:
-    _controller: 'Drupal\dpc_user_management\Controller\UserImportController::statusStep'
+    _controller: 'Drupal\dpc_user_management\Controller\UserImportController::main'
     _title: 'User Import'
   requirements:
     _permission: 'administer user import'

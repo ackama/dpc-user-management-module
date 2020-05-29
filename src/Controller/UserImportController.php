@@ -662,7 +662,7 @@ class UserImportController extends ControllerBase
      *
      * @return array
      */
-    public function statusStep() {
+    public function main() {
 
         $statuses = [];
 
