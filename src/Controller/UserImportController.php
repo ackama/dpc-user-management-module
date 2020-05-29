@@ -5,12 +5,9 @@ use Drupal;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\dpc_user_management\UserEntity;
 use Drupal\file\Entity\File;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 class UserImportController extends ControllerBase
 {
