@@ -212,23 +212,6 @@ class UserImportController extends ControllerBase
     }
 
     /**
-     * Updates Record with new information
-     *
-     * @param $record
-     * @return Drupal\Core\Database\StatementInterface|int|null
-     */
-    public function updateRecord($record) {
-        $rid = $record['id'];
-        unset($record['id']);
-
-        return $this->getDB()
-            ->update(self::$t)
-            ->fields($record)
-            ->condition('id', $rid)
-            ->execute();
-    }
-
-    /**
      * @param $record
      * @return Drupal\Core\Database\StatementInterface|int|null
      * @throws \Exception
@@ -256,6 +239,23 @@ class UserImportController extends ControllerBase
         }
 
         return $query->execute();
+    }
+
+    /**
+     * Updates Record with new information
+     *
+     * @param $record
+     * @return Drupal\Core\Database\StatementInterface|int|null
+     */
+    public function updateRecord($record) {
+        $rid = $record['id'];
+        unset($record['id']);
+
+        return $this->getDB()
+            ->update(self::$t)
+            ->fields($record)
+            ->condition('id', $rid)
+            ->execute();
     }
 
     /**
