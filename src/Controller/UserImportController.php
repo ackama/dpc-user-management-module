@@ -148,6 +148,8 @@ class UserImportController extends ControllerBase
         return $this->getDB()->select(self::$table_name, self::$t);
     }
 
+    // Database Queries
+
     /**
      * Returns all records in table
      *
