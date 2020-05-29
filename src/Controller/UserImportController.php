@@ -176,11 +176,11 @@ class UserImportController extends ControllerBase
             ->fetchAll();
     }
 
-    public function getRecordsIDsByStatus($status) {
+    public function getRecordsIDsByStatus($status, $limit = null) {
         return $this->query()
             ->fields(self::$t, ['id'])
             ->condition('status', $status)
-            ->range(0,10)
+            ->range(0 , $limit)
             ->execute()
             ->fetchAll();
     }
