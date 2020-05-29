@@ -460,6 +460,8 @@ class UserImportController extends ControllerBase
         return $username;
     }
 
+    // Methods that deal with CSV records that are currently being imported
+
     /**
      * @param $data
      * @param $whitelist
