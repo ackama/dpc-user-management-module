@@ -228,14 +228,6 @@ class UserImportController extends ControllerBase
             ->execute();
     }
 
-
-    public function inProgressValidated() {
-        return !!$this->query()
-            ->condition('status', self::ST_NEW)
-            ->countQuery()
-            ->execute();
-    }
-
     /**
      * @param $record
      * @return Drupal\Core\Database\StatementInterface|int|null
