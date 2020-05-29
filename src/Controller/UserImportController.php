@@ -280,6 +280,8 @@ class UserImportController extends ControllerBase
             'created' => $dt = \DateTime::createFromFormat("Y-m-d", $record['registration_date'])->getTimestamp()
         ]);
 
+        // @ToDo Add Real name
+
         if($user->save()) {
             $record['status'] = self::ST_IMPORTED;
         }
