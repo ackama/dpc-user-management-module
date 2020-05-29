@@ -125,15 +125,6 @@ class UserImportController extends ControllerBase
     const ST_UNKNOWN = 'unknown';
 
     /**
-     * @var FormStateInterface
-     */
-    private $form_state;
-
-    public function _construct(FormStateInterface $form_state) {
-        $this->form_state = $form_state;
-    }
-
-    /**
      * @return Connection
      */
     private function getDB() {
