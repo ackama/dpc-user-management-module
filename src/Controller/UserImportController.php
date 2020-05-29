@@ -120,6 +120,7 @@ class UserImportController extends ControllerBase
     const ST_IMPORTED = 'imported';
     const ST_NOT_ALLOWED = 'not allowed';
     const ST_UNKNOWN = 'unknown';
+    const ST_FAILED = 'failed';
 
     // DB Access Methods and Properties
 
@@ -268,15 +269,22 @@ class UserImportController extends ControllerBase
      *
      * @param array $record
      * @return mixed
+     * @throws Drupal\Core\Entity\EntityStorageException
      */
     public function createUser($record) {
-        // Stub
-        // Generate New User Data
-        // Verify its not conflicting
-        // UserEntity::create($data);
-        // Update User Record with outcome and status
+        $record['status'] = self::ST_FAILED;
 
-        return true;
+        $user = Drupal\dpc_user_management\UserEntity::create([
+            'name' => $record['username'],
+            'mail' => $record['email'],
+            'created' => $dt = \DateTime::createFromFormat("Y-m-d", $record['registration_date'])->getTimestamp()
+        ]);
+
+        if($user->save()) {
+            $record['status'] = self::ST_IMPORTED;
+        }
+
+        return $record;
     }
 
     /// Validation Methods
@@ -312,6 +320,28 @@ class UserImportController extends ControllerBase
 
         $record['outcome'] = self::OUT_VALID;
         $record['status']  = self::ST_NEW;
+
+        return $record;
+    }
+
+    /**
+     * @param $record
+     * @return array
+     */
+    public function validateUserRecord($record) {
+        if (!$this->validateEmailUnique($record)) {
+            $record['outcome'] = self::OUT_MAIL_EXISTS;
+            $record['status']  = self::ST_FAILED;
+
+            return $record;
+        }
+
+        if (!$this->validateUsername($record)) {
+            $record['outcome'] = self::OUT_USERNAME_EXISTS;
+            $record['status']  = self::ST_FAILED;
+
+            return $record;
+        }
 
         return $record;
     }
@@ -404,6 +434,16 @@ class UserImportController extends ControllerBase
                 self::OUT_MAIL_REPEATED
             ]
         );
+    }
+
+    /**
+     * Returns if the record is completely valid to import
+     *
+     * @param $record
+     * @return bool
+     */
+    public function isRecordReadyForImport($record) {
+        return $record['status'] == self::ST_NEW && $record['outcome'] == self::OUT_VALID;
     }
 
     // Methods that deal with populating user record data when having a raw import record
@@ -656,6 +696,86 @@ class UserImportController extends ControllerBase
         // @ToDo display nice report
         dpm($results);
     }
+
+
+    /**
+     * Method that processes raw records from imported CSV from batch api form
+     *
+     * @param $total
+     * @param $context
+     * @throws Drupal\Core\Entity\EntityStorageException
+     */
+    public static function processAndImportUsers($total, &$context) {
+
+        $controller = new self();
+
+        if (empty($context['sandbox'])) {
+            $context['sandbox']['progress'] = 0;
+            $context['sandbox']['current_id'] = 0;
+            $context['sandbox']['max'] = 20;
+            $context['results'] = [
+                self::ST_IMPORTED => 0,
+                self::OUT_UNKNOWN => 0,
+                self::OUT_MAIL_DOMAIN_INVALID => 0,
+                self::OUT_VALID => 0,
+                self::OUT_MAIL_REPEATED => 0,
+                self::OUT_MAIL_EXISTS => 0,
+                self::OUT_USERNAME_EXISTS => 0
+            ];
+        }
+
+        $records_per_batch = 10;
+
+        $record_ids = $controller->getRecordsIDsByStatus(self::ST_NEW, $records_per_batch);
+
+        foreach($record_ids as $r) {
+            $record = $controller->getRecord($r->id);
+            $record = $controller->validateUserRecord($record);
+
+            if ($controller->isRecordReadyForImport($record)) {
+                $record = $controller->createUser($record);
+                dpm($record);
+            }
+
+            $controller->updateRecord($record);
+
+            $context['sandbox']['current_id'] = $r->id;
+            $context['sandbox']['progress']++;
+            $context['results'][$record['outcome']]++;
+        }
+
+        if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+            $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+        }
+
+        $context['message'] = 'Processed ' . $context['sandbox']['progress'] . ' records out of ' . $total;
+    }
+
+    /**
+     * Method that gets called at the end of the process from @processAndValidateRecords
+     *
+     * @param $success
+     * @param $results
+     * @param $operations
+     */
+    public static function processAndImportUsersFinishedCallback($success, $results, $operations) {
+
+        // If there's errors in processing
+        if(!$success) {
+            $error_operation = reset($operations);
+            $message = t('An error occurred while processing %error_operation with arguments: @arguments', array(
+                '%error_operation' => $error_operation[0],
+                '@arguments' => print_r($error_operation[1], TRUE),
+            ));
+            (new \Drupal\Core\Messenger\Messenger)->addMessage($message);
+
+            return;
+        }
+
+        // @ToDo display nice report
+        dpm($results);
+    }
+
 
     // Main Processing Methods
 

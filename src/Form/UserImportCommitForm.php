@@ -4,8 +4,7 @@ namespace Drupal\dpc_user_management\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Markup;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\dpc_user_management\Controller\UserImportController;
 
 class UserImportCommitForm extends ConfigFormBase
 {
@@ -26,7 +25,35 @@ class UserImportCommitForm extends ConfigFormBase
      */
     public function getFormId()
     {
-        return 'dpc_user_import_form';
+        return 'dpc_user_import_commit_form';
+    }
+
+    /**
+     * Provides an instance of the UserImportController
+     */
+    public function getController() {
+        return new UserImportController();
+    }
+
+    /**
+     * Saves current record count to save queries and enable
+     * serialisation of the class used by drupal's batch api
+     *
+     * @var int
+     */
+    private $record_count = 0;
+
+    /**
+     * Returns the amount of pending records for this process
+     *
+     * @return int
+     */
+    public function getPendingRecordsCount() {
+        if(!$this->record_count) {
+            $this->record_count = $this->getController()->getCountByStatus(UserImportController::ST_NEW);
+        }
+
+        return $this->record_count;
     }
 
     /**
@@ -35,20 +62,22 @@ class UserImportCommitForm extends ConfigFormBase
     public function buildForm(array $form, FormStateInterface $form_state)
     {
         $form = parent::buildForm($form, $form_state);
-        $form['csv_file'] = [
-            '#type'        => 'file',
-            '#title'       => $this->t('Upload a CSV file with users records'),
-            '#description' => $this->t('The file has 4 columns: "FIRST NAME","SURNAME","EMAIL","REGISTRATION DATE". Fields needs to be quoted and the date needs to be in the format "YYYY/MM/DD"')
+
+        $records_current = $this->getPendingRecordsCount();
+
+        $form['#prefix'] = sprintf('<p>There are %s records to be imported as users</p>', $records_current);
+
+        $form['records_current'] = [
+            '#type' => 'value',
+            '#value' => $records_current,
         ];
-        $form['invalid_domains'] = [
-            '#type'        => 'textarea',
-            '#title'       => $this->t('Allowed Domains'),
-            '#description' => $this->t('A list of domains that white lists users in the CSV import file. The rest of the users will be ignored')
-        ];
+
+        $message = $this->t('Start Importing');
+
         $form['actions']['submit'] = [
             '#type' => 'submit',
-            '#value' => $this->t('Submit'),
-            '#button_type' => 'primary',
+            '#value' => $message,
+            '#button_type' => 'primary'
         ];
 
         return $form;
@@ -59,22 +88,22 @@ class UserImportCommitForm extends ConfigFormBase
      */
     public function submitForm(array &$form, FormStateInterface $form_state)
     {
-        // Stub
-    }
+        // @see batch_set()
+        $batch = array(
+            'title' => t('Importing Users...'),
+            'operations' => [],
+            'init_message'     => t('Validating Records and Creating Users...'),
+            'progress_message' => t('Processing...'),
+            'error_message'    => t('An error occurred during processing'),
+            'progressive'      => true,
+            'finished' => '\Drupal\dpc_user_management\Controller\UserImportController::processAndImportUsersFinishedCallback',
+        );
 
-    /**
-     * @param array $users
-     * @param string $message
-     * @return TranslatableMarkup
-     */
-    private function buildHTMLList(array $users, $message = '')
-    {
-        $output = $message;
+        $batch['operations'][] = [
+            '\Drupal\dpc_user_management\Controller\UserImportController::processAndImportUsers',
+            [$this->getPendingRecordsCount()]
+        ];
 
-        // Stub, create markup for output
-
-        $rendered_output = Markup::create($output);
-
-        return new TranslatableMarkup ('@message', ['@message' => $rendered_output]);
+        batch_set($batch);
     }
 }
