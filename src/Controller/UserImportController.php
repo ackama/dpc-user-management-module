@@ -443,7 +443,7 @@ class UserImportController extends ControllerBase
 
         // Check we don't have any column names in out data
         foreach($column_names as $key => $name) {
-            if($data[$key] == $name) {
+            if($data[trim($key)] == $name) {
                 return self::ERR_CONTAINS_COLUMN_NAME;
             }
         }
