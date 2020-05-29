@@ -463,6 +463,54 @@ class UserImportController extends ControllerBase
     // Methods that deal with CSV records that are currently being imported
 
     /**
+     * @param File $file
+     * @param array $whitelist
+     * @return array|bool
+     * @throws \Exception
+     */
+    public function importCSVFile(File $file, array $whitelist) {
+
+        $handle = fopen($file->getFileUri(),'r');
+        $records = [];
+        $r_total = 0;
+        $r_parsed = 0;
+
+        if(!$handle) {
+            return false;
+        }
+
+        while ($data = fgetcsv($handle)) {
+            $record = $this->parseImportUserRecord($data, $whitelist);
+
+            $r_total++;
+
+            if(!$record) {
+                continue;
+            }
+
+            $r_parsed++;
+
+            $records[] = $record;
+
+            if(count($records) > 200) {
+                $this->insertRecords($records);
+                $records = [];
+            }
+        }
+
+        if(count($records)) {
+            $this->insertRecords($records);
+        }
+
+        fclose($handle);
+
+        return [
+            'total' => $r_total,
+            'parsed' => $r_parsed
+        ];
+    }
+
+    /**
      * @param $data
      * @param $whitelist
      * @return bool|mixed
@@ -511,54 +559,6 @@ class UserImportController extends ControllerBase
         }
 
         return $record;
-    }
-
-    /**
-     * @param File $file
-     * @param array $whitelist
-     * @return array|bool
-     * @throws \Exception
-     */
-    public function importCSVFile(File $file, array $whitelist) {
-
-        $handle = fopen($file->getFileUri(),'r');
-        $records = [];
-        $r_total = 0;
-        $r_parsed = 0;
-
-        if(!$handle) {
-            return false;
-        }
-
-        while ($data = fgetcsv($handle)) {
-            $record = $this->parseImportUserRecord($data, $whitelist);
-
-            $r_total++;
-
-            if(!$record) {
-                continue;
-            }
-
-            $r_parsed++;
-
-            $records[] = $record;
-
-            if(count($records) > 200) {
-                $this->insertRecords($records);
-                $records = [];
-            }
-        }
-
-        if(count($records)) {
-            $this->insertRecords($records);
-        }
-
-        fclose($handle);
-
-        return [
-            'total' => $r_total,
-            'parsed' => $r_parsed
-        ];
     }
 
     /**
