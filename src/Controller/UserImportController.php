@@ -657,15 +657,6 @@ class UserImportController extends ControllerBase
         return $results;
     }
 
-    public function processCommit()
-    {
-        /**
-         * 1. Process Records in Batches of 10
-         * 2. Create User from Records in DB
-         * 3. Capture final outcome in Database
-         */
-    }
-
     /**
      * Provides report on import records
      *
