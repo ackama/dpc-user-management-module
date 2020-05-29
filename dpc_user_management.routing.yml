@@ -83,7 +83,7 @@ dpc_user_management.user_import.commit:
 dpc_user_management.user_import.upload:
   path: '/admin/config/people/user_import/upload'
   defaults:
-    _form: 'Drupal\dpc_user_management\Form\UserImportForm'
+    _form: 'Drupal\dpc_user_management\Form\UserImportCSVForm'
     _title: 'Upload User Import CSV'
   requirements:
     _permission: 'administer user import'

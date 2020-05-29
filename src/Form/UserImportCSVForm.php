@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\dpc_user_management\Controller\UserImportController;
 use Drupal\file\Entity\File;
 
-class UserImportForm extends ConfigFormBase
+class UserImportCSVForm extends ConfigFormBase
 {
     /**
      * Gets the configuration names that will be editable.
