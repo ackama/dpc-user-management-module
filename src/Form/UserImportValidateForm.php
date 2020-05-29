@@ -25,7 +25,7 @@ class UserImportValidateForm extends ConfigFormBase
      */
     public function getFormId()
     {
-        return 'dpc_user_import_commit_form';
+        return 'dpc_user_import_validate_form';
     }
 
     /**
