@@ -468,6 +468,29 @@ class UserImportController extends ControllerBase
      * @return array|bool
      * @throws \Exception
      */
+    public function processImport(File $file, array $whitelist)
+    {
+        drupal_flush_all_caches();
+
+        if(!$file || empty($whitelist)) {
+            return false;
+        }
+
+        $results = $this->importCSVFile($file, $whitelist);
+
+        if (!$results) {
+            return false;
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param File $file
+     * @param array $whitelist
+     * @return array|bool
+     * @throws \Exception
+     */
     public function importCSVFile(File $file, array $whitelist) {
 
         $handle = fopen($file->getFileUri(),'r');
@@ -632,29 +655,6 @@ class UserImportController extends ControllerBase
 
         // @ToDo display nice report
         dpm($results);
-    }
-
-    /**
-     * @param File $file
-     * @param array $whitelist
-     * @return array|bool
-     * @throws \Exception
-     */
-    public function processImport(File $file, array $whitelist)
-    {
-        drupal_flush_all_caches();
-
-        if(!$file || empty($whitelist)) {
-            return false;
-        }
-
-        $results = $this->importCSVFile($file, $whitelist);
-
-        if (!$results) {
-            return false;
-        }
-
-        return $results;
     }
 
     /**
