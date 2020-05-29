@@ -11,6 +11,8 @@ use Drupal\file\Entity\File;
 
 class UserImportController extends ControllerBase
 {
+    // Schema definitions and table name/alias
+
     /**
      * Table name
      *
@@ -24,11 +26,6 @@ class UserImportController extends ControllerBase
      * @var string
      */
     private static $t = 'dpc_user_import';
-
-    /**
-     * @var Connection
-     */
-    private $_db;
 
     /**
      * Provides Schema for Importing Users
@@ -123,6 +120,13 @@ class UserImportController extends ControllerBase
     const ST_IMPORTED = 'imported';
     const ST_NOT_ALLOWED = 'not allowed';
     const ST_UNKNOWN = 'unknown';
+
+    // DB Access Methods and Properties
+
+    /**
+     * @var Connection
+     */
+    private $_db;
 
     /**
      * @return Connection
