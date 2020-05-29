@@ -712,7 +712,7 @@ class UserImportController extends ControllerBase
         if (empty($context['sandbox'])) {
             $context['sandbox']['progress'] = 0;
             $context['sandbox']['current_id'] = 0;
-            $context['sandbox']['max'] = 20;
+            $context['sandbox']['max'] = $total;
             $context['results'] = [
                 self::ST_IMPORTED => 0,
                 self::OUT_UNKNOWN => 0,
