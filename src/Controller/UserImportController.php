@@ -317,35 +317,6 @@ class UserImportController extends ControllerBase
     }
 
     /**
-     * Returns a valid username
-     *
-     * @param $record
-     * @param int $attempt
-     * @return string
-     */
-    public function generateUsername($record, $attempt = 0) {
-        $name = strtolower($record['first_name']);
-        $surname = strtolower($record['surname']);
-
-        // join surname with a space
-        $username = sprintf('%s.%s', $name, $surname);
-
-        // Clean as a machine name
-        $username = \Drupal::transliteration()->transliterate($username, LanguageInterface::LANGCODE_DEFAULT, '_', 60);
-        $username = mb_strtolower($username);
-        $username = preg_replace('@[^a-z0-9_.]+@', '_', $username);
-
-        // If not first attempt at creating a valid username,
-        // use the $attempt number to append into the surname
-        // number is padded by a zero and a dot
-        if($attempt) {
-            $username = sprintf("%s.%02d", substr($username,0,57), $attempt);
-        }
-
-        return $username;
-    }
-
-    /**
      * Validates inqueness of username against existing user database
      *
      * @param $record
@@ -433,6 +404,35 @@ class UserImportController extends ControllerBase
                 self::OUT_MAIL_REPEATED
             ]
         );
+    }
+
+    /**
+     * Returns a valid username
+     *
+     * @param $record
+     * @param int $attempt
+     * @return string
+     */
+    public function generateUsername($record, $attempt = 0) {
+        $name = strtolower($record['first_name']);
+        $surname = strtolower($record['surname']);
+
+        // join surname with a space
+        $username = sprintf('%s.%s', $name, $surname);
+
+        // Clean as a machine name
+        $username = \Drupal::transliteration()->transliterate($username, LanguageInterface::LANGCODE_DEFAULT, '_', 60);
+        $username = mb_strtolower($username);
+        $username = preg_replace('@[^a-z0-9_.]+@', '_', $username);
+
+        // If not first attempt at creating a valid username,
+        // use the $attempt number to append into the surname
+        // number is padded by a zero and a dot
+        if($attempt) {
+            $username = sprintf("%s.%02d", substr($username,0,57), $attempt);
+        }
+
+        return $username;
     }
 
     /**
