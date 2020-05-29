@@ -105,6 +105,25 @@ class UserImportController extends ControllerBase
         ],
     ];
 
+    // Process Constants
+
+    const ERR_INVALID_RECORD = false;
+    const ERR_CONTAINS_COLUMN_NAME = false;
+    const ERR_INVALID_RDATE = false;
+
+    const OUT_VALID = 'valid to import';
+    const OUT_MAIL_EXISTS = 'e-mail exists';
+    const OUT_MAIL_REPEATED = 'email exists in import';
+    const OUT_MAIL_DOMAIN_INVALID = 'e-mail domain not whitelisted';
+    const OUT_USERNAME_EXISTS = 'username exists';
+    const OUT_UNKNOWN = 'unknown';
+
+    const ST_RAW = 'raw';
+    const ST_NEW = 'new';
+    const ST_IMPORTED = 'imported';
+    const ST_NOT_ALLOWED = 'not allowed';
+    const ST_UNKNOWN = 'unknown';
+
     /**
      * @var FormStateInterface
      */
@@ -274,22 +293,7 @@ class UserImportController extends ControllerBase
         return true;
     }
 
-    const ERR_INVALID_RECORD = false;
-    const ERR_CONTAINS_COLUMN_NAME = false;
-    const ERR_INVALID_RDATE = false;
-
-    const OUT_VALID = 'valid to import';
-    const OUT_MAIL_EXISTS = 'e-mail exists';
-    const OUT_MAIL_REPEATED = 'email exists in import';
-    const OUT_MAIL_DOMAIN_INVALID = 'e-mail domain not whitelisted';
-    const OUT_USERNAME_EXISTS = 'username exists';
-    const OUT_UNKNOWN = 'unknown';
-
-    const ST_RAW = 'raw';
-    const ST_NEW = 'new';
-    const ST_IMPORTED = 'imported';
-    const ST_NOT_ALLOWED = 'not allowed';
-    const ST_UNKNOWN = 'unknown';
+    /// Validation Methods
 
     /**
      * @param $record
