@@ -159,7 +159,7 @@ class UserImportController extends ControllerBase
             ->orderBy('id')
             ->condition('id',$id)
             ->execute()
-            ->fetchObject();
+            ->fetchAssoc();
     }
 
     public function getRecordsCount()
