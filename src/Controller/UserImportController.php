@@ -368,11 +368,13 @@ class UserImportController extends ControllerBase
      */
     public function validateEmailUniqueInImport($record) {
         return !$this->query()
+            ->fields(self::$t)
             ->condition('email', $record['email'])
             ->condition('outcome', self::OUT_VALID)
             ->condition('status', self::ST_NEW)
             ->countQuery()
-            ->execute();
+            ->execute()
+            ->fetchField();
     }
 
     /**
