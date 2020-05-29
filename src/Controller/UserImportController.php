@@ -547,19 +547,61 @@ class UserImportController extends ControllerBase
         ];
     }
 
-    public function processAndValidateRecords($id, &$context) {
-//        $record = $this->validateImportRecord($record, $whitelist);
-//
-//        if(!$this->validOutcome($record['outcome'])) {
-//            continue;
-//        }
+    public static function processAndValidateRecords($total, &$context) {
 
-        $context['results'][] = $id;
-        $context['message'] = t('Created @id', array('@id' => $id));
+        $controller = new self();
+
+        if (empty($context['sandbox'])) {
+            $context['sandbox']['progress'] = 0;
+            $context['sandbox']['current_id'] = 0;
+            $context['sandbox']['max'] = $total;
+            $context['results'] = [
+                self::OUT_UNKNOWN => 0,
+                self::OUT_MAIL_DOMAIN_INVALID => 0,
+                self::OUT_VALID => 0,
+                self::OUT_MAIL_REPEATED => 0,
+                self::OUT_MAIL_EXISTS => 0,
+                self::OUT_USERNAME_EXISTS => 0
+            ];
+        }
+
+        $records_per_batch = 10;
+
+        $record_ids = $controller->getRecordsIDsByStatus(self::ST_RAW, $records_per_batch);
+
+        foreach($record_ids as $r) {
+            $record = $controller->getRecord($r->id);
+            $record = $controller->populateImportedRecord($record);
+            $record = $controller->validateImportRecord($record);
+            $controller->updateRecord($record);
+
+            $context['sandbox']['current_id'] = $r->id;
+            $context['sandbox']['progress']++;
+            $context['results'][$record['outcome']]++;
+        }
+
+        if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+            $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+        }
+
+        $context['message'] = 'Processed ' . $context['sandbox']['progress'] . ' records out of ' . $total;
     }
 
-    public function processAndValidateRecordsFinishedCallback() {
-        return 'The End';
+    public static function processAndValidateRecordsFinishedCallback($success, $results, $operations) {
+
+        // If there's errors in processing
+        if(!$success) {
+            $error_operation = reset($operations);
+            $message = t('An error occurred while processing %error_operation with arguments: @arguments', array(
+                '%error_operation' => $error_operation[0],
+                '@arguments' => print_r($error_operation[1], TRUE),
+            ));
+            (new \Drupal\Core\Messenger\Messenger)->addMessage($message);
+
+            return;
+        }
+
+        dpm($results);
     }
 
     /**
