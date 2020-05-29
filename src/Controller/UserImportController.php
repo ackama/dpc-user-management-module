@@ -734,7 +734,6 @@ class UserImportController extends ControllerBase
 
             if ($controller->isRecordReadyForImport($record)) {
                 $record = $controller->createUser($record);
-                dpm($record);
             }
 
             $controller->updateRecord($record);
@@ -840,6 +839,12 @@ class UserImportController extends ControllerBase
 
         $statuses[self::ST_UNKNOWN] = [
             'name' => 'Records with unknown status. This should always be 0.',
+            'count' => 0,
+            'actions' => '',
+        ];
+
+        $statuses[self::ST_FAILED] = [
+            'name' => 'Records with failed status. These records passed all validation but failed to get imported.',
             'count' => 0,
             'actions' => '',
         ];
