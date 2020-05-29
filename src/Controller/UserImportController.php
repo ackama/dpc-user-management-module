@@ -193,6 +193,18 @@ class UserImportController extends ControllerBase
             ->fetchField();
     }
 
+    public function updateRecord($record) {
+        $rid = $record['id'];
+        unset($record['id']);
+
+        return $this->getDB()
+            ->update(self::$t)
+            ->fields($record)
+            ->condition('id', $rid)
+            ->execute();
+    }
+
+
     public function inProgressValidated() {
         return !!$this->query()
             ->condition('status', self::ST_NEW)
