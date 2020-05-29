@@ -31,22 +31,32 @@ class UserImportValidateForm extends ConfigFormBase
         return 'dpc_user_import_commit_form';
     }
 
-    private $record_ids = [];
-
-    public function getPendingRecords() {
-
-        if(empty($this->record_ids)) {
-            $this->record_ids = array_map(
-                function($r) { return $r->id; },
-                $this->getController()->getRecordsIDsByStatus(UserImportController::ST_RAW)
-            );
-        }
-
-        return $this->record_ids;
-    }
-
+    /**
+     * Provides an instance of the UserImportController
+     */
     public function getController() {
         return new UserImportController();
+    }
+
+    /**
+     * Saves current record count to save queries and enable
+     * serialisation of the class used by drupal's batch api
+     *
+     * @var int
+     */
+    private $record_count = 0;
+
+    /**
+     * Returns the amount of pending records for this process
+     *
+     * @return int
+     */
+    public function getPendingRecordsCount() {
+        if(!$this->record_count) {
+            $this->record_count = $this->getController()->getCountByStatus(UserImportController::ST_RAW);
+        }
+
+        return $this->record_count;
     }
 
     /**
@@ -56,7 +66,7 @@ class UserImportValidateForm extends ConfigFormBase
     {
         $form = parent::buildForm($form, $form_state);
 
-        $records_raw_current = $this->getController()->getCountByStatus($this->getController()::ST_RAW);
+        $records_raw_current = $this->getController()->getCountByStatus(UserImportController::ST_RAW);
 
         $form['#prefix'] = sprintf('<p>There are %s records pending processing and validation</p>', $records_raw_current);
 
@@ -100,41 +110,22 @@ class UserImportValidateForm extends ConfigFormBase
      */
     public function submitForm(array &$form, FormStateInterface $form_state)
     {
+        // @see batch_set()
         $batch = array(
             'title' => t('Validating and Processing Records...'),
             'operations' => [],
-            'init_message'     => t('Commencing'),
-            'progress_message' => t('Processed @current out of @total.'),
+            'init_message'     => t('Validating and Processing Records...'),
+            'progress_message' => t('Processing...'),
             'error_message'    => t('An error occurred during processing'),
-            'finished' => '\Drupal\dpc_user_management\UserImportController::processAndValidateRecordsFinishedCallback',
+            'progressive'      => true,
+            'finished' => '\Drupal\dpc_user_management\Controller\UserImportController::processAndValidateRecordsFinishedCallback',
         );
 
-        $batch['operations'] = array_map(
-            function($record){
-                return [
-                    '\Drupal\dpc_user_management\UserImportController::processAndValidateRecords',
-                    [$record->id]
-                ];
-            },
-            $this->getPendingRecords()
-        );
+        $batch['operations'][] = [
+            '\Drupal\dpc_user_management\Controller\UserImportController::processAndValidateRecords',
+            [$this->getPendingRecordsCount()]
+        ];
 
         batch_set($batch);
-
-        \Drupal::messenger()->addMessage('Processed!');
-
-        $form_state->setRebuild(TRUE);
     }
-
-
-    public function validateChunk() {
-
-        sleep(5);
-
-//        $controller = new UserImportController();
-//        $results = $controller->validateChunk();
-
-        return [100];
-    }
-
 }
