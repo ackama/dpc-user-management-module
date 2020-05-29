@@ -412,7 +412,7 @@ class UserImportController extends ControllerBase
      * @param $record
      * @return bool
      */
-    public function validOutcome($record)
+    public function isValidOutcome($record)
     {
         return in_array($record,
             [
