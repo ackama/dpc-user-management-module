@@ -716,11 +716,4 @@ class UserImportController extends ControllerBase
 
         return $element;
     }
-
-    public function validateChunk() {
-
-    }
-    public function commitStep() {
-
-    }
 }
