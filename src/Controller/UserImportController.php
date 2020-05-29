@@ -561,6 +561,8 @@ class UserImportController extends ControllerBase
         return $record;
     }
 
+    // High level Form Processing for RAW Records into Valid Records
+
     /**
      * Method that processes raw records from imported CSV from batch api form
      *
