@@ -162,6 +162,11 @@ class UserImportController extends ControllerBase
             ->fetchAssoc();
     }
 
+    /**
+     * Returns a count of each status in database
+     *
+     * @return mixed
+     */
     public function getRecordsCount()
     {
         $records = $this->query()
@@ -176,6 +181,13 @@ class UserImportController extends ControllerBase
             ->fetchAll();
     }
 
+    /**
+     * Return a list of Objects with the id field given a certain status
+     *
+     * @param $status
+     * @param null $limit
+     * @return mixed
+     */
     public function getRecordsIDsByStatus($status, $limit = null) {
         return $this->query()
             ->fields(self::$t, ['id'])
@@ -185,6 +197,12 @@ class UserImportController extends ControllerBase
             ->fetchAll();
     }
 
+    /**
+     * Returns amount of records give a certain status
+     *
+     * @param $status
+     * @return mixed
+     */
     public function getCountByStatus($status) {
         return $this->query()
             ->condition('status', $status)
@@ -193,6 +211,12 @@ class UserImportController extends ControllerBase
             ->fetchField();
     }
 
+    /**
+     * Updates Record with new information
+     *
+     * @param $record
+     * @return Drupal\Core\Database\StatementInterface|int|null
+     */
     public function updateRecord($record) {
         $rid = $record['id'];
         unset($record['id']);
@@ -400,6 +424,10 @@ class UserImportController extends ControllerBase
         return in_array($parsed_data[1], $whitelist);
     }
 
+    /**
+     * @param $date
+     * @return bool
+     */
     public function validateDate($date) {
         $dt = \DateTime::createFromFormat("Y-m-d", $date);
 
@@ -547,6 +575,12 @@ class UserImportController extends ControllerBase
         ];
     }
 
+    /**
+     * Method that processes raw records from imported CSV from batch api form
+     *
+     * @param $total
+     * @param $context
+     */
     public static function processAndValidateRecords($total, &$context) {
 
         $controller = new self();
@@ -587,6 +621,13 @@ class UserImportController extends ControllerBase
         $context['message'] = 'Processed ' . $context['sandbox']['progress'] . ' records out of ' . $total;
     }
 
+    /**
+     * Method that gets called at the end of the process from @processAndValidateRecords
+     *
+     * @param $success
+     * @param $results
+     * @param $operations
+     */
     public static function processAndValidateRecordsFinishedCallback($success, $results, $operations) {
 
         // If there's errors in processing
@@ -601,6 +642,7 @@ class UserImportController extends ControllerBase
             return;
         }
 
+        // @ToDo display nice report
         dpm($results);
     }
 
@@ -636,6 +678,11 @@ class UserImportController extends ControllerBase
          */
     }
 
+    /**
+     * Provides report on import records
+     *
+     * @return array
+     */
     public function statusStep() {
 
         $statuses = [];
