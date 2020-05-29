@@ -261,6 +261,8 @@ class UserImportController extends ControllerBase
             ->execute();
     }
 
+    // Methods that Interact with UserEntity
+
     /**
      * Returns records that have not been processed
      *
