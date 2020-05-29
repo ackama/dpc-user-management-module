@@ -657,6 +657,8 @@ class UserImportController extends ControllerBase
         dpm($results);
     }
 
+    // Main Processing Methods
+
     /**
      * Provides report on import records
      *
