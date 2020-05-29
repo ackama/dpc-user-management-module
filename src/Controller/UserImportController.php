@@ -406,6 +406,8 @@ class UserImportController extends ControllerBase
         );
     }
 
+    // Methods that deal with populating user record data when having a raw import record
+
     /**
      * Returns a valid username
      *
