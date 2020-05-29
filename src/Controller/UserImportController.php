@@ -438,7 +438,17 @@ class UserImportController extends ControllerBase
         }
 
         // We create a record like array with the keys and data
-        $record = array_combine($column_keys, $data);
+        $record = array_combine(
+            $column_keys,
+            array_map(
+                function($v) {
+                    // Clean whitespace from strings.
+                    // Add other cleanup here
+                    return trim($v);
+                },
+                $data
+            )
+        );
         $record['outcome'] = self::OUT_UNKNOWN;
         $record['status'] = self::ST_RAW;
 
