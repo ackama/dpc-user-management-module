@@ -151,19 +151,6 @@ class UserImportController extends ControllerBase
     // Database Queries
 
     /**
-     * Returns all records in table
-     *
-     * @return mixed
-     */
-    public function getAllRecords() {
-        return $this->query()
-            ->fields(self::$t)
-            ->condition('status', 'pending')
-            ->execute()
-            ->fetchAll();
-    }
-
-    /**
      * Returns records that have not been processed
      *
      * @param $id
