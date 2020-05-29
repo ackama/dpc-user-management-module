@@ -677,20 +677,20 @@ class UserImportController extends ControllerBase
 
     public function validateChunk() {
 
-        $records = $this->getRecordsByStatus();
-
-        foreach($records as $record) {
-            $record = $this->populateImportedRecord($record);
-            $record = $this->validateImportRecord($record);
-
-            $this->updateRecord($record);
-
-            if(!$this->validOutcome($record['outcome'])) {
-                continue;
-            }
-        }
-
-        return $elements;
+//        $records = $this->getRecordsIDsByStatus();
+//
+//        foreach($records as $record) {
+//            $record = $this->populateImportedRecord($record);
+//            $record = $this->validateImportRecord($record);
+//
+//            $this->updateRecord($record);
+//
+//            if(!$this->validOutcome($record['outcome'])) {
+//                continue;
+//            }
+//        }
+//
+//        return $elements;
     }
     public function commitStep() {
 
