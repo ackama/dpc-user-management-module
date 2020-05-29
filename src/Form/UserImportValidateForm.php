@@ -4,10 +4,7 @@ namespace Drupal\dpc_user_management\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Markup;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\dpc_user_management\Controller\UserImportController;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 class UserImportValidateForm extends ConfigFormBase
 {
@@ -96,13 +93,6 @@ class UserImportValidateForm extends ConfigFormBase
         ];
 
         return $form;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validateForm(array &$form, FormStateInterface $form_state) {
-
     }
 
     /**
