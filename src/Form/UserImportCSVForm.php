@@ -29,7 +29,7 @@ class UserImportCSVForm extends ConfigFormBase
      */
     public function getFormId()
     {
-        return 'dpc_user_import_form';
+        return 'dpc_user_import_csv_form';
     }
 
     /**
