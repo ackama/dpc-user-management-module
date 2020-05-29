@@ -409,6 +409,29 @@ class UserImportController extends ControllerBase
     // Methods that deal with populating user record data when having a raw import record
 
     /**
+     * @param $record
+     * @return mixed
+     */
+    public function populateImportedRecord($record) {
+
+        // Capitalise Names
+        $record['first_name'] = ucfirst($record['first_name']);
+        $record['surname'] = ucfirst($record['surname']);
+
+        // generates valid username
+        $username_attempts = 0;
+        do {
+            $record['username'] = $this->generateUsername($record, $username_attempts);
+            $username_attempts++;
+        } while (!$this->validateUsername($record));
+
+        // Have a Full Name
+        $record['name'] = sprintf('%s %s', $record['first_name'], $record['surname']);
+
+        return $record;
+    }
+
+    /**
      * Returns a valid username
      *
      * @param $record
@@ -484,29 +507,6 @@ class UserImportController extends ControllerBase
             $record['outcome'] = self::OUT_MAIL_DOMAIN_INVALID;
             $record['status'] = self::ST_NOT_ALLOWED;
         }
-
-        return $record;
-    }
-
-    /**
-     * @param $record
-     * @return mixed
-     */
-    public function populateImportedRecord($record) {
-
-        // Capitalise Names
-        $record['first_name'] = ucfirst($record['first_name']);
-        $record['surname'] = ucfirst($record['surname']);
-
-        // generates valid username
-        $username_attempts = 0;
-        do {
-            $record['username'] = $this->generateUsername($record, $username_attempts);
-            $username_attempts++;
-        } while (!$this->validateUsername($record));
-
-        // Have a Full Name
-        $record['name'] = sprintf('%s %s', $record['first_name'], $record['surname']);
 
         return $record;
     }
