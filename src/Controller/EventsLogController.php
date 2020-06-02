@@ -174,7 +174,7 @@ class EventsLogController extends ControllerBase
      */
     public function display()
     {
-        $logs = $this->getAllRecords();
+        $logs = $this->getUnprocessedRecords();
         $gids   = array_map(function ($log) {
             return $log->gid;
         }, $logs);
@@ -234,6 +234,10 @@ class EventsLogController extends ControllerBase
      */
     private function _return_pager_for_array($items, $num_page)
     {
+        if(!count($items)) {
+            return [];
+        }
+
         // Get total items count
         $total = count($items);
         // Get the number of the current page
@@ -388,19 +392,5 @@ class EventsLogController extends ControllerBase
         $this->processUnprocessedRecords();
 
         return $this->redirect('dpc_user_management.group_events_log');
-    }
-
-    /**
-     * Processes queue and sends out notifications
-     */
-    public function sendNotifications() {
-        while($this->queue()->numberOfItems()){
-            $item = $this->queue()->claimItem();
-            try{
-                $this->queueWorker()->processItem($item->data);
-            } catch (\Exception $e) {
-                $this->queue()->releaseItem($item);
-            }
-        }
     }
 }
