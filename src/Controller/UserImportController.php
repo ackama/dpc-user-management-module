@@ -278,6 +278,7 @@ class UserImportController extends ControllerBase
         $user = Drupal\dpc_user_management\UserEntity::create([
             'name' => $record['username'],
             'mail' => $record['email'],
+            'status' => 1,
             'created' => $dt = \DateTime::createFromFormat("Y-m-d", $record['registration_date'])->getTimestamp()
         ]);
 
