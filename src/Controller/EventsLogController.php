@@ -174,7 +174,7 @@ class EventsLogController extends ControllerBase
      */
     public function display()
     {
-        $logs = $this->getAllRecords();
+        $logs = $this->getUnprocessedRecords();
         $gids   = array_map(function ($log) {
             return $log->gid;
         }, $logs);
