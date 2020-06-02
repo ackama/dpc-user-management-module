@@ -8,6 +8,7 @@ use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\file\Entity\File;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class UserImportController extends ControllerBase
 {
@@ -695,8 +696,48 @@ class UserImportController extends ControllerBase
             return;
         }
 
-        // @ToDo display nice report
-        dpm($results);
+        $statuses = [];
+
+        $statuses[self::OUT_VALID] = [
+            'name' => 'Records with Valid Status: %s',
+            'count' => 0,
+        ];
+
+        $statuses[self::OUT_UNKNOWN] = [
+            'name' => 'Records ended with unkown status. These should always be zero: %s',
+            'count' => 0,
+        ];
+
+        $statuses[self::OUT_MAIL_DOMAIN_INVALID] = [
+            'name' => 'Records whose email domain was not whitelisted: %s',
+            'count' => 0,
+        ];
+
+
+        $statuses[self::OUT_MAIL_REPEATED] = [
+            'name' => 'Records whose email was duplicated in the import batch: %s',
+            'count' => 0,
+        ];
+
+        $statuses[self::OUT_MAIL_EXISTS] = [
+            'name' => 'Records whose email already exist in the system: %s',
+            'count' => 0,
+        ];
+
+        $statuses[self::OUT_USERNAME_EXISTS] = [
+            'name' => 'Records whose username already exist in the system: %s',
+            'count' => 0,
+        ];
+
+        $messenger = \Drupal::messenger();
+
+        $messenger->addStatus(t('Records have processed and validated'));
+
+        foreach ($statuses as $key => $row) {
+            $messenger->addStatus(sprintf($row['name'], $results[$key]));
+        }
+
+        return new RedirectResponse(Drupal\Core\Url::fromRoute('dpc_user_management.user_import')->toString());
     }
 
 
@@ -736,6 +777,9 @@ class UserImportController extends ControllerBase
 
             if ($controller->isRecordReadyForImport($record)) {
                 $record = $controller->createUser($record);
+                if($record['status'] == self::ST_IMPORTED) {
+                    $context['results'][self::ST_IMPORTED]++;
+                }
             }
 
             $controller->updateRecord($record);
@@ -758,6 +802,7 @@ class UserImportController extends ControllerBase
      * @param $success
      * @param $results
      * @param $operations
+     * @return RedirectResponse
      */
     public static function processAndImportUsersFinishedCallback($success, $results, $operations) {
 
@@ -773,8 +818,53 @@ class UserImportController extends ControllerBase
             return;
         }
 
-        // @ToDo display nice report
-        dpm($results);
+        $statuses = [];
+
+        $statuses[self::ST_IMPORTED] = [
+            'name' => 'Imported Users: %s',
+            'count' => 0,
+        ];
+
+        $statuses[self::OUT_VALID] = [
+            'name' => 'Records with Valid Status. This should be the same as Imported: %s',
+            'count' => 0,
+        ];
+
+        $statuses[self::OUT_UNKNOWN] = [
+            'name' => 'Records ended with unkown status. These should always be zero: %s',
+            'count' => 0,
+        ];
+
+        $statuses[self::OUT_MAIL_DOMAIN_INVALID] = [
+            'name' => 'Records whose email domain was not whitelisted: %s',
+            'count' => 0,
+        ];
+
+
+        $statuses[self::OUT_MAIL_REPEATED] = [
+            'name' => 'Records whose email was duplicated in the import batch: %s',
+            'count' => 0,
+        ];
+
+        $statuses[self::OUT_MAIL_EXISTS] = [
+            'name' => 'Records whose email already exist in the system: %s',
+            'count' => 0,
+        ];
+
+        $statuses[self::OUT_USERNAME_EXISTS] = [
+            'name' => 'Records whose username already exist in the system: %s',
+            'count' => 0,
+        ];
+
+        $messenger = \Drupal::messenger();
+
+        $messenger->addStatus(t('Records have processed and valid users have been imported'));
+
+        foreach ($statuses as $key => $row) {
+            $messenger->addStatus(sprintf($row['name'], $results[$key]));
+        }
+
+        return new RedirectResponse(Drupal\Core\Url::fromRoute('dpc_user_management.user_import')->toString());
     }
 
 
