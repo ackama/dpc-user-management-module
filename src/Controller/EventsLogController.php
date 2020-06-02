@@ -389,18 +389,4 @@ class EventsLogController extends ControllerBase
 
         return $this->redirect('dpc_user_management.group_events_log');
     }
-
-    /**
-     * Processes queue and sends out notifications
-     */
-    public function sendNotifications() {
-        while($this->queue()->numberOfItems()){
-            $item = $this->queue()->claimItem();
-            try{
-                $this->queueWorker()->processItem($item->data);
-            } catch (\Exception $e) {
-                $this->queue()->releaseItem($item);
-            }
-        }
-    }
 }
