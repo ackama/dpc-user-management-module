@@ -234,6 +234,10 @@ class EventsLogController extends ControllerBase
      */
     private function _return_pager_for_array($items, $num_page)
     {
+        if(!count($items)) {
+            return [];
+        }
+
         // Get total items count
         $total = count($items);
         // Get the number of the current page
