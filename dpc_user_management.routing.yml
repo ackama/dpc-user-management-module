@@ -59,6 +59,35 @@ dpc_user_management.group_events_log:
     _permission: 'access administration pages'
   options:
     _admin_route: TRUE
+dpc_user_management.user_import:
+  path: '/admin/config/people/user_import'
+  defaults:
+    _controller: 'Drupal\dpc_user_management\Controller\UserImportController::main'
+    _title: 'User Import'
+  requirements:
+    _permission: 'administer user import'
+dpc_user_management.user_import.validate:
+  path: '/admin/config/people/user_import/validate'
+  defaults:
+    _form: 'Drupal\dpc_user_management\Form\UserImportValidateForm'
+    _title: 'Validate Users for Import'
+  requirements:
+    _permission: 'administer user import'
+dpc_user_management.user_import.commit:
+  path: '/admin/config/people/user_import/commit'
+  defaults:
+    _form: 'Drupal\dpc_user_management\Form\UserImportCommitForm'
+    _title: 'Execute User Import'
+  requirements:
+    _permission: 'administer user import'
+dpc_user_management.user_import.upload:
+  path: '/admin/config/people/user_import/upload'
+  defaults:
+    _form: 'Drupal\dpc_user_management\Form\UserImportCSVForm'
+    _title: 'Upload User Import CSV'
+  requirements:
+    _permission: 'administer user import'
+
 dpc_user_management.group_events_log.process:
   path: '/admin/config/system/group-events-log/process'
   defaults:
