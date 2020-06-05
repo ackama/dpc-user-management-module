@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\dpc_user_management\Controller\EventsLogController;
 use Drupal\dpc_user_management\Controller\MailchimpController;
 use Drupal\user\Entity\User;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
@@ -128,6 +129,13 @@ function dpc_user_management_cron(){
     $mc_controller = new MailchimpController('cron');
     $request = new Request();
     $mc_controller->syncAudience($request);
+
+    /**
+     * Processes all Event Record on cron call
+     */
+    $EventsLog = new EventsLogController();
+    $EventsLog->processUnprocessedRecords();
+
 }
 
 /**
