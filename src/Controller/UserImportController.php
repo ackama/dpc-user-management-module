@@ -682,6 +682,7 @@ class UserImportController extends ControllerBase
      * @param $success
      * @param $results
      * @param $operations
+     * @return RedirectResponse|void
      */
     public static function processAndValidateRecordsFinishedCallback($success, $results, $operations) {
 
@@ -708,12 +709,6 @@ class UserImportController extends ControllerBase
             'name' => 'Records ended with unkown status. These should always be zero: %s',
             'count' => 0,
         ];
-
-        $statuses[self::OUT_MAIL_DOMAIN_INVALID] = [
-            'name' => 'Records whose email domain was not whitelisted: %s',
-            'count' => 0,
-        ];
-
 
         $statuses[self::OUT_MAIL_REPEATED] = [
             'name' => 'Records whose email was duplicated in the import batch: %s',
