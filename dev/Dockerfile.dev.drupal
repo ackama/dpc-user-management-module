@@ -32,7 +32,7 @@ RUN curl -sS https://getcomposer.org/installer | php && \
     ln -s /root/.composer/vendor/bin/drush /usr/local/bin/drush
 
 # Install Drush
-RUN composer global require drush/drush && \
+RUN composer global require drush/drush:8.3.4 && \
     composer global update
 
 # # Install PHP extension: gd (PHP 7.4 version)

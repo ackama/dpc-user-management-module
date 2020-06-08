@@ -14,7 +14,7 @@ drush site:install -vvv \
   -r /var/www/html \
   --account-name=$DRUPAL_ADMIN_USERNAME \
   --account-pass=$DRUPAL_ADMIN_PASSWORD \
-  standard
+  standard install_configure_form.enable_update_status_module=NULL install_configure_form.enable_update_status_emails=NULL
 
 # We have performed the install as root so change ownership of
 # sites/default/files to allow Apache+PHP to write them
