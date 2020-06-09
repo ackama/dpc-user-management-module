@@ -682,6 +682,7 @@ class UserImportController extends ControllerBase
      * @param $success
      * @param $results
      * @param $operations
+     * @return RedirectResponse|void
      */
     public static function processAndValidateRecordsFinishedCallback($success, $results, $operations) {
 
@@ -708,12 +709,6 @@ class UserImportController extends ControllerBase
             'name' => 'Records ended with unkown status. These should always be zero: %s',
             'count' => 0,
         ];
-
-        $statuses[self::OUT_MAIL_DOMAIN_INVALID] = [
-            'name' => 'Records whose email domain was not whitelisted: %s',
-            'count' => 0,
-        ];
-
 
         $statuses[self::OUT_MAIL_REPEATED] = [
             'name' => 'Records whose email was duplicated in the import batch: %s',
@@ -759,12 +754,7 @@ class UserImportController extends ControllerBase
             $context['sandbox']['max'] = $total;
             $context['results'] = [
                 self::ST_IMPORTED => 0,
-                self::OUT_UNKNOWN => 0,
-                self::OUT_MAIL_DOMAIN_INVALID => 0,
-                self::OUT_VALID => 0,
-                self::OUT_MAIL_REPEATED => 0,
-                self::OUT_MAIL_EXISTS => 0,
-                self::OUT_USERNAME_EXISTS => 0
+                self::ST_FAILED => 0
             ];
         }
 
@@ -778,9 +768,7 @@ class UserImportController extends ControllerBase
 
             if ($controller->isRecordReadyForImport($record)) {
                 $record = $controller->createUser($record);
-                if($record['status'] == self::ST_IMPORTED) {
-                    $context['results'][self::ST_IMPORTED]++;
-                }
+                $context['results'][$record['status']]++;
             }
 
             $controller->updateRecord($record);
@@ -826,34 +814,8 @@ class UserImportController extends ControllerBase
             'count' => 0,
         ];
 
-        $statuses[self::OUT_VALID] = [
-            'name' => 'Records with Valid Status. This should be the same as Imported: %s',
-            'count' => 0,
-        ];
-
-        $statuses[self::OUT_UNKNOWN] = [
-            'name' => 'Records ended with unkown status. These should always be zero: %s',
-            'count' => 0,
-        ];
-
-        $statuses[self::OUT_MAIL_DOMAIN_INVALID] = [
-            'name' => 'Records whose email domain was not whitelisted: %s',
-            'count' => 0,
-        ];
-
-
-        $statuses[self::OUT_MAIL_REPEATED] = [
-            'name' => 'Records whose email was duplicated in the import batch: %s',
-            'count' => 0,
-        ];
-
-        $statuses[self::OUT_MAIL_EXISTS] = [
-            'name' => 'Records whose email already exist in the system: %s',
-            'count' => 0,
-        ];
-
-        $statuses[self::OUT_USERNAME_EXISTS] = [
-            'name' => 'Records whose username already exist in the system: %s',
+        $statuses[self::ST_FAILED] = [
+            'name' => 'Records that failed importing: %s',
             'count' => 0,
         ];
 
