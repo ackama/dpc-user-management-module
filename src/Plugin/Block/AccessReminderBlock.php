@@ -68,6 +68,9 @@ class AccessReminderBlock extends BlockBase implements BlockPluginInterface{
                     'dpc_user_management/user_frontend',
                 ],
             ],
+            '#cache' => [
+                'max-age' => 0,
+            ],
         ];
     }
 
