@@ -127,9 +127,10 @@ trait HandlesMailchimpSubscriptions
     }
 
     /**
-     * @param      $subscribed_address
+     * @param        $subscribed_address
+     * @param string $reason the reason for the action
      */
-    public function batchUnsubscribe($subscribed_address)
+    public function batchUnsubscribe($subscribed_address, $reason = null)
     {
         if (!$this->mailchimpConnected()) {
             return;
@@ -139,6 +140,8 @@ trait HandlesMailchimpSubscriptions
 
         $this->batch->put('unsubscribed', "lists/$this->audience_id/members/" . $member_id, [
             'status' => 'unsubscribed',
+            'email_address' => $subscribed_address,
+            'reason' => $reason ? "because $reason" : ""
         ]);
     }
 
