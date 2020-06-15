@@ -343,21 +343,24 @@ class EventsLogController extends ControllerBase
             // Get Results based on logs
             $results = $this->processRecordsForUser($uid, $logs);
 
-            if (empty($results['added']) && empty($results['removed'])) {
-                // There're logs but nothing happened regarding memberships.
-                // i.e. User does something and then undoes it
-                // Mark logs as processed. Early Exit.
-                $this->markLogsAsProcessed($logs);
-                break;
-            }
-
             // Get User
             /** @var UserEntity $user */
             $user = User::load($uid);
 
+            if (empty($results['added']) && empty($results['removed'])) {
+                // There're logs but nothing happened regarding memberships.
+                // i.e. User does something and then undoes it
+                // Mark logs as processed. Early Exit.
+                \Drupal::logger('dpc_user_management')->info('No changes for ' . $user->getAccountName());
+
+                $this->markLogsAsProcessed($logs);
+                break;
+            }
+
             // If user is not in access Group, check what happened and possibly send email
             // If there are groups in the removed key of the response, attempt sending emails
             if (!$user->inAccessGroup() && key_exists($user->accessGroup()->id(), $results['removed'])) {
+                \Drupal::logger('dpc_user_management')->info('Adding notification for ' . $user->getAccountName());
                 // Queues sending notifications
                 $this->queue()->createItem([
                     'user_id' => $user->id(),

@@ -43,6 +43,10 @@ class NotifyUserTask extends QueueWorkerBase {
      */
     public function processItem($data)
     {
+
+        \Drupal::logger('dpc_user_management')->info('Sending notification', $data);
+        \Drupal::logger('dpc_user_management')->info(print_r($data, TRUE));
+
         if (empty($data['removed'])) {
             return;
         }
