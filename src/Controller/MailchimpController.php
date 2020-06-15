@@ -81,7 +81,7 @@ class MailchimpController extends ControllerBase
             $this->operations_list += array_map(function ($item) {
                 $operation = json_decode($item['body']);
 
-                return "$operation->email_address will be $operation->status";
+                return "$operation->email_address will be $operation->status" . ($operation->reason ? " because $operation->reason" : "");
             }, $this->batch->get_operations());
         }
 
@@ -114,7 +114,7 @@ class MailchimpController extends ControllerBase
 
             // unsubscribe the member is the user is not found
             if (!$user_id) {
-                $this->batchUnsubscribe($email);
+                $this->batchUnsubscribe($email, 'the user was not found in Drupal.');
 
                 continue;
             }
@@ -152,8 +152,6 @@ class MailchimpController extends ControllerBase
 
                 continue;
             }
-
-            $this->batchUnsubscribe($email);
         };
     }
 
