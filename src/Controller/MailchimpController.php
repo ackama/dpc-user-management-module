@@ -81,7 +81,12 @@ class MailchimpController extends ControllerBase
             $this->operations_list += array_map(function ($item) {
                 $operation = json_decode($item['body']);
 
-                return "$operation->email_address will be $operation->status $operation->reason";
+                if (!isset($operation->email_address) || !isset($operation->status)) {
+                    return null;
+                }
+
+                return "$operation->email_address will be $operation->status" . isset($operation->reason) ? " " . $operation->reason : "";
+
             }, $this->batch->get_operations());
         }
 
