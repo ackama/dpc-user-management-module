@@ -333,6 +333,10 @@ class EventsLogController extends ControllerBase
      * Gets all unprocessed records, groups them by user and processes each user group.
      */
     public function processUnprocessedRecords(){
+
+        // Reports this action running
+        \Drupal::logger('dpc_user_management')->info(sprintf('Processing group event logs'));
+
         // Get all unprocessed records
         $allRecords = $this->getUnprocessedRecords();
 
@@ -360,7 +364,8 @@ class EventsLogController extends ControllerBase
             // If user is not in access Group, check what happened and possibly send email
             // If there are groups in the removed key of the response, attempt sending emails
             if (!$user->inAccessGroup() && key_exists($user->accessGroup()->id(), $results['removed'])) {
-                \Drupal::logger('dpc_user_management')->info('Adding notification for ' . $user->getAccountName());
+                // Logs event with associated user
+                \Drupal::logger('dpc_user_management')->info(sprintf('Queueing notifications for %s (%s)', $user->getDisplayName(), $user->id()));
                 // Queues sending notifications
                 $this->queue()->createItem([
                     'user_id' => $user->id(),
@@ -371,6 +376,11 @@ class EventsLogController extends ControllerBase
             // Mark logs as processed at the end always
             $this->markLogsAsProcessed($logs);
         }
+
+        // Reports this action results
+        \Drupal::logger('dpc_user_management')->info(sprintf('Processed Total: %s', count($allRecords)));
+        \Drupal::logger('dpc_user_management')->info(sprintf('Processed Users: %s', count($user_logs)));
+        \Drupal::logger('dpc_user_management')->info(sprintf('Queued Notifications: %s', $this->queue()->numberOfItems()));
 
         return [
             'total' => count($allRecords),
