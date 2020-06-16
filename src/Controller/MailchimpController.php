@@ -85,7 +85,7 @@ class MailchimpController extends ControllerBase
                     return null;
                 }
 
-                return "$operation->email_address will be $operation->status" . isset($operation->reason) ? " " . $operation->reason : "";
+                return "$operation->email_address will be $operation->status" . (isset($operation->reason) ? " " . $operation->reason : "");
 
             }, $this->batch->get_operations());
         }
@@ -114,18 +114,21 @@ class MailchimpController extends ControllerBase
             $email = $member['email_address'];
             $query = \Drupal::entityQuery('user');
             $query->Condition('field_email_addresses', $email, '=');
+
             $user_id = $query->execute();
             $user_id = array_shift($user_id);
+            /** @var EntityInterface $user */
+            $user = User::load($user_id);
 
             // unsubscribe the member is the user is not found
             if (!$user_id) {
-                $this->batchUnsubscribe($email, 'the user was not found in Drupal.');
+                $user = user_load_by_mail($email);
+                if (!$user) {
+                    $this->batchUnsubscribe($email, 'the user was not found in Drupal.');
 
-                continue;
+                    continue;
+                }
             }
-
-            /** @var EntityInterface $user */
-            $user = User::load($user_id);
 
             // check if user is unsubscribed
             if ($member['status'] === 'unsubscribed') {
@@ -173,7 +176,7 @@ class MailchimpController extends ControllerBase
             if (!$mc_address) {
                 $user      = User::load($id);
                 if ($user->hasGroupContentAccess() && $user->field_mailchimp_audience_status->getValue() &&
-                $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
+                    $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
                     $this->batchSubscribe($user);
                 }
             }
