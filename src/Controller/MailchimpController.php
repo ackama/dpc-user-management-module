@@ -120,8 +120,12 @@ class MailchimpController extends ControllerBase
             /** @var EntityInterface $user */
             $user = User::load($user_id);
 
-            // unsubscribe the member is the user is not found
-            if (!$user_id) {
+            // unsubscribe the member if the user is not found
+            if ($user_id) {
+                /** @var EntityInterface $user */
+                $user = User::load($user_id);
+            }
+            if (!$user) {
                 $user = user_load_by_mail($email);
                 if (!$user) {
                     $this->batchUnsubscribe($email, 'the user was not found in Drupal.');
