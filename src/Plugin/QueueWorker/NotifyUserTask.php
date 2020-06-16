@@ -43,10 +43,6 @@ class NotifyUserTask extends QueueWorkerBase {
      */
     public function processItem($data)
     {
-
-        \Drupal::logger('dpc_user_management')->info('Sending notification', $data);
-        \Drupal::logger('dpc_user_management')->info(print_r($data, TRUE));
-
         if (empty($data['removed'])) {
             return;
         }
@@ -56,6 +52,9 @@ class NotifyUserTask extends QueueWorkerBase {
 
         /** @var array */
         $groups_ids = array_keys($data['removed']);
+
+        // Logs event with associated user
+        \Drupal::logger('dpc_user_management')->info(sprintf('Sending notification for %s (%s)' . $user->getDisplayName(), $user->id()));
 
         self::sendEmail($user, $groups_ids);
         // @ToDo Hook sending sms notifications when available
