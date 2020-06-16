@@ -333,6 +333,10 @@ class EventsLogController extends ControllerBase
      * Gets all unprocessed records, groups them by user and processes each user group.
      */
     public function processUnprocessedRecords(){
+
+        // Reports this action running
+        \Drupal::logger('dpc_user_management')->info(sprintf('Processing group event logs'));
+
         // Get all unprocessed records
         $allRecords = $this->getUnprocessedRecords();
 
@@ -372,6 +376,11 @@ class EventsLogController extends ControllerBase
             // Mark logs as processed at the end always
             $this->markLogsAsProcessed($logs);
         }
+
+        // Reports this action results
+        \Drupal::logger('dpc_user_management')->info(sprintf('Processed Total: %s', count($allRecords)));
+        \Drupal::logger('dpc_user_management')->info(sprintf('Processed Users: %s', count($user_logs)));
+        \Drupal::logger('dpc_user_management')->info(sprintf('Queued Notifications: %s', $this->queue()->numberOfItems()));
 
         return [
             'total' => count($allRecords),
