@@ -361,7 +361,7 @@ class EventsLogController extends ControllerBase
             // If there are groups in the removed key of the response, attempt sending emails
             if (!$user->inAccessGroup() && key_exists($user->accessGroup()->id(), $results['removed'])) {
                 // Logs event with associated user
-                \Drupal::logger('dpc_user_management')->info(sprintf('Queueing notifications for %s (%s)' . $user->getDisplayName(), $user->id()));
+                \Drupal::logger('dpc_user_management')->info(sprintf('Queueing notifications for %s (%s)', $user->getDisplayName(), $user->id()));
                 // Queues sending notifications
                 $this->queue()->createItem([
                     'user_id' => $user->id(),
