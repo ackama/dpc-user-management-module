@@ -85,7 +85,7 @@ class MailchimpController extends ControllerBase
                     return null;
                 }
 
-                return "$operation->email_address will be $operation->status" . isset($operation->reason) ? " " . $operation->reason : "";
+                return "$operation->email_address will be $operation->status" . (isset($operation->reason) ? " " . $operation->reason : "");
 
             }, $this->batch->get_operations());
         }
@@ -96,10 +96,12 @@ class MailchimpController extends ControllerBase
             }
 
             $this->logger->info('End MailChimp audience sync');
+
             return new JsonResponse($this->operations_list);
         }
 
         $this->logger->info('End MailChimp audience sync');
+
         return new JsonResponse('There are no updates to make.');
     }
 
@@ -114,24 +116,30 @@ class MailchimpController extends ControllerBase
             $email = $member['email_address'];
             $query = \Drupal::entityQuery('user');
             $query->Condition('field_email_addresses', $email, '=');
+
             $user_id = $query->execute();
             $user_id = array_shift($user_id);
+            $user    = false;
 
-            // unsubscribe the member is the user is not found
-            if (!$user_id) {
-                $this->batchUnsubscribe($email, 'the user was not found in Drupal.');
-
-                continue;
+            // unsubscribe the member if the user is not found
+            if ($user_id) {
+                /** @var EntityInterface $user */
+                $user = User::load($user_id);
             }
+            if (!$user) {
+                $user = user_load_by_mail($email);
+                if (!$user) {
+                    $this->batchUnsubscribe($email, 'the user was not found in Drupal.');
 
-            /** @var EntityInterface $user */
-            $user = User::load($user_id);
+                    continue;
+                }
+            }
 
             // check if user is unsubscribed
             if ($member['status'] === 'unsubscribed') {
                 if ($user) {
                     // update the user field
-                    if ( $user->field_mailchimp_audience_status->getValue() && $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
+                    if ($user->field_mailchimp_audience_status->getValue() && $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
                         $user->field_mailchimp_audience_status->setValue('unsubscribed');
                         $this->operations_list[] = $user->getDisplayName() . ' has unsubscribed.';
                         $user->save();
@@ -171,9 +179,9 @@ class MailchimpController extends ControllerBase
         foreach ($user_ids as $id) {
             $mc_address = \Drupal::service('user.data')->get('dpc_user_management', $id, 'mc_subscribed_email');
             if (!$mc_address) {
-                $user      = User::load($id);
+                $user = User::load($id);
                 if ($user->hasGroupContentAccess() && $user->field_mailchimp_audience_status->getValue() &&
-                $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
+                    $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
                     $this->batchSubscribe($user);
                 }
             }
