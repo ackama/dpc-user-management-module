@@ -149,6 +149,7 @@ class MailchimpController extends ControllerBase
                     if ($user->field_mailchimp_audience_status->getValue() && $user->field_mailchimp_audience_status->getValue()[0]['value'] == 'subscribed') {
                         $user->field_mailchimp_audience_status->setValue('unsubscribed');
                         $this->operations_list[] = $user->getDisplayName() . ' has unsubscribed.';
+                        \Drupal::service('user.data')->delete('dpc_user_management', $user->id(), 'mc_subscribed_email');
                         $user->save();
                     }
                 }
@@ -185,6 +186,14 @@ class MailchimpController extends ControllerBase
                 $this->updateEmail($user, $subscribed_email['value'], $primary['value']);
 
                 continue;
+            }
+
+            // if the user was manually resubscribed in MC then update the status in drupal
+            if ($member['status'] === 'subscribed' && $user->field_mailchimp_audience_status->getValue() &&
+                $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
+                $this->operations_list[] = $user->getDisplayName() . ' was resubscribed so their status in Drupal will be updated.';
+                \Drupal::service('user.data')->set('dpc_user_management', $user->id(), 'mc_subscribed_email', $email);
+                $user->field_mailchimp_audience_status->setValue('subscribed');
             }
         };
     }
