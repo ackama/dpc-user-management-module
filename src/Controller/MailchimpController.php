@@ -146,7 +146,7 @@ class MailchimpController extends ControllerBase
             if ($member['status'] === 'unsubscribed') {
                 if ($user) {
                     // update the user field
-                    if ($user->field_mailchimp_audience_status->getValue() && $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
+                    if ($user->field_mailchimp_audience_status->getValue() && $user->field_mailchimp_audience_status->getValue()[0]['value'] == 'subscribed') {
                         $user->field_mailchimp_audience_status->setValue('unsubscribed');
                         $this->operations_list[] = $user->getDisplayName() . ' has unsubscribed.';
                         $user->save();
@@ -161,7 +161,7 @@ class MailchimpController extends ControllerBase
             $stored_subscribed_email = \Drupal::service('user.data')->get('dpc_user_management', $user->id(), 'mc_subscribed_email');
             $primary = $user_emails[array_search(true, array_column($user_emails, 'is_primary'))];
 
-            if ($primary !== $stored_subscribed_email) {
+            if ($primary['value'] !== $stored_subscribed_email) {
                 if ($primary['status'] !== 'verified') {
 
                     continue;
@@ -185,16 +185,6 @@ class MailchimpController extends ControllerBase
                 $this->updateEmail($user, $subscribed_email['value'], $primary['value']);
 
                 continue;
-            }
-
-            // if the users access has changed change the status to 'pending'
-            if (!$user->hasAnyAccess()) {
-                $this->batchUpdateStatus($email, 'pending');
-                $this->operations_list[] = $user->getDisplayName() . ' status will be changed to "Pending" in MailChimp because they lost Special or Group access.';
-                $user->field_mailchimp_audience_status->setValue('Not subscribed');
-                $user->save();
-
-                \Drupal::service('user.data')->delete('dpc_user_management', $user->id(), 'mc_subscribed_email');
             }
         };
     }
