@@ -187,6 +187,12 @@ class UserEntity extends User
     }
 
     /**
+     * @return bool
+     */
+    public function hasAnyAccess() {
+        return $this->inSpecialGroups() || $this->inAccessGroup() || $this->inEmailGroups();
+    }
+    /**
      * Because drupal can't handle adding default values to old records (ie existing users)
      * when creating these fields, we need to check for unset values first
      * We use this helper function to keep things DRY

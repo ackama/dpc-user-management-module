@@ -3,6 +3,7 @@ namespace Drupal\dpc_user_management\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\dpc_user_management\Plugin\QueueWorker\CheckMailchimpBatchStatusTask;
 use Drupal\dpc_user_management\Traits\HandlesMailchimpSubscriptions;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -127,11 +128,17 @@ class MailchimpController extends ControllerBase
                 $user = User::load($user_id);
             }
             if (!$user) {
-                $user = user_load_by_mail($email);
-                if (!$user) {
-                    $this->batchUnsubscribe($email, 'the user was not found in Drupal.');
+                // check subscribed mail data
+                $user = $this->checkStoredSubscribers($email);
 
-                    continue;
+                // check drupal mail field
+                if (!$user) {
+                    $user = user_load_by_mail($email);
+                    if (!$user) {
+                        $this->batchUnsubscribe($email);
+                        $this->operations_list[] = $email . ' will be unsubscribed because the user was not found in Drupal.';
+                        continue;
+                    }
                 }
             }
 
@@ -151,10 +158,24 @@ class MailchimpController extends ControllerBase
 
             // check if email is the primary email
             $user_emails      = $user->field_email_addresses->getValue();
+            $stored_subscribed_email = \Drupal::service('user.data')->get('dpc_user_management', $user->id(), 'mc_subscribed_email');
+            $primary = $user_emails[array_search(true, array_column($user_emails, 'is_primary'))];
+
+            if ($primary !== $stored_subscribed_email) {
+                if ($primary['status'] !== 'verified') {
+
+                    continue;
+                }
+                $this->operations_list[] = $user->getDisplayName() . ' has updated their primary email, subscribed email will be updated.';
+                $this->updateEmail($user, $stored_subscribed_email, $primary['value']);
+
+                continue;
+            }
+
             $subscribed_email = $user_emails[array_search($email, array_column($user_emails, 'value'))];
+
             if (!$subscribed_email['is_primary']) {
                 // if the email is not the primary, update the member
-                $primary = $user_emails[array_search(true, array_column($user_emails, 'is_primary'))];
                 // unless it is not yet verfied
                 if ($primary['status'] !== 'verified') {
 
@@ -180,11 +201,29 @@ class MailchimpController extends ControllerBase
             $mc_address = \Drupal::service('user.data')->get('dpc_user_management', $id, 'mc_subscribed_email');
             if (!$mc_address) {
                 $user = User::load($id);
-                if ($user->hasGroupContentAccess() && $user->field_mailchimp_audience_status->getValue() &&
+                if ($user->hasAnyAccess() && $user->field_mailchimp_audience_status->getValue() &&
                     $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
+                    $this->operations_list[] = $user->getDisplayName() . ' will be subscribed';
                     $this->batchSubscribe($user);
                 }
             }
         }
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return bool|EntityInterface|null
+     */
+    private function checkStoredSubscribers($email)
+    {
+        $subscribed_emails = \Drupal::service('user.data')->get('dpc_user_management', null, 'mc_subscribed_email');
+        foreach ($subscribed_emails as $uid => $address) {
+            if ($email == $address) {
+                return User::load($uid);
+            }
+        }
+
+        return false;
     }
 }
