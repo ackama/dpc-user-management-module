@@ -186,6 +186,16 @@ class MailchimpController extends ControllerBase
 
                 continue;
             }
+
+            // if the users access has changed change the status to 'pending'
+            if (!$user->hasAnyAccess()) {
+                $this->batchUpdateStatus($email, 'pending');
+                $this->operations_list[] = $user->getDisplayName() . ' status will be changed to "Pending" in MailChimp because they lost Special or Group access.';
+                $user->field_mailchimp_audience_status->setValue('Not subscribed');
+                $user->save();
+
+                \Drupal::service('user.data')->delete('dpc_user_management', $user->id(), 'mc_subscribed_email');
+            }
         };
     }
 

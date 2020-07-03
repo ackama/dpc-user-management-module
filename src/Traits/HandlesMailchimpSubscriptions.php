@@ -169,6 +169,23 @@ trait HandlesMailchimpSubscriptions
     }
 
     /**
+     * @param $subscribed_address
+     * @param $status
+     */
+    public function batchUpdateStatus($subscribed_address, $status) {
+        if (!$this->mailchimpConnected()) {
+            return;
+        }
+
+        $member_id = $this->mailchimp::subscriberHash($subscribed_address);
+
+        $this->batch->put('status_change', "lists/$this->audience_id/members/" . $member_id, [
+            'status' => $status,
+            'email_address' => $subscribed_address
+        ]);
+    }
+
+    /**
      * @return bool
      */
     private function mailchimpConnected()
