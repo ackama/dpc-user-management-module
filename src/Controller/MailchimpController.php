@@ -45,6 +45,10 @@ class MailchimpController extends ControllerBase
      * @var array
      */
     public $operations_list = [];
+    /**
+     * @var string
+     */
+    private $unsubscribed_list_key = 'dpc_mailchimp_unsubscribed';
 
     public function __construct($context = null, $mailchimp = null, $audience_id = null)
     {
@@ -117,11 +121,11 @@ class MailchimpController extends ControllerBase
             $email = $member['email_address'];
             $query = \Drupal::entityQuery('user');
             $query->Condition('field_email_addresses', $email, '=');
+            $query->Condition('status', 1, '=');
 
             $user_id = $query->execute();
             $user_id = array_shift($user_id);
             $user    = false;
-
             // unsubscribe the member if the user is not found
             if ($user_id) {
                 /** @var EntityInterface $user */
@@ -135,6 +139,14 @@ class MailchimpController extends ControllerBase
                 if (!$user) {
                     $user = user_load_by_mail($email);
                     if (!$user) {
+                        $unsubbed_list = \Drupal::state()->get($this->unsubscribed_list_key, []);
+                        if (in_array($email, $unsubbed_list)) {
+
+                            continue;
+                        }
+                        $unsubbed_list[] = $email;
+                        \Drupal::state()->set($this->unsubscribed_list_key, $unsubbed_list);
+
                         $this->batchUnsubscribe($email);
                         $this->operations_list[] = $email . ' will be unsubscribed because the user was not found in Drupal.';
                         continue;
@@ -164,6 +176,7 @@ class MailchimpController extends ControllerBase
                 $this->operations_list[] = $user->getDisplayName() . ' was resubscribed so their status in Drupal will be updated.';
                 \Drupal::service('user.data')->set('dpc_user_management', $user->id(), 'mc_subscribed_email', $email);
                 $user->field_mailchimp_audience_status->setValue('subscribed');
+                $user->save();
 
                 continue;
             }
