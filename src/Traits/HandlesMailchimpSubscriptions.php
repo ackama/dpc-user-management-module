@@ -185,6 +185,7 @@ trait HandlesMailchimpSubscriptions
         ]);
 
         $user->field_mailchimp_audience_status->setValue($status);
+        $user->save();
     }
 
     /**
