@@ -128,14 +128,14 @@ class MailchimpControllerTest extends BrowserTestBase
         $this->assertEquals("lists/$this->audeince_id/members/nonexistentuser@test.com", $action_log['batch_unsubscribed']);
     }
 
-    // public function testAddMissingUsersToList()
-    // {
-    //     // $this->controller->addMissingUsersToList();
-    //     // $action_log = $this->mailChimpApi->getLog();
-    //     //
-    //     // $this->assertArrayHasKey('batch_subscribed', $action_log);
-    //     // $this->assertEquals($this->user1->getEmail(), $action_log['batch_subscribed']);
-    // }
+    public function testAddMissingUsersToList()
+    {
+        $this->controller->addMissingUsersToList();
+        $action_log = $this->mailChimpApi->getLog();
+
+        $this->assertArrayHasKey('batch_subscribed', $action_log);
+        $this->assertEquals($this->user1->getEmail(), $action_log['batch_subscribed'][1]);
+    }
 }
 
 
@@ -203,6 +203,6 @@ class FakeMailchimpBatch
 
     public function post($batch_id, $method, $args)
     {
-        $this->log['batch_' . $batch_id] = $args['email_address'];
+        $this->log['batch_' . $batch_id][] = $args['email_address'];
     }
 }

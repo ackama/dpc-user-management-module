@@ -184,7 +184,7 @@ class MailchimpController extends ControllerBase
             // if the users access has changed change the status to 'pending'
             if (!$user->hasAnyAccess()) {
                 $this->batchUnsubscribe($email);
-                $this->operations_list[] = $user->getDisplayName() . ' status will be changed to "Pending" in MailChimp because they lost Special or Group access.';
+                $this->operations_list[] = $user->getDisplayName() . ' status will be unsubscribed because they lost Special or Group access.';
                 $user->field_mailchimp_audience_status->setValue('Not subscribed');
                 $user->save();
 
