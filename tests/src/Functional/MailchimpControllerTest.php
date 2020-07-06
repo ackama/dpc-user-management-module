@@ -159,7 +159,8 @@ class FakeMailchimp
                     'email_address' => 'user2@subscribedmail.com',
                     'status'        => 'subscribed'
                 ],
-            ]
+            ],
+            'total_items' => 2
         ];
     }
 
