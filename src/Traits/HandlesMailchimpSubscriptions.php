@@ -105,7 +105,7 @@ trait HandlesMailchimpSubscriptions
         }
 
         $member_id = $this->mailchimp::subscriberHash($old_address);
-        $result = $this->mailchimp->patch("lists/$this->audience_id/members/$member_id", [
+        $this->mailchimp->patch("lists/$this->audience_id/members/$member_id", [
             'email_address' => $new_email
         ]);
 
@@ -166,6 +166,25 @@ trait HandlesMailchimpSubscriptions
             'status' => 'unsubscribed',
             'email_address' => $subscribed_address
         ]);
+    }
+
+    /**
+     * @param $user
+     * @param $status
+     */
+    public function batchUpdateStatus($user, $status) {
+        if (!$this->mailchimpConnected()) {
+            return;
+        }
+        $subscribed_address = $user->getEmail();
+        $member_id = $this->mailchimp::subscriberHash($subscribed_address);
+
+        $this->batch->put('status_change', "lists/$this->audience_id/members/" . $member_id, [
+            'status' => $status,
+            'email_address' => $subscribed_address
+        ]);
+
+        $user->field_mailchimp_audience_status->setValue($status);
     }
 
     /**

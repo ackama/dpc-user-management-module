@@ -115,9 +115,9 @@ class MailchimpController extends ControllerBase
      */
     public function updateMembersInList()
     {
-        $member_list = $this->mailchimp->get('lists/' . $this->audience_id . '/members');
+        $member_list = $this->getMailchimpMembers();
 
-        foreach ($member_list['members'] as $member) {
+        foreach ($member_list as $member) {
             $email = $member['email_address'];
             $query = \Drupal::entityQuery('user');
             $query->Condition('field_email_addresses', $email, '=');
@@ -181,6 +181,16 @@ class MailchimpController extends ControllerBase
                 continue;
             }
 
+            // if the users access has changed change the status to 'pending'
+            if (!$user->hasAnyAccess()) {
+                $this->batchUnsubscribe($email);
+                $this->operations_list[] = $user->getDisplayName() . ' status will be changed to "Pending" in MailChimp because they lost Special or Group access.';
+                $user->field_mailchimp_audience_status->setValue('Not subscribed');
+                $user->save();
+
+                continue;
+            }
+
             // check if email is the primary email
             $user_emails      = $user->field_email_addresses->getValue();
             $stored_subscribed_email = \Drupal::service('user.data')->get('dpc_user_management', $user->id(), 'mc_subscribed_email');
@@ -224,12 +234,17 @@ class MailchimpController extends ControllerBase
         $user_ids = $query->execute();
         foreach ($user_ids as $id) {
             $mc_address = \Drupal::service('user.data')->get('dpc_user_management', $id, 'mc_subscribed_email');
-            if (!$mc_address) {
-                $user = User::load($id);
-                if ($user->hasAnyAccess() && $user->field_mailchimp_audience_status->getValue() &&
-                    $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
+            $user = User::load($id);
+            if ($user->hasAnyAccess() && $user->field_mailchimp_audience_status->getValue()) {
+                // subscribe new users
+                if (!$mc_address && $user->field_mailchimp_audience_status->getValue()[0]['value'] !== 'unsubscribed') {
                     $this->operations_list[] = $user->getDisplayName() . ' will be subscribed';
                     $this->batchSubscribe($user);
+                }
+                // update existing users
+                if ($mc_address && $user->field_mailchimp_audience_status->getValue()[0]['value'] == 'Not subscribed') {
+                    $this->operations_list[] = $user->getDisplayName() . ' will be subscribed';
+                    $this->batchUpdateStatus($user, 'subscribed');
                 }
             }
         }
@@ -250,5 +265,21 @@ class MailchimpController extends ControllerBase
         }
 
         return false;
+    }
+
+    private function getMailchimpMembers() {
+        $members = [];
+        $count = 1000;
+        $result = $this->mailchimp->get('lists/' . $this->audience_id . "/members?fields=total_items");
+        $total = $result['total_items'];
+
+        for( $offset = 0; $offset < $total; $offset += 1000 ){
+            $result = $this->mailchimp->get('lists/' . $this->audience_id . "/members?fields=members.email_address,members.status,total_items&count=$count&offset=$offset");
+
+            foreach($result['members'] as $member)
+                $members[] = $member;
+        }
+
+        return $members;
     }
 }
