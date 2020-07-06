@@ -134,7 +134,7 @@ class MailchimpControllerTest extends BrowserTestBase
         $action_log = $this->mailChimpApi->getLog();
 
         $this->assertArrayHasKey('batch_subscribed', $action_log);
-        $this->assertEquals($this->user1->getEmail(), $action_log['batch_subscribed'][1]);
+        $this->assertEquals($this->user1->getEmail(), $action_log['batch_subscribed'][0]);
     }
 }
 
