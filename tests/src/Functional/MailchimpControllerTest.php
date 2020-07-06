@@ -94,6 +94,7 @@ class MailchimpControllerTest extends BrowserTestBase
          * primary email. Email should get updated in mc
          */
         $this->user2 = $this->drupalCreateUser(['administer users', 'administer node fields'], 'user3', false, ['mail' => 'user2@newemail.com']);
+        $this->user2->addToGroup($this->group);
         $this->user2->field_email_addresses->setValue([
             [
                 'value'=> 'user2@newemail.com',
@@ -119,9 +120,9 @@ class MailchimpControllerTest extends BrowserTestBase
         $action_log = $this->mailChimpApi->getLog();
 
         // assert user2 email is updated
-//         $this->assertArrayHasKey('update', $action_log);
-//         $this->assertEquals($this->user2->getEmail(), $action_log['update']['email_address']);
-// var_dump($action_log);
+        $this->assertArrayHasKey('update', $action_log);
+        $this->assertEquals($this->user2->getEmail(), $action_log['update']['email_address']);
+
         // assert mc list member is unsubscribed after not being found in drupal
         $this->assertArrayHasKey('batch_unsubscribed', $action_log);
         $this->assertEquals("lists/$this->audeince_id/members/nonexistentuser@test.com", $action_log['batch_unsubscribed']);
