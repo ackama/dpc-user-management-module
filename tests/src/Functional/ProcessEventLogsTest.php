@@ -258,8 +258,8 @@ class ProcessEventLogsTest extends BrowserTestBase
 
         /**
          * @ToDo User 1 Block 1
-         * Add Email[0] (Group 1) (Master Group)
-         * Add Email[1] (Group 2) (Group 3)
+         * Add Email[0] (Group 1) (Group 3) (Master Group)
+         * Add Email[1] (Group 2)
          * Count logs = 4
          * Process Logs
          *  total 4
