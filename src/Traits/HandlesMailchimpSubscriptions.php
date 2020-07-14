@@ -3,6 +3,7 @@
 namespace Drupal\dpc_user_management\Traits;
 
 use DrewM\MailChimp\MailChimp;
+use Drupal\Component\Utility\Random;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 
@@ -24,7 +25,10 @@ trait HandlesMailchimpSubscriptions
      * @var \DrewM\MailChimp\Batch
      */
     protected $batch;
-
+    /**
+     * @var string
+     */
+    public $batch_id;
     /**
      * HandlesMailchimpSubscriptions constructor.
      *
@@ -45,8 +49,8 @@ trait HandlesMailchimpSubscriptions
         if (!$this->audience_id) {
             $this->audience_id = $this->config->get('audience_id');
         }
-
-        $this->batch = $this->mailchimp->new_batch();
+        $this->batch_id = (new Random)->string();
+        $this->batch = $this->mailchimp->new_batch($this->batch_id);
     }
 
     /**
@@ -81,6 +85,7 @@ trait HandlesMailchimpSubscriptions
 
         $this->mailchimp->put("lists/$this->audience_id/members/$member_id", [
             'status' => 'unsubscribed',
+            'email_address' => $subscribed_address
         ]);
 
         $user->field_mailchimp_audience_status->setValue('unsubscribed');
@@ -101,6 +106,25 @@ trait HandlesMailchimpSubscriptions
 
         $member_id = $this->mailchimp::subscriberHash($old_address);
         $this->mailchimp->patch("lists/$this->audience_id/members/$member_id", [
+            'email_address' => $new_email
+        ]);
+
+        \Drupal::service('user.data')->set('dpc_user_management', $user->id(), 'mc_subscribed_email', $new_email);
+    }
+
+    /**
+     * @param UserInterface $user
+     * @param               $old_address
+     * @param               $new_email
+     */
+    public function batchUpdateEmail(UserInterface $user, $old_address, $new_email)
+    {
+        if (!$this->mailchimpConnected()) {
+            return;
+        }
+
+        $member_id = $this->mailchimp::subscriberHash($old_address);
+        $this->batch->patch('updated', "lists/$this->audience_id/members/$member_id", [
             'email_address' => $new_email
         ]);
 
@@ -140,9 +164,28 @@ trait HandlesMailchimpSubscriptions
 
         $this->batch->put('unsubscribed', "lists/$this->audience_id/members/" . $member_id, [
             'status' => 'unsubscribed',
-            'email_address' => $subscribed_address,
-            'reason' => $reason ? "because $reason" : ""
+            'email_address' => $subscribed_address
         ]);
+    }
+
+    /**
+     * @param $user
+     * @param $status
+     */
+    public function batchUpdateStatus($user, $status) {
+        if (!$this->mailchimpConnected()) {
+            return;
+        }
+        $subscribed_address = $user->getEmail();
+        $member_id = $this->mailchimp::subscriberHash($subscribed_address);
+
+        $this->batch->put('status_change', "lists/$this->audience_id/members/" . $member_id, [
+            'status' => $status,
+            'email_address' => $subscribed_address
+        ]);
+
+        $user->field_mailchimp_audience_status->setValue($status);
+        $user->save();
     }
 
     /**
