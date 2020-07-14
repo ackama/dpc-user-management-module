@@ -94,6 +94,7 @@ class MailchimpControllerTest extends BrowserTestBase
          * primary email. Email should get updated in mc
          */
         $this->user2 = $this->drupalCreateUser(['administer users', 'administer node fields'], 'user3', false, ['mail' => 'user2@newemail.com']);
+        $this->user2->addToGroup($this->group);
         $this->user2->field_email_addresses->setValue([
             [
                 'value'=> 'user2@newemail.com',
@@ -133,7 +134,7 @@ class MailchimpControllerTest extends BrowserTestBase
         $action_log = $this->mailChimpApi->getLog();
 
         $this->assertArrayHasKey('batch_subscribed', $action_log);
-        $this->assertEquals($this->user1->getEmail(), $action_log['batch_subscribed']);
+        $this->assertEquals($this->user1->getEmail(), $action_log['batch_subscribed'][0]);
     }
 }
 
@@ -159,7 +160,8 @@ class FakeMailchimp
                     'email_address' => 'user2@subscribedmail.com',
                     'status'        => 'subscribed'
                 ],
-            ]
+            ],
+            'total_items' => 2
         ];
     }
 
@@ -201,6 +203,6 @@ class FakeMailchimpBatch
 
     public function post($batch_id, $method, $args)
     {
-        $this->log['batch_' . $batch_id] = $args['email_address'];
+        $this->log['batch_' . $batch_id][] = $args['email_address'];
     }
 }
