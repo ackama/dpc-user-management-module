@@ -39,9 +39,7 @@ trait MembershipMailTrait {
             return self::getGroupLabel($gid);
         }, $group_ids);
 
-        $user_emails = array_map(function($email) {
-            return $email['value'];
-        }, $user->get('field_email_addresses')->getValue());
+        $user_emails = $user->getActiveEmails();
 
         // Build message
         $message = "Changes were made to you account which has affected your content access membership. \n\r";
