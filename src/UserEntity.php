@@ -323,20 +323,15 @@ class UserEntity extends User
      */
     public function getActiveEmails()
     {
-        return array_unique(
-            array_merge(
-                [$this->getEmail()],
-                array_map(
-                    function ($x) {
-                        return $x['value'];
-                    },
-                    array_filter(
-                        $this->get('field_email_addresses')->getValue(),
-                        function ($x) {
-                            return $x['status'] === 'verified';
-                        }
-                    )
-                )
+        return array_map(
+            function ($x) {
+                return $x['value'];
+            },
+            array_filter(
+                $this->get('field_email_addresses')->getValue(),
+                function ($x) {
+                    return $x['status'] === 'verified';
+                }
             )
         );
     }
