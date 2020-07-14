@@ -85,11 +85,10 @@ class UserEntity extends User
     public function preSave(EntityStorageInterface $storage)
     {
         if ($this->isNew()) {
-            $this->initializeEmailsField();
-
             return parent::preSave($storage);
         }
 
+        $this->initializeEmailsField();
         $this->verify_email_addresses();
 
         parent::preSave($storage);
