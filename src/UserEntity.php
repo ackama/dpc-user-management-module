@@ -396,8 +396,6 @@ class UserEntity extends User
         });
         $this->set('field_email_addresses', $addresses);
 
-        self::removeUsersFromGroups($this, [$email]);
-
         return true;
     }
 
@@ -422,8 +420,6 @@ class UserEntity extends User
             return $email_address;
         }, $addresses);
         $this->set('field_email_addresses', $addresses);
-
-        self::addUserToGroups($this, $email);
 
         return true;
     }
