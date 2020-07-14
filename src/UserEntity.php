@@ -85,6 +85,8 @@ class UserEntity extends User
     public function preSave(EntityStorageInterface $storage)
     {
         if ($this->isNew()) {
+            $this->initializeEmailsField();
+
             return parent::preSave($storage);
         }
 
@@ -156,6 +158,24 @@ class UserEntity extends User
         $this->get('field_email_addresses')->setValue($addresses);
         if (!empty($verification_sent)) {
             \Drupal::messenger()->addMessage(t('A verification email was sent to ' . implode(',', $verification_sent)));
+        }
+    }
+
+    /**
+     * Makes sure the multiple emails field is filled with the user's email
+     *
+     * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
+     */
+    public function initializeEmailsField() {
+        if(empty($this->get('field_email_addresses')->getValue())) {
+            // Copy the email field into this field
+            $this->field_email_addresses->setValue([
+                [
+                    'value'=> $this->getEmail(),
+                    'status' => 'verified',
+                    'is_primary' => true
+                ]
+            ]);
         }
     }
 
