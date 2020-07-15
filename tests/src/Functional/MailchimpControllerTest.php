@@ -98,9 +98,6 @@ class MailchimpControllerTest extends BrowserTestBase
         $this->user2->makeEmailPrimary('user2@newemail.com');
         $this->user2->save();
 
-        // Second save() is able to verify the email account
-        // With this, the user has officially changed their e-mail
-
         $this->mailChimpApi = new FakeMailchimp($this->api_key);
         $this->controller   = new MailchimpController(null, $this->mailChimpApi, $this->audeince_id);
 
