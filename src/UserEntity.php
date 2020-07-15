@@ -452,13 +452,7 @@ class UserEntity extends User
         // Update users emails with new primary email selection
         $addresses = $this->get('field_email_addresses')->getValue();
         $addresses = array_map(function($email_field) use ($email) {
-            if($email_field['value'] == $email) {
-                $email_field['is_primary'] = 1;
-
-                return $email_field;
-            }
-
-            $email_field['is_primary'] = 0;
+            $email_field['is_primary'] = ($email_field['value'] == $email) ? 1 : 0;
 
             return $email_field;
         }, $addresses);
