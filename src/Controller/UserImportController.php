@@ -288,6 +288,9 @@ class UserImportController extends ControllerBase
             $record['status'] = self::ST_IMPORTED;
         }
 
+        // Save again in order to process hooks
+        $user->save();
+
         return $record;
     }
 

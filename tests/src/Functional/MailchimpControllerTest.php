@@ -4,7 +4,7 @@ namespace Drupal\Tests\dpc_user_management\Functional;
 
 use Drupal\dpc_user_management\Controller\MailchimpController;
 use Drupal\dpc_user_management\UserEntity;
-use Drupal\group\Entity\Group;
+use Drupal\dpc_user_management\GroupEntity as Group;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -45,9 +45,9 @@ class MailchimpControllerTest extends BrowserTestBase
     ];
 
     /**
-     * @var \Drupal\user\Entity\User $user1
-     * @var \Drupal\user\Entity\User $user2
-     * @var \Drupal\user\Entity\User $user3
+     * @var UserEntity $user1
+     * @var UserEntity $user2
+     * @var UserEntity $user3
      */
     protected $user1, $user2, $user3;
     /**
@@ -69,6 +69,7 @@ class MailchimpControllerTest extends BrowserTestBase
         parent::setUp();
         $group_domains = [
             ['value' => 'test.net'],
+            ['value' => 'subscribedmail.com']
         ];
 
         $this->group = Group::create(['type' => UserEntity::$group_type_email_domain_id, 'label' => 'email domain group']);
@@ -80,33 +81,21 @@ class MailchimpControllerTest extends BrowserTestBase
          * and will be subscribed to the mc audience
          */
         $this->user1 = $this->drupalCreateUser(['administer users', 'administer node fields'], 'user1', false, ['mail' => 'user1@test.net']);
-        $this->user1->addToGroup($this->group);
-        $this->user1->field_email_addresses->setValue([
-            [
-                'value'=> 'user1@test.net',
-                'status' => 'verified',
-                'is_primary' => true
-            ]
-        ]);
         $this->user1->save();
+
         /**
          * User2 is part of the audience and has updated their
          * primary email. Email should get updated in mc
          */
-        $this->user2 = $this->drupalCreateUser(['administer users', 'administer node fields'], 'user3', false, ['mail' => 'user2@newemail.com']);
-        $this->user2->addToGroup($this->group);
-        $this->user2->field_email_addresses->setValue([
-            [
-                'value'=> 'user2@newemail.com',
-                'status' => 'verified',
-                'is_primary' => true
-            ],
-            [
-                'value'=> 'user2@subscribedmail.com',
-                'status' => 'verified',
-                'is_primary' => false
-            ],
-        ]);
+        $this->user2 = $this->drupalCreateUser(['administer users', 'administer node fields'], 'user3', false, ['mail' => 'user2@subscribedmail.com']);
+        // This line creates the mc hash association
+        $this->user2->save();
+
+        // This method saves twice already, with the current state it's not possible to add
+        // an email and have it verified within the same save() call
+        $this->user2->addEmailAndVerify('user2@newemail.com');
+
+        $this->user2->makeEmailPrimary('user2@newemail.com');
         $this->user2->save();
 
         $this->mailChimpApi = new FakeMailchimp($this->api_key);

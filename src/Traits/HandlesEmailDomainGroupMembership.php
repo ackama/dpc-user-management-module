@@ -4,8 +4,8 @@ namespace Drupal\dpc_user_management\Traits;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\dpc_user_management\GroupEntity as Group;
 use Drupal\dpc_user_management\UserEntity;
-use Drupal\group\Entity\Group;
 use Drupal\user\UserInterface;
 
 trait HandlesEmailDomainGroupMembership

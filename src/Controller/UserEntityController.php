@@ -43,9 +43,6 @@ class UserEntityController extends ControllerBase
                     $addresses[$key]['verification_token'] = null;
                     $message                               = 'Thank you for verifying your email address';
 
-                    // Add user to groups based on email domain
-                    self::addUserToGroups($user, $address['value']);
-
                     // dispatch primary email changed event
                     if ($address['is_primary']) {
                         $event_dispatcher = \Drupal::service('event_dispatcher');
