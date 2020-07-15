@@ -150,11 +150,7 @@ class UserEntity extends User
 
             // If a primary email flag has been set then override the mail setting
             if ($address['is_primary']) {
-                $this->setEmail($address['value']);
-                // dispatch primary email changed event
-                $event_dispatcher = \Drupal::service('event_dispatcher');
-                $event = new PrimaryEmailUpdated($this);
-                $event_dispatcher->dispatch('primaryEmailUpdated', $event);
+                $this->makeEmailPrimary($address['value']);
             }
         }
 
@@ -453,20 +449,29 @@ class UserEntity extends User
             return null;
         }
 
+        // Update users emails with new primary email selection
         $addresses = $this->get('field_email_addresses')->getValue();
-        $addresses = array_map(function($email_address) use ($email) {
-            if($email_address['value'] == $email) {
-                $email_address['is_primary'] = 1;
+        $addresses = array_map(function($email_field) use ($email) {
+            if($email_field['value'] == $email) {
+                $email_field['is_primary'] = 1;
 
-                return $email_address;
+                return $email_field;
             }
 
-            $email_address['is_primary'] = 0;
+            $email_field['is_primary'] = 0;
 
-            return $email_address;
+            return $email_field;
         }, $addresses);
 
         $this->set('field_email_addresses', $addresses);
+
+        // Set Primary Email on the user's email field
+        $this->setEmail($email);
+
+        // Dispatch primary email changed event
+        $event_dispatcher = \Drupal::service('event_dispatcher');
+        $event = new PrimaryEmailUpdated($this);
+        $event_dispatcher->dispatch('primaryEmailUpdated', $event);
 
         return true;
     }

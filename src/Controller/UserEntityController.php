@@ -5,7 +5,6 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\dpc_user_management\Event\PrimaryEmailUpdated;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\dpc_user_management\Traits\SendsEmailVerificationEmail;
 use Drupal\dpc_user_management\UserEntity as User;
@@ -45,9 +44,7 @@ class UserEntityController extends ControllerBase
 
                     // dispatch primary email changed event
                     if ($address['is_primary']) {
-                        $event_dispatcher = \Drupal::service('event_dispatcher');
-                        $event = new PrimaryEmailUpdated($user);
-                        $event_dispatcher->dispatch('primaryEmailUpdated', $event);
+                        $user->makeEmailPrimary($address);
                     }
                 }
             }
