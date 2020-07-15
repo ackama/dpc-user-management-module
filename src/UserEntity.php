@@ -5,6 +5,7 @@ namespace Drupal\dpc_user_management;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\dpc_user_management\Controller\EventsLogController;
+use Drupal\dpc_user_management\Event\PrimaryEmailUpdated;
 use Drupal\dpc_user_management\Traits\HandleMembershipTrait;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\dpc_user_management\GroupEntity;
@@ -150,6 +151,10 @@ class UserEntity extends User
             // If a primary email flag has been set then override the mail setting
             if ($address['is_primary']) {
                 $this->setEmail($address['value']);
+                // dispatch primary email changed event
+                $event_dispatcher = \Drupal::service('event_dispatcher');
+                $event = new PrimaryEmailUpdated($this);
+                $event_dispatcher->dispatch('primaryEmailUpdated', $event);
             }
         }
 
