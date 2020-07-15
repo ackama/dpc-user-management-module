@@ -358,7 +358,7 @@ class EventsLogController extends ControllerBase
                 \Drupal::logger('dpc_user_management')->info('No changes for ' . $user->getAccountName());
 
                 $this->markLogsAsProcessed($logs);
-                break;
+                continue;
             }
 
             // If user is not in access Group, check what happened and possibly send email
