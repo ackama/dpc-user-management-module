@@ -91,57 +91,11 @@ class MailchimpControllerTest extends BrowserTestBase
         // This line creates the mc hash association
         $this->user2->save();
 
-//        $this->user2->addEmailAndVerify('user2@newemail.com');
-//        $this->user2->makeEmailPrimary('user2@newemail.com');
-//        $this->user2->save();
+        // This method saves twice already, with the current state it's not possible to add
+        // an email and have it verified within the same save() call
+        $this->user2->addEmailAndVerify('user2@newemail.com');
 
-        $this->user2->field_email_addresses->setValue([
-            [
-                'value'=> 'user2@newemail.com',
-                'status' => 'verified',
-                'is_primary' => true
-            ],
-            [
-                'value'=> 'user2@subscribedmail.com',
-                'status' => 'verified',
-                'is_primary' => false
-            ],
-        ]);
-
-        $this->user2->save();
-
-        // Above results in
-        //
-        // Array(
-        //    [0] => Array
-        //        (
-        //            [value] => user2@newemail.com
-        //            [status] => verified
-        //            [is_primary] => 1
-        //        )
-        //
-        //    [1] => Array
-        //        (
-        //            [value] => user2@subscribedmail.com
-        //            [status] => pending
-        //            [is_primary] =>
-        //            [verification_token] => ufBN1TBWeuuoBowSmPYOExjBHGwp3YOKiRvuX_TzKqzlzc20bB3YTjLpsduxs_5qKaDpnlrZ5Q
-        //        )
-        //
-        // )
-
-        $this->user2->field_email_addresses->setValue([
-            [
-                'value'=> 'user2@newemail.com',
-                'status' => 'verified',
-                'is_primary' => true
-            ],
-            [
-                'value'=> 'user2@subscribedmail.com',
-                'status' => 'verified',
-                'is_primary' => false
-            ],
-        ]);
+        $this->user2->makeEmailPrimary('user2@newemail.com');
         $this->user2->save();
 
         // Second save() is able to verify the email account
