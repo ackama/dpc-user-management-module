@@ -9,7 +9,7 @@
         "source": "https://github.com/ackama/dpc-user-management-module.git"
     },
     "repositories": [
-        {
+        "drupal": {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
         }

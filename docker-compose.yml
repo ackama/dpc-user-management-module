@@ -54,10 +54,9 @@ services:
             # - "./drupal-db-dump.sql:/docker-entrypoint-initdb.d/dump.sql"
     drupal:
         build:
-            context: ./
+            context: .
             dockerfile: Dockerfile.dev.drupal
             cache_from:
-              - dev_drupal:latest
               - docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
 
         ports:
@@ -99,7 +98,6 @@ services:
             - ./dev/src/phpunit.xml:/var/www/html/phpunit.xml
 
             - ./:/var/www/html/modules/custom/dpc_user_management
-
             ##
             # Adds a named volume under the module's root where ./dev/ should be placed
             # in order to prevent recursion happening when discovering paths:
