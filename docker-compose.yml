@@ -69,7 +69,7 @@ services:
     drupal:
         build:
             context: .
-            dockerfile: Dockerfile.dev.drupal
+            dockerfile: dev/Dockerfile.dev.drupal
             cache_from:
               - docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
 
