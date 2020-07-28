@@ -35,8 +35,7 @@ you whether this command should be run on your docker host (`your-computer`
 below) or one of the containers.
 
 ```sh
-# IMPORTANT: All the commands below are assumed to be run from the dev/ directory
-cd dev
+# IMPORTANT: All the commands below are assumed to be run from the root directory
 
 ## Terminal 1 ########
 
@@ -48,7 +47,7 @@ you@your-computer$ docker-compose up --build
 
 ## install Drupal (edit config/services/drupal/root/setup.sh if you want to
 change ## how Drupal is installed e.g. download and enable modules etc.)
-you@your-computer$ docker-compose  exec drupal /root/setup.sh
+you@your-computer$ docker-compose exec drupal /root/setup.sh
 
 ## Now your drupal site should be available.
 
@@ -65,7 +64,7 @@ drupal-container$ tail -f /var/log/nginx/access.log
 drupal-container$ mysql
 
 ## ... working with JS
-drupal-container$ cd modules/custom/dpc_user_management
+drupal-container$ cd html/modules/custom/dpc_user_management
 drupal-container$ npm run sass # or whatever commands you have defined in npm
 ```
 
