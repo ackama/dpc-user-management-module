@@ -85,6 +85,11 @@ RUN rm /var/www/html/index.nginx-debian.html
 COPY composer.json /var/www/composer.json
 COPY composer.lock /var/www/composer.lock
 
+# Explicitly set the WORKDIR so that when we run drush commands via
+# `docker-compose exec` they will work because the default working dir is the
+# Drupal root dir.
+WORKDIR /var/www
+
 # Install Drupal & associated modules
 RUN composer install
 
@@ -96,11 +101,6 @@ RUN rm composer.json composer.lock
 
 # Copy the script that will be used as CMD below
 COPY dev/config/services/drupal/root/start.sh /root/start.sh
-
-# Explicitly set the WORKDIR so that when we run drush commands via
-# `docker-compose exec` they will work because the default working dir is the
-# Drupal root dir.
-WORKDIR /var/www
 
 # Add the directory that composer will put tools such as phpunit, drupal
 # console in to PATH so they are avaiable wihtout having to type the
