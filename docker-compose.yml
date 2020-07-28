@@ -120,7 +120,7 @@ services:
             - prevent_recursion_hack_2:/var/www/html/modules/custom/dpc_user_management/vendor
             - prevent_recursion_hack_3:/var/www/html/modules/custom/dpc_user_management/node_modules
 
-            #- ./dev/src/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php
+            - ./dev/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php:cached
 
             - ./dev/config/services/drupal/root/setup.sh:/root/setup.sh
             - ./dev/config/services/drupal/root/run-ci.sh:/root/run-ci.sh

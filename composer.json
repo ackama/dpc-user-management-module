@@ -46,7 +46,8 @@
             "overwrite": true,
             "file-mapping": {
                 "[project-root]/.editorconfig": false,
-                "[project-root]/.gitattributes": false
+                "[project-root]/.gitattributes": false,
+                "[web-root]/sites/default/settings.local.php": false
             },
             "locations": {
                 "web-root": "./html/"
