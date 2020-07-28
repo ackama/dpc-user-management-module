@@ -109,7 +109,7 @@ you@your-computer$ docker-compose exec drupal bash
 ## We have to run PHPUnit as a non-root user (otherwise it seems to fall back to
 ## running as the 'nobody' user who has no permissions to do anything)
 root@drupal-container> su www-data
-www-data@drupal-container> cd /var/www/html
+www-data@drupal-container> cd /var/www
 www-data@drupal-container> phpunit --verbose modules/custom/my-module-under-development/
 ```
 
