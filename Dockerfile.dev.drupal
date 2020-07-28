@@ -72,8 +72,8 @@ RUN docker-php-ext-install pdo pdo_mysql
 
 # Install and setup opcache
 RUN docker-php-ext-install opcache
-COPY config/services/drupal/usr/local/etc/php/conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
-COPY config/services/drupal/usr/local/etc/php/conf.d/core.ini /usr/local/etc/php/conf.d/core.ini
+COPY dev/config/services/drupal/usr/local/etc/php/conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY dev/config/services/drupal/usr/local/etc/php/conf.d/core.ini /usr/local/etc/php/conf.d/core.ini
 
 # Clean up a file which could cause confusion in the context of our app
 RUN rm /var/www/html/index.nginx-debian.html
@@ -82,8 +82,8 @@ RUN rm /var/www/html/index.nginx-debian.html
 
 # Copy the composer files in so they are available for the 'composer install'
 # command later in this file
-COPY composer.json /var/www/html/composer.json
-COPY composer.lock /var/www/html/composer.lock
+COPY composer.json /var/www/composer.json
+COPY composer.lock /var/www/composer.lock
 
 # Install Drupal & associated modules
 RUN composer install
@@ -100,12 +100,12 @@ COPY dev/config/services/drupal/root/start.sh /root/start.sh
 # Explicitly set the WORKDIR so that when we run drush commands via
 # `docker-compose exec` they will work because the default working dir is the
 # Drupal root dir.
-WORKDIR /var/www/html
+WORKDIR /var/www
 
 # Add the directory that composer will put tools such as phpunit, drupal
 # console in to PATH so they are avaiable wihtout having to type the
 # 'vendor/bin/' prefix
-ENV PATH=$PATH:/var/www/html/vendor/bin
+ENV PATH=$PATH:/var/www/vendor/bin
 
 RUN echo 'export LS_OPTIONS="--color=auto"' >> /root/.bashrc
 RUN echo 'alias ls="ls $LS_OPTIONS"' >> /root/.bashrc
