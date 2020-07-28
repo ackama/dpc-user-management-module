@@ -110,23 +110,37 @@ services:
             - ./composer.lock:/var/www/composer.lock:cached
             - ./phpunit.xml:/var/www/phpunit.xml:cached
 
-            - ./:/var/www/html/modules/custom/dpc_user_management:cached
             ##
-            # Adds a named volume under the module's root where ./html/ should be placed
+            # Adds a named volume under the module's root where ./html/ and ./dev/ should be placed
             # in order to prevent recursion happening when discovering paths:
-            # ./html/ is a child of ./ and ./ is mounted under ./html/modules/custom/
-            - prevent_recursion_hack:/var/www/html/modules/custom/dpc_user_management/html:cached
-            - prevent_recursion_hack_2:/var/www/html/modules/custom/dpc_user_management/vendor:cached
-            - prevent_recursion_hack_3:/var/www/html/modules/custom/dpc_user_management/node_modules:cached
+            # ./html/ is a child of ./ and ./ is mounted under ./html/modules/custom/...
+            # ./dev/ is a child of ./ and ./ is be mounted under ./dev/themes/custom/ and ./dev/themes/custom/
+            - prevent_recursion_html:/var/www/html/modules/custom/dpc_user_management/html:cached
+            - prevent_recursion_dev:/var/www/html/modules/custom/dpc_user_management/dev:cached
+            - prevent_recursion_vendor:/var/www/html/modules/custom/dpc_user_management/vendor:cached
+            - prevent_recursion_node_modules:/var/www/html/modules/custom/dpc_user_management/node_modules:cached
 
+            ##
+            # Customise local development settings
             - ./dev/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php:cached
 
             - ./dev/config/services/drupal/root/setup.sh:/root/setup.sh:cached
             - ./dev/config/services/drupal/root/run-ci.sh:/root/run-ci.sh:cached
 
             - ./dev/config/services/drupal/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:cached
+
+            ##
+            # Module Code - This mounts out module's codebase into the container
+            - ./:/var/www/html/modules/custom/dpc_user_management:cached
+
+            ##
+            # Third Party Custom Modules and Themes
+            - ./dev/modules/custom:/var/www/html/modules/custom
+            - ./dev/themes/custom:/var/www/html/themes/custom
+
 volumes:
     mysql_data:
-    prevent_recursion_hack:
-    prevent_recursion_hack_2:
-    prevent_recursion_hack_3:
+    prevent_recursion_html:
+    prevent_recursion_dev:
+    prevent_recursion_vendor:
+    prevent_recursion_node_modules:

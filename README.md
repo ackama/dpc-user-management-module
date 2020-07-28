@@ -82,9 +82,10 @@ After you install Drupal (see above), the following should be available in your 
 * http://localhost:8080/ (Drupal in the `drupal` container)
 * http://localhost:3001/ (Browsersync in the `frontend` container)
 
-### Adding custom module code
+### Adding external third party drupal dependencies
 
-Create custom modules in `src/modules/custom` and they will automatically be available to the Drupal container.
+In the case you need to add custom dependencies that can't be managed through composer,
+add them inside `./dev/modules/custom` or `./dev/themes/custom` accordingly.
 
 If your custom module is in a separate git repo then you can clone into that dir and that will also be fine.
 
