@@ -114,7 +114,9 @@ RUN echo 'alias ls="ls $LS_OPTIONS"' >> /root/.bashrc
 RUN chsh -s /bin/bash www-data
 
 # Create some directories that phpunit will expect to exist
-RUN mkdir -p sites/simpletest/browser_output
-RUN chmod -R 777 sites/simpletest
+RUN mkdir -p html/sites/simpletest/browser_output
+RUN chmod -R 777 html/sites/simpletest
+RUN mkdir -p html/sites/default/files/
+RUN chmod -R 777 html/sites/default/files/
 
 CMD [ "/root/start.sh" ]
