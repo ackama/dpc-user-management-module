@@ -13,7 +13,7 @@
             "type": "composer",
             "url": "https://packages.drupal.org/8"
         }
-    ],
+    },
     "require": {
         "php": "^7.3",
         "drupal/group": "^1.0@RC",
@@ -28,7 +28,6 @@
         "behat/mink-goutte-driver": "^1.2",
         "phpunit/phpunit": "^7",
         "symfony/phpunit-bridge": "^5.0",
-        "phpunit/phpunit": "^7",
         "drupal/admin_toolbar": "^2.2",
         "drupal/group": "dev-1.x",
         "drupal/phpmailer_smtp": "^1.4",
