@@ -88,6 +88,8 @@ add them inside `./dev/modules/custom` or `./dev/themes/custom` accordingly.
 
 If your custom module is in a separate git repo then you can clone into that dir and that will also be fine.
 
+You will also need to uncomment the appropriate lines in the `docker-compose.yml` file 
+
 ### Access to dependencies on your host
 
 Composer and docker-compose are configured so dependencies are installed into the project

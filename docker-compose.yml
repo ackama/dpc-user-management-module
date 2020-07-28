@@ -135,8 +135,8 @@ services:
 
             ##
             # Third Party Custom Modules and Themes
-            - ./dev/modules/custom:/var/www/html/modules/custom
-            - ./dev/themes/custom:/var/www/html/themes/custom
+            # - ./dev/modules/custom:/var/www/html/modules/custom:cached
+            # - ./dev/themes/custom:/var/www/html/themes/custom:cached
 
 volumes:
     mysql_data:
