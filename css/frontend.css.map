@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,wBAAyB;EACrB,KAAK,EAAE,IAAI;EACX,UAAU,EAAE,OAAO;EACnB,OAAO,EAAE,MAAM;EACf,MAAM,EAAE,aAAa;EACrB,KAAK,EAAE,IAAI;EACX,OAAO,EAAE,KAAK;EACd,UAAU,EAAE,MAAM",
+"sources": ["../scss/frontend/user_email_reminder.scss"],
+"names": [],
+"file": "frontend.css"
+}

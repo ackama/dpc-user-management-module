@@ -8,13 +8,15 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\dpc_user_management\Controller\EventsLogController;
+use Drupal\dpc_user_management\Controller\MailchimpController;
 use Drupal\user\Entity\User;
 use Drupal\dpc_user_management\Traits\HandlesEmailDomainGroupMembership;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * TODO: add helpful content or remove this hook
  * Implements hook_help().
  *
  * @param                     $route_name
@@ -30,6 +32,110 @@ function dpc_user_management_help($route_name, RouteMatchInterface $route_match)
         <h2>User management module information.</h2>
       ');
     }
+}
+
+/**
+ * Implemets hook_schema()
+ */
+function dpc_user_management_schema()
+{
+    $schema = [];
+
+    $schema['dpc_group_events'] = [
+        'description' => 'Table for DPC Group membership events.',
+        'fields'      => [
+            'id'      => [
+                'description' => 'The primary key to store unique information.',
+                'type'        => 'serial',
+                'not null'    => true,
+            ],
+            'uid'     => [
+                'description' => 'The primary identifier for a User.',
+                'type'        => 'int',
+                'unsigned'    => true,
+                'not null'    => true,
+            ],
+            'gid'     => [
+                'description' => 'The primary identifier for a Group.',
+                'type'        => 'int',
+                'unsigned'    => true,
+                'not null'    => true,
+            ],
+            'name'    => [
+                'description' => 'The name of the event',
+                'type'        => 'varchar',
+                'length'      => 32,
+                'not null'    => true,
+                'default'     => '',
+            ],
+            'status'  => [
+                'description' => 'The status of the event',
+                'type'        => 'varchar',
+                'length'      => 32,
+                'not null'    => false,
+            ],
+            'created' => [
+                'type'     => 'int',
+                'not null' => false,
+                'size'     => 'normal',
+            ],
+            'changed' => [
+                'type'     => 'int',
+                'not null' => false,
+                'size'     => 'normal',
+            ],
+        ],
+        'primary key' => [
+            'id',
+        ],
+    ];
+
+    $schema[\Drupal\dpc_user_management\Controller\DeletedGroupController::$table_name] =
+        \Drupal\dpc_user_management\Controller\DeletedGroupController::$schema;
+
+    $schema[\Drupal\dpc_user_management\Controller\UserImportController::$table_name] =
+        \Drupal\dpc_user_management\Controller\UserImportController::$schema;
+
+    return $schema;
+}
+
+/**
+ * Add records to the events table
+ *
+ * @param $name "event name"
+ * @param $gid  "group id"
+ * @param $uid  "user id"
+ *
+ * @throws Exception
+ */
+function dpc_log_event($name, $gid, $uid)
+{
+    $connection = \Drupal::database();
+    $connection->insert('dpc_group_events')->fields([
+        'name'    => $name,
+        'uid'     => $uid,
+        'gid'     => $gid,
+        'status'  => 'pending',
+        'created' => strtotime('now')
+    ])->execute();
+}
+
+/**
+ * Implements hook_cron()
+ *
+ * @throws Exception
+ */
+function dpc_user_management_cron(){
+    $mc_controller = new MailchimpController('cron');
+    $request = new Request();
+    $mc_controller->syncAudience($request);
+
+    /**
+     * Processes all Event Record on cron call
+     */
+    $EventsLog = new EventsLogController();
+    $EventsLog->processUnprocessedRecords();
+
 }
 
 /**
@@ -58,6 +164,11 @@ function dpc_user_management_user_prepare_form(
                     ]
                 ]);
             }
+
+            $mc_audience_status = $entity->get('field_mailchimp_audience_status');
+            if (empty($mc_audience_status->getValue())) {
+                $mc_audience_status->setValue('Not subscribed');
+            }
         } catch (\Exception $exception) {
         }
     }
@@ -75,14 +186,38 @@ function dpc_user_management_form_alter(&$form, FormStateInterface $form_state, 
     if ($form_id === 'user_form') {
         // remove the default email field
         unset($form['account']['mail']);
+
         // add asset library
         $form['#attached']['library'][] = 'dpc_user_management/user_profile';
         // add validation
         $form['#validate'][] = 'dpc_user_management_email_validation';
+
+        $mc_config = \Drupal::config('dpc_mailchimp.settings');
+        if (!$mc_config->get('audience_id') || ! $mc_config->get('api_key')) {
+            unset($form['field_mailchimp_audience_status']);
+        }
+
+        if (isset($form['field_mailchimp_audience_status'])) {
+            $form['field_mailchimp_audience_status']['widget'][0]['value']['#attributes']['disabled'] = TRUE;
+        }
+
+        if (!\Drupal::currentUser()->hasPermission('administer group fields')) {
+            unset($form['jse_access']);
+        }
     }
+
     if ($form_id === 'user_register_form') {
         // hide email addresses form on registration
         unset($form['field_email_addresses']);
+        unset($form['field_mailchimp_audience_status']);
+
+        if (!\Drupal::currentUser()->hasPermission('administer group fields')) {
+            unset($form['jse_access']);
+        }
+    }
+
+    if ($form_id === 'mailchimp_audience_settings') {
+        $form['#attached']['library'][] = 'dpc_user_management/mailchimp';
     }
 }
 
@@ -97,27 +232,31 @@ function dpc_user_management_entity_type_build(&$entity_types)
     if (isset($entity_types['user'])) {
         $entity_types['user']->setClass('Drupal\dpc_user_management\UserEntity');
     }
+    if (isset($entity_types['group'])) {
+        $entity_types['group']->setClass('Drupal\dpc_user_management\GroupEntity');
+    }
 }
 
 /**
- * @param $form
+ * @param                                      $form
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  */
 function dpc_user_management_email_validation($form, &$form_state)
 {
     if ($form_state->hasValue('field_email_addresses')) {
-        $addresses = $form_state->getValue('field_email_addresses');
+        $addresses             = $form_state->getValue('field_email_addresses');
         $has_primary_email_set = in_array(true, array_column($addresses, 'is_primary'));
         foreach ($addresses as $address) {
             // check if primary email is removed
             if (is_array($address)) {
                 if ($address['is_primary'] && empty($address['value']) && !$has_primary_email_set) {
-                    return $form_state->setErrorByName('field_email_addresses', "Set another address as Primary before removing your Primary address");
+                    return $form_state->setErrorByName('field_email_addresses',
+                        "Set another address as Primary before removing your Primary address");
                 }
 
                 if (empty($address['status']) && !empty($address['value'])) {
-                    $email = $address['value'];
-                    $db = \Drupal::database();
+                    $email          = $address['value'];
+                    $db             = \Drupal::database();
                     $address_exists = $db
                         ->query("select * from {user__field_email_addresses} where field_email_addresses_value = '$email'")
                         ->fetchAll();

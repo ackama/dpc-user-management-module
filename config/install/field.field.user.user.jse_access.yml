@@ -1,0 +1,24 @@
+# field.field.user.user.jse_access.yml
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.jse_access
+  module:
+    - user
+    - group
+id: user.user.jse_access
+field_name: jse_access
+bundle: user
+label: 'Provide Content Access'
+description: 'Manually provide Content access provided to users who do not belong to any specific access group'
+required: false
+translatable: false
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean
+entity_type: user
+default_value:
+  -
+    value: 0

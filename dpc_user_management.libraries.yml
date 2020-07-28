@@ -2,8 +2,24 @@ user_profile:
   version: 'VERSION'
   css:
     theme:
-      css/main.css: {}
+      css/backend.css: {}
   js:
     js/user_profile.js: {}
+  dependencies:
+    - 'core/jquery'
+
+user_frontend:
+  version: 'VERSION'
+  css:
+    theme:
+      css/frontend.css: {}
+
+mailchimp:
+  version: 'VERSION'
+  css:
+    theme:
+      css/backend.css: {}
+  js:
+    js/mailchimp.js: {}
   dependencies:
     - 'core/jquery'

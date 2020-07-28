@@ -14,7 +14,7 @@ drush site:install -vvv \
   -r /var/www/html \
   --account-name=$DRUPAL_ADMIN_USERNAME \
   --account-pass=$DRUPAL_ADMIN_PASSWORD \
-  standard
+  standard install_configure_form.enable_update_status_module=NULL install_configure_form.enable_update_status_emails=NULL
 
 # We have performed the install as root so change ownership of
 # sites/default/files to allow Apache+PHP to write them
@@ -36,8 +36,21 @@ drush --yes pm:enable devel,devel_generate,kint
 #
 # drush --yes pm:enable webprofiler
 
+# Enable Admin Toolbar goodies
+drush --yes pm:enable admin_toolbar
+drush --yes pm:enable admin_toolbar_tools
+drush --yes pm:enable admin_toolbar_search
+
 # Enable our module's Drupal dependencies (they are installed via composer)
 drush --yes pm:enable group
+
+# Enable phpmailer smtp and mailsystem
+# Configures both to route emails to mailhog docker service
+# drush --yes pm:enable phpmailer_smtp mailsystem
+# drush config:set --yes mailsystem.settings defaults.sender phpmailer_smtp
+# drush config:set --yes mailsystem.settings defaults.formatter phpmailer_smtp
+# drush config:set --yes phpmailer_smtp.settings smtp_host mailhog
+# drush config:set --yes phpmailer_smtp.settings smtp_port 1025
 
 # Rebuild drupal cache after installing Drupal and enabling plugins. Cache
 # rebuilds sometimes fail the first time for no apparent reason so we run with

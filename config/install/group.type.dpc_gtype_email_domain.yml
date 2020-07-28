@@ -1,9 +1,9 @@
 langcode: en
 status: true
 dependencies: {  }
-id: email_domain_group
-label: 'Email domain group'
+id: dpc_gtype_email_domain
+label: 'DPC Managed - Email Domain Groups'
 description: ''
-creator_membership: true
+creator_membership: false
 creator_wizard: false
 creator_roles: {  }

@@ -1,0 +1,18 @@
+# core.base_field_override.group.dpc_gtype_special.label.yml
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.dpc_gtype_special
+id: group.dpc_gtype_special.label
+field_name: label
+entity_type: group
+bundle: dpc_gtype_special
+label: 'Special Group Name'
+description: 'The name that will be displayed in the user profile'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

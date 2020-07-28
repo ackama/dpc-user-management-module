@@ -5,12 +5,54 @@
  * Installation functions for DPC User Management Module
  */
 
+use Drupal\dpc_user_management\UserEntity;
+
 /**
  * Implements hook_install().
  */
 function dpc_user_management_install()
 {
     Drupal::logger('dpc_user_management')->notice('DPC User Management Installed');
+
+    // Adds DPC Module Managed Group Type if it doesn't exist
+    if( is_null( \Drupal\group\Entity\GroupType::load(\Drupal\dpc_user_management\UserEntity::$group_type_id) ) ) {
+        $group_type = \Drupal\group\Entity\GroupType::create([
+            'id' => \Drupal\dpc_user_management\UserEntity::$group_type_id,
+            'label' => \Drupal\dpc_user_management\UserEntity::$group_type_label,
+            'description' => '',
+            'creator_membership' => false,
+            'creator_wizard' => true,
+            'creator_roles' => [],
+            'status' => true,
+            'isUninstalling' => false,
+            'langcode' => 'en',
+            'trustedData' => false,
+            'enforceIsNew' => NULL,
+            'typedData' => NULL,
+            'cacheContexts' => [],
+            'cacheTags' => [],
+            'cacheMaxAge' => -1,
+            'isSyncing' => false
+        ]);
+
+        $group_type->save();
+    }
+
+    // Adds DPC Module Managed Group if it doesn't exist
+    $group_ids =  \Drupal::entityQuery('group')
+        ->condition('label', UserEntity::$group_label)
+        ->accessCheck(false)
+        ->execute();
+
+    if( !count($group_ids) ) {
+        $group = \Drupal\group\Entity\Group::create([
+            'id' => UserEntity::$group_id,
+            'label' => UserEntity::$group_label,
+            'type' => UserEntity::$group_type_id
+        ]);
+
+        $group->save();
+    }
 
     /**
      * Set visibility for field in views
@@ -23,8 +65,24 @@ function dpc_user_management_install()
             // Prevents overwriting of configuration when disabling and enabling
             if (!$view->getComponent('special_group')) {
                 /** @var Drupal\Core\Entity\Display\EntityDisplayInterface $view */
-                $view->setComponent('special_group', [
+                $view->setComponent('special_groups', [
                     'type' => 'boolean',
+                    'settings' => []
+                ])->save();
+            }
+
+            if (!$view->getComponent('jse_access')) {
+                /** @var Drupal\Core\Entity\Display\EntityDisplayInterface $view */
+                $view->setComponent('jse_access', [
+                    'type' => 'boolean',
+                    'settings' => []
+                ])->save();
+            }
+
+            if (!$view->getComponent('field_mailchimp_audience_status')) {
+                /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
+                $view->setComponent('field_mailchimp_audience_status', [
+                    'type' => 'text_default',
                     'settings' => []
                 ])->save();
             }
@@ -42,8 +100,24 @@ function dpc_user_management_install()
             // Prevents overwriting of configuration when disabling and enabling
             if (!$view->getComponent('special_group')) {
                 /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
-                $view->setComponent('special_group', [
+                $view->setComponent('special_groups', [
+                    'type' => 'options_buttons',
+                    'settings' => []
+                ])->save();
+            }
+
+            if (!$view->getComponent('jse_access')) {
+                /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
+                $view->setComponent('jse_access', [
                     'type' => 'boolean_checkbox',
+                    'settings' => []
+                ])->save();
+            }
+
+            if (!$view->getComponent('field_mailchimp_audience_status')) {
+                /** @var Drupal\Core\Entity\Display\EntityFormDisplayInterface $view */
+                $view->setComponent('field_mailchimp_audience_status', [
+                    'type' => 'string_textfield',
                     'settings' => []
                 ])->save();
             }
@@ -66,6 +140,23 @@ function dpc_user_management_install()
 
         $view_display->save();
     }
+
+    /** @var \Drupal\Core\Theme\ActiveTheme $theme */
+    $theme = \Drupal::service('theme.manager')->getActiveTheme();
+
+    /** @var \Drupal\block\Entity\Block $block */
+    $block = \Drupal\block\Entity\Block::create([
+        'id' => \Drupal\dpc_user_management\Plugin\Block\AccessReminderBlock::$_id,
+        'plugin' => \Drupal\dpc_user_management\Plugin\Block\AccessReminderBlock::$_id,
+        'theme' => $theme->getName(),
+        'region' => 'highlighted',
+        'settings' => [
+            'label' => 'Access Reminder Block',
+            'label_display' => '0'
+        ]
+    ]);
+    $block->save();
+
 }
 
 /**

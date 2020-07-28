@@ -2,7 +2,9 @@
     "name": "dpc-user-management",
     "version": "1.0.0",
     "scripts": {
-        "sass": "sass ./scss/main.scss:./css/main.css"
+        "sass": "npm run sass:frontend && npm run sass:backend",
+        "sass:frontend": "sass ./scss/frontend/main.scss:./css/frontend.css",
+        "sass:backend": "sass ./scss/backend/main.scss:./css/backend.css"
     },
     "devDependencies": {
         "sass": "^1.26.3"

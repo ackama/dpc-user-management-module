@@ -1,0 +1,93 @@
+#edit-field-email-addresses-wrapper .form-item .form-item {
+  display: inline-block;
+  width: 350px;
+  margin-left: 15px; }
+  #edit-field-email-addresses-wrapper .form-item .form-item:first-of-type {
+    margin-left: 0; }
+  #edit-field-email-addresses-wrapper .form-item .form-item:nth-of-type(2) {
+    width: auto;
+    margin-right: 10px; }
+#edit-field-email-addresses-wrapper tbody tr {
+  display: flex;
+  position: relative; }
+  #edit-field-email-addresses-wrapper tbody tr td {
+    display: flex;
+    align-items: center; }
+#edit-field-email-addresses-wrapper .form-item .button {
+  margin-top: 1.4em; }
+  #edit-field-email-addresses-wrapper .form-item .button.disabled {
+    text-transform: capitalize;
+    cursor: default;
+    background: transparent; }
+    #edit-field-email-addresses-wrapper .form-item .button.disabled:hover {
+      box-shadow: none; }
+  #edit-field-email-addresses-wrapper .form-item .button.status-verified {
+    border-color: green;
+    color: green; }
+  #edit-field-email-addresses-wrapper .form-item .button.status-pending {
+    border-color: #777777;
+    color: #777777; }
+  #edit-field-email-addresses-wrapper .form-item .button.status-unverified {
+    color: #e09600;
+    border-color: #e09600; }
+  #edit-field-email-addresses-wrapper .form-item .button.new-item {
+    visibility: hidden; }
+  #edit-field-email-addresses-wrapper .form-item .button.disabled:hover {
+    pointer-events: none; }
+#edit-field-email-addresses-wrapper .form-item .dpc_resend_verification.disabled {
+  background: transparent;
+  border: transparent; }
+#edit-field-email-addresses-wrapper .form-item .dpc_resend_verification.verified {
+  visibility: hidden; }
+#edit-field-email-addresses-wrapper .form-item .form-type-checkbox {
+  width: 130px;
+  margin-top: 28px; }
+  #edit-field-email-addresses-wrapper .form-item .form-type-checkbox input {
+    display: none; }
+  #edit-field-email-addresses-wrapper .form-item .form-type-checkbox label {
+    position: relative;
+    font-weight: 100;
+    color: grey;
+    line-height: 2;
+    padding-left: 30px; }
+    #edit-field-email-addresses-wrapper .form-item .form-type-checkbox label:before {
+      display: inline-block;
+      content: '';
+      border-radius: 100%;
+      height: 16px;
+      width: 16px;
+      margin-right: 10px;
+      border: 1px solid grey;
+      position: absolute;
+      top: 0;
+      left: 0; }
+  #edit-field-email-addresses-wrapper .form-item .form-type-checkbox input:checked + label {
+    color: green; }
+    #edit-field-email-addresses-wrapper .form-item .form-type-checkbox input:checked + label:before {
+      border: 1px solid green; }
+    #edit-field-email-addresses-wrapper .form-item .form-type-checkbox input:checked + label:after {
+      background: green;
+      display: block;
+      content: '';
+      vertical-align: middle;
+      border-radius: 100%;
+      height: 12px;
+      width: 12px;
+      position: absolute;
+      top: 3px;
+      left: 3px; }
+
+#main-wrapper #edit-field-email-addresses-wrapper tr td {
+  border: none; }
+#main-wrapper #edit-field-email-addresses-wrapper .form-item .form-type-checkbox {
+  margin-top: 16px; }
+  #main-wrapper #edit-field-email-addresses-wrapper .form-item .form-type-checkbox label:after {
+    top: 3px; }
+
+#mc-sync-result {
+  background: #f6f6f6;
+  margin: 1em 0;
+  padding: 1em;
+  display: none; }
+
+/*# sourceMappingURL=backend.css.map */

@@ -1,7 +1,9 @@
 <?php
-namespace Drupal\Tests\DPC_User_Management\Functional;
+namespace Drupal\Tests\dpc_user_management\Functional;
 
 use Drupal\Core\Test\AssertMailTrait;
+use Drupal\dpc_user_management\Controller\EventsLogController;
+use Drupal\dpc_user_management\UserEntity;
 use Drupal\group\Entity\Group;
 use Drupal\Tests\BrowserTestBase;
 
@@ -69,7 +71,7 @@ class GroupMembershipTest extends BrowserTestBase
             ['value' => 'domain.org'],
             ['value' => 'example.com']
         ];
-        $this->group   = Group::create(['type' => 'email_domain_group', 'label' => 'email domain group']);
+        $this->group   = Group::create(['type' =>  UserEntity::$group_type_email_domain_id, 'label' => 'email domain group']);
         $this->group->set('field_email_domain', $group_domains);
         $this->group->save();
 
@@ -110,7 +112,7 @@ class GroupMembershipTest extends BrowserTestBase
 
         // get the verification email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
@@ -137,7 +139,7 @@ class GroupMembershipTest extends BrowserTestBase
 
         // verify the new email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
@@ -149,12 +151,6 @@ class GroupMembershipTest extends BrowserTestBase
 
         // check that the user was removed from the group
         $this->assertFalse($this->group->getMember($this->user));
-
-        // check that the user received a notification after being removed
-        $site_name = \Drupal::config('system.site')->get('name');
-        $captured_emails = $this->drupalGetMails();
-
-        $this->assertEqual("$site_name: You have been removed from a group", $captured_emails[2]['subject']);
     }
 
     /**
@@ -177,7 +173,7 @@ class GroupMembershipTest extends BrowserTestBase
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         // verify the new email
         $captured_emails = $this->drupalGetMails();
-        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[1]['body'],
+        preg_match("/(http|https):\/\/[a-zA-z.]*\/verify-email\/[0-9]*\/\?token=.*/", $captured_emails[0]['body'],
             $verification_link);
         $this->drupalGet($verification_link[0]);
 
@@ -214,5 +210,20 @@ class GroupMembershipTest extends BrowserTestBase
         ];
         $this->drupalPostForm('user/' . $this->user->id() . '/edit', $edit, 'Save');
         $this->assertFalse($this->group->getMember($this->user));
+    }
+
+    public function testGroupMembershipActionsAreLogged()
+    {
+        $admin = $this->drupalCreateUser(['administer site configuration', 'access administration pages']);
+
+        // user was added to a group
+        $this->drupalLogin($this->user);
+
+        $this->drupalLogin($admin);
+        $this->drupalGet('admin/config/system/group-events-log');
+        $group_name = $this->group->getName();
+        $user_name = $this->user->getDisplayName();
+
+        $this->assertContains("added $group_name $user_name pending", $this->getSession()->getPage()->getText());
     }
 }
