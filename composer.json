@@ -22,7 +22,6 @@
     "require-dev": {
         "drupal/console": "~1.0",
         "drupal/devel": "^2.1",
-        "drupal/core-composer-scaffold": "^8.8",
         "drupal/core-recommended": "^8.8",
         "composer/installers": "^1.2",
         "behat/mink-goutte-driver": "^1.2",
@@ -42,34 +41,29 @@
         "sort-packages": true
     },
     "extra": {
-        "drupal-scaffold": {
-            "locations": {
-                "web-root": "./"
-            }
-        },
         "installer-paths": {
-            "./core": [
+            "./html/core": [
                 "type:drupal-core"
             ],
-            "./libraries/{$name}": [
+            "./html/libraries/{$name}": [
                 "type:drupal-library"
             ],
-            "./modules/contrib/{$name}": [
+            "./html/modules/contrib/{$name}": [
                 "type:drupal-module"
             ],
-            "./profiles/contrib/{$name}": [
+            "./html/profiles/contrib/{$name}": [
                 "type:drupal-profile"
             ],
-            "./themes/contrib/{$name}": [
+            "./html/themes/contrib/{$name}": [
                 "type:drupal-theme"
             ],
             "drush/Commands/contrib/{$name}": [
                 "type:drupal-drush"
             ],
-            "./modules/custom/{$name}": [
+            "./html/modules/custom/{$name}": [
                 "type:drupal-custom-module"
             ],
-            "./themes/custom/{$name}": [
+            "./html/themes/custom/{$name}": [
                 "type:drupal-custom-theme"
             ]
         }
