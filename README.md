@@ -98,7 +98,7 @@ you@your-computer$ docker-compose exec drupal bash
 ## running as the 'nobody' user who has no permissions to do anything)
 root@drupal-container> su www-data
 www-data@drupal-container> cd /var/www/html
-www-data@drupal-container> phpunit --verbose modules/my-module-under-development/
+www-data@drupal-container> phpunit --verbose modules/custom/my-module-under-development/
 ```
 
 ### Running tests as CI does
@@ -106,7 +106,7 @@ www-data@drupal-container> phpunit --verbose modules/my-module-under-development
 This runs all tests the same way CI does.
 
 ```sh
-you@your-computer$ docker-compose  exec drupal /root/run-ci.sh
+you@your-computer$ docker-compose exec drupal /root/run-ci.sh
 ```
 
 ### Drupal admin credentials
