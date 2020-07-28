@@ -22,6 +22,7 @@
     "require-dev": {
         "drupal/console": "~1.0",
         "drupal/devel": "^2.1",
+        "drupal/core-composer-scaffold": "^8.8",
         "drupal/core-recommended": "^8.8",
         "composer/installers": "^1.2",
         "behat/mink-goutte-driver": "^1.2",
@@ -41,6 +42,16 @@
         "sort-packages": true
     },
     "extra": {
+        "drupal-scaffold": {
+            "overwrite": true,
+            "file-mapping": {
+                "[project-root]/.editorconfig": false,
+                "[project-root]/.gitattributes": false
+            },
+            "locations": {
+                "web-root": "./html/"
+            }
+        },
         "installer-paths": {
             "./html/core": [
                 "type:drupal-core"
