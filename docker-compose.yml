@@ -102,30 +102,25 @@ services:
             MYSQL_CLIENT_DATABASE: drupal
         volumes:
             ##
-            # We mount only the files and folders we will want to edit on the
-            # host. We assume that all commands will be run within the
-            # container.
+            # We mount the module files only the files and specific directories
+            # we will want to edit on the host.
+            # We assume that all commands will be run within the container.
             #
-            - ./composer.json:/var/www/html/composer.json
-            - ./composer.lock:/var/www/html/composer.lock
+            - ./composer.json:/var/www/composer.json
+            - ./composer.lock:/var/www/composer.lock
 
             - ./dev/src/phpunit.xml:/var/www/html/phpunit.xml
 
             - ./:/var/www/html/modules/custom/dpc_user_management
             ##
-            # Adds a named volume under the module's root where ./dev/ should be placed
+            # Adds a named volume under the module's root where ./html/ should be placed
             # in order to prevent recursion happening when discovering paths:
-            # ./dev/ is a child of ./ and ./ is mounted under ./dev/src/modules/custom/
-            - prevent_recursion_hack:/var/www/html/modules/custom/dpc_user_management/dev
+            # ./html/ is a child of ./ and ./ is mounted under ./html/modules/custom/
+            - prevent_recursion_hack:/var/www/html/modules/custom/dpc_user_management/html
             - prevent_recursion_hack_2:/var/www/html/modules/custom/dpc_user_management/vendor
             - prevent_recursion_hack_3:/var/www/html/modules/custom/dpc_user_management/node_modules
 
-            # - ./dev/src/profiles:/var/www/html/profiles
-            #
-            # - ./dev/src/themes/contrib:/var/www/html/themes/contrib
-            # - ./dev/src/themes/custom:/var/www/html/themes/custom
-
-            - ./dev/src/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php
+            #- ./dev/src/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php
 
             - ./dev/config/services/drupal/root/setup.sh:/root/setup.sh
             - ./dev/config/services/drupal/root/run-ci.sh:/root/run-ci.sh
