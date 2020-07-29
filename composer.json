@@ -8,27 +8,76 @@
         "issues": "https://github.com/ackama/dpc-user-management-module/issues",
         "source": "https://github.com/ackama/dpc-user-management-module.git"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
+    "repositories": {
+        "drupal": {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    },
     "require": {
         "php": "^7.3",
         "drupal/group": "^1.0@RC",
         "drewm/mailchimp-api": "^2.5"
     },
     "require-dev": {
-        "drupal/devel": "^2.1",
         "behat/mink-goutte-driver": "^1.2",
-        "phpunit/phpunit": "^7",
-        "symfony/phpunit-bridge": "^5.0",
+        "composer/installers": "^1.2",
         "drupal/admin_toolbar": "^2.2",
+        "drupal/console": "~1.0",
+        "drupal/core-composer-scaffold": "^8.8",
+        "drupal/core-recommended": "^8.8",
+        "drupal/devel": "^2.1",
         "drupal/group": "dev-1.x",
+        "drupal/mailsystem": "^4.3",
         "drupal/phpmailer_smtp": "^1.4",
-        "drupal/mailsystem": "^4.3"
+        "phpunit/phpunit": "^7",
+        "symfony/phpunit-bridge": "^5.0"
     },
-    "repositories": {
-        "drupal": {
-            "type": "composer",
-            "url": "https://packages.drupal.org/8"
+    "conflict": {
+        "drupal/drupal": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "drupal-scaffold": {
+            "overwrite": true,
+            "file-mapping": {
+                "[project-root]/.editorconfig": false,
+                "[project-root]/.gitattributes": false,
+                "[web-root]/sites/default/settings.local.php": false
+            },
+            "locations": {
+                "web-root": "./html/"
+            }
+        },
+        "installer-paths": {
+            "./html/core": [
+                "type:drupal-core"
+            ],
+            "./html/libraries/{$name}": [
+                "type:drupal-library"
+            ],
+            "./html/modules/contrib/{$name}": [
+                "type:drupal-module"
+            ],
+            "./html/profiles/contrib/{$name}": [
+                "type:drupal-profile"
+            ],
+            "./html/themes/contrib/{$name}": [
+                "type:drupal-theme"
+            ],
+            "drush/Commands/contrib/{$name}": [
+                "type:drupal-drush"
+            ],
+            "./html/modules/custom/{$name}": [
+                "type:drupal-custom-module"
+            ],
+            "./html/themes/custom/{$name}": [
+                "type:drupal-custom-theme"
+            ]
         }
     }
 }

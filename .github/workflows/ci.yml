@@ -14,13 +14,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Show docker command versions (for later debugging)
-        working-directory: ./dev
         run: |
           docker --version
           docker-compose --version
 
       - name: Login docker to Github packages registry
-        working-directory: ./dev
         env:
           EOIN_PAT: ${{secrets.EOIN_PAT}}
         run: echo $EOIN_PAT | docker login docker.pkg.github.com -u eoinkelly --password-stdin
@@ -41,22 +39,19 @@ jobs:
       # environment.
       #
       - name: Pull the base Drupal image (so we can use it as a source of layers via cache_from)
-        working-directory: ./dev
         env:
           EOIN_PAT: ${{secrets.EOIN_PAT}}
         run: |
           docker pull docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest || true
 
       - name: Build and start all containers
-        working-directory: ./dev
         run: docker-compose up -d --build
 
       - name: Tag and push the Drupal image to the Github packages registry (so we can use it as a source of layers on future builds)
-        working-directory: ./dev
         env:
           EOIN_PAT: ${{secrets.EOIN_PAT}}
         run: |
-          docker tag dev_drupal:latest docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
+          docker tag dpc-user-management-module_drupal:latest docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
           docker push docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
 
       - name: Wait for MariaDB container to start
@@ -64,19 +59,15 @@ jobs:
         # **twice**. This while loop gathers the log output from the MariaDB
         # container and looks for that magic string. It will loop (sleeping 1
         # second on each loop) while it waits to see the magic string twice.
-        working-directory: ./dev
         run: "while [ $(docker-compose logs mysql |grep 'mysqld: ready for connections' | wc -l | tr -d ' ') -ne '2' ]; do echo 'sleeping...' && sleep 1; done"
 
       - name: Dump info about running containers (for future debugging)
-        working-directory: ./dev
         run: docker ps -a
 
       - name: Install Drupal
-        working-directory: ./dev
         run: docker-compose exec -T drupal /root/setup.sh
 
       - name: Run tests
-        working-directory: ./dev
         # Show symfony deprecation warnings but don't fail on them. Many
         # warnings come from plugins we depend on and don't control.
         run: docker-compose exec -T --env SYMFONY_DEPRECATIONS_HELPER=disabled drupal /root/run-ci.sh

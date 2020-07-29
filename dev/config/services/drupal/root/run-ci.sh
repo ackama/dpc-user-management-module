@@ -7,9 +7,8 @@ set -x
 # (i.e. exit with a non-zero status)
 set -e
 
-cd /var/www/html
+cd /var/www
 
 # If we try to run phpunit as root it will drop back to the 'nobody' user so
 # our test run will fail due to permissions errors
-sudo -u www-data SYMFONY_DEPRECATIONS_HELPER=weak vendor/bin/phpunit --verbose modules/custom/
-sudo -u www-data SYMFONY_DEPRECATIONS_HELPER=weak vendor/bin/phpunit --verbose themes/custom/
+sudo -u www-data SYMFONY_DEPRECATIONS_HELPER=weak vendor/bin/phpunit --verbose html/modules/custom/

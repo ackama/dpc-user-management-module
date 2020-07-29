@@ -68,10 +68,9 @@ services:
     #         - "8025:8025"
     drupal:
         build:
-            context: ./
-            dockerfile: Dockerfile.dev.drupal
+            context: .
+            dockerfile: dev/Dockerfile.dev.drupal
             cache_from:
-              - dev_drupal:latest
               - docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
 
         ports:
@@ -103,34 +102,45 @@ services:
             MYSQL_CLIENT_DATABASE: drupal
         volumes:
             ##
-            # We mount only the files and folders we will want to edit on the
-            # host. We assume that all commands will be run within the
-            # container.
+            # We mount the module files only the files and specific directories
+            # we will want to edit on the host.
+            # We assume that all commands will be run within the container.
             #
-            - ./src/composer.json:/var/www/html/composer.json
-            - ./src/composer.lock:/var/www/html/composer.lock
-
-            - ./src/phpunit.xml:/var/www/html/phpunit.xml
-
-            - ../:/var/www/html/modules/custom/dpc_user_management
+            - ./composer.json:/var/www/composer.json:cached
+            - ./composer.lock:/var/www/composer.lock:cached
+            - ./phpunit.xml:/var/www/phpunit.xml:cached
 
             ##
-            # Adds a named volume under the module's root where ./dev/ should be placed
+            # Adds a named volume under the module's root where ./html/ and ./dev/ should be placed
             # in order to prevent recursion happening when discovering paths:
-            # ./dev/ is a child of ./ and ./ is mounted under ./dev/src/modules/custom/
-            - prevent_recursion_hack:/var/www/html/modules/custom/dpc_user_management/dev
+            # ./html/ is a child of ./ and ./ is mounted under ./html/modules/custom/...
+            # ./dev/ is a child of ./ and ./ is be mounted under ./dev/themes/custom/ and ./dev/themes/custom/
+            - prevent_recursion_html:/var/www/html/modules/custom/dpc_user_management/html:cached
+            - prevent_recursion_dev:/var/www/html/modules/custom/dpc_user_management/dev:cached
+            - prevent_recursion_vendor:/var/www/html/modules/custom/dpc_user_management/vendor:cached
+            - prevent_recursion_node_modules:/var/www/html/modules/custom/dpc_user_management/node_modules:cached
 
-            - ./src/profiles:/var/www/html/profiles
+            ##
+            # Customise local development settings
+            - ./dev/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php:cached
 
-            - ./src/themes/contrib:/var/www/html/themes/contrib
-            - ./src/themes/custom:/var/www/html/themes/custom
+            - ./dev/config/services/drupal/root/setup.sh:/root/setup.sh:cached
+            - ./dev/config/services/drupal/root/run-ci.sh:/root/run-ci.sh:cached
 
-            - ./src/sites/default/settings.local.php:/var/www/html/sites/default/settings.local.php
+            - ./dev/config/services/drupal/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:cached
 
-            - ./config/services/drupal/root/setup.sh:/root/setup.sh
-            - ./config/services/drupal/root/run-ci.sh:/root/run-ci.sh
+            ##
+            # Module Code - This mounts out module's codebase into the container
+            - ./:/var/www/html/modules/custom/dpc_user_management:cached
 
-            - ./config/services/drupal/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+            ##
+            # Third Party Custom Modules and Themes
+            # - ./dev/modules/custom:/var/www/html/modules/custom:cached
+            # - ./dev/themes/custom:/var/www/html/themes/custom:cached
+
 volumes:
     mysql_data:
-    prevent_recursion_hack:
+    prevent_recursion_html:
+    prevent_recursion_dev:
+    prevent_recursion_vendor:
+    prevent_recursion_node_modules:
