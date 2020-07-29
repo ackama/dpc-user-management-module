@@ -1,7 +1,9 @@
 {
-    "name": "ackama/dpc-user-management",
+    "name": "dpc/user-management",
     "type": "drupal-module",
     "description": "This module allows you to group users, content and other entities",
+    "license": "BSD-3-Clause",
+    "homepage": "https://github.com/ackama/dpc-user-management-module",
     "support": {
         "issues": "https://github.com/ackama/dpc-user-management-module/issues",
         "source": "https://github.com/ackama/dpc-user-management-module.git"
