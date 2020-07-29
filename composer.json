@@ -1,5 +1,5 @@
 {
-    "name": "dpc/user-management",
+    "name": "au-vic-gov-dpc/user-management",
     "type": "drupal-module",
     "description": "This module allows you to group users, content and other entities",
     "license": "BSD-3-Clause",
