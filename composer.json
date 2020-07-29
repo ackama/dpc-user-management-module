@@ -1,5 +1,5 @@
 {
-    "name": "ackama/dpc-user-management",
+    "name": "dpc/user-management",
     "type": "drupal-module",
     "description": "This module allows you to group users, content and other entities",
     "license": "proprietary",
