@@ -2,9 +2,8 @@
 dpc-user-management-module.iml
 node_modules
 vendor
-dev/vendor
+html/
 composer.lock
-dev/src/
 /.csslintrc
 /.eslintignore
 /.eslintrc.json
