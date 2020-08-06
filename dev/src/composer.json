@@ -22,14 +22,13 @@
         "drupal/core-composer-scaffold": "^8.8",
         "drupal/core-recommended": "^8.8",
         "drupal/devel": "^2.1",
-        "drupal/group": "^1.0@RC"
+        "drupal/group": "^1.2"
     },
     "require-dev": {
         "behat/mink-goutte-driver": "^1.2",
         "phpunit/phpunit": "^7",
         "symfony/phpunit-bridge": "^5.0",
         "drupal/admin_toolbar": "^2.2",
-        "drupal/group": "dev-1.x",
         "drupal/phpmailer_smtp": "^1.4",
         "drupal/mailsystem": "^4.3"
     },
