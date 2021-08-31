@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a35b3e41eec685c81ece20141ee478e2",
+    "content-hash": "df841db89a13ccb2d94f3797442396df",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -5115,27 +5115,27 @@
         },
         {
             "name": "drupal/phpmailer_smtp",
-            "version": "1.5.0",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/phpmailer_smtp.git",
-                "reference": "8.x-1.5"
+                "reference": "2.0.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/phpmailer_smtp-8.x-1.5.zip",
-                "reference": "8.x-1.5",
-                "shasum": "249c1f44f208c0dd0c9145172bf67b71a7a1f3e8"
+                "url": "https://ftp.drupal.org/files/projects/phpmailer_smtp-2.0.2.zip",
+                "reference": "2.0.2",
+                "shasum": "b459a91d897a7a504b0b810cece7ce56dee6f3cd"
             },
             "require": {
                 "drupal/core": "^8.8 || ^9",
-                "phpmailer/phpmailer": "^6.1.6"
+                "phpmailer/phpmailer": "^6.1.8"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.5",
-                    "datestamp": "1590617307",
+                    "version": "2.0.2",
+                    "datestamp": "1606107101",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
