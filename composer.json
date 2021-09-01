@@ -16,22 +16,18 @@
     },
     "require": {
         "php": "^7.3",
-        "drupal/group": "^1.0@RC",
-        "drewm/mailchimp-api": "^2.5"
+        "drewm/mailchimp-api": "^2.5",
+        "drupal/group": "^1.4"
     },
     "require-dev": {
-        "behat/mink-goutte-driver": "^1.2",
-        "composer/installers": "^1.2",
-        "drupal/admin_toolbar": "^2.2",
-        "drupal/console": "~1.0",
-        "drupal/core-composer-scaffold": "^8.8",
-        "drupal/core-recommended": "^8.8",
-        "drupal/devel": "^2.1",
-        "drupal/group": "dev-1.x",
+        "drupal/admin_toolbar": "^3.0",
+        "drupal/console": "^1.9",
+        "drupal/core-composer-scaffold": "^8.9.18",
+        "drupal/core-dev": "^8.9.18",
+        "drupal/core-recommended": "^8.9.18",
+        "drupal/devel": "^4.1",
         "drupal/mailsystem": "^4.3",
-        "drupal/phpmailer_smtp": "^1.4",
-        "phpunit/phpunit": "^7",
-        "symfony/phpunit-bridge": "^5.0"
+        "drupal/phpmailer_smtp": "^2.0"
     },
     "conflict": {
         "drupal/drupal": "*"
