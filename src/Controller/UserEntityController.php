@@ -40,7 +40,8 @@ class UserEntityController extends ControllerBase
                 if (hash_equals($token, Crypt::hashBase64($address['verification_token'] . $user->id() . $address['value']))) {
                     $addresses[$key]['status']             = 'verified';
                     $addresses[$key]['verification_token'] = null;
-                    $message                               = 'Thank you for verifying your email address';
+                    $message                               = 'Thank you for verifying your email address.<br><br>
+<a href="/">Continue</a>';
 
                     // dispatch primary email changed event
                     if ($address['is_primary']) {
