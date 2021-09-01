@@ -35,8 +35,7 @@ you whether this command should be run on your docker host (`your-computer`
 below) or one of the containers.
 
 ```sh
-# IMPORTANT: All the commands below are assumed to be run from the dev/ directory
-cd dev
+# IMPORTANT: All the commands below are assumed to be run from the root directory
 
 ## Terminal 1 ########
 
@@ -48,7 +47,7 @@ you@your-computer$ docker-compose up --build
 
 ## install Drupal (edit config/services/drupal/root/setup.sh if you want to
 change ## how Drupal is installed e.g. download and enable modules etc.)
-you@your-computer$ docker-compose  exec drupal /root/setup.sh
+you@your-computer$ docker-compose exec drupal /root/setup.sh
 
 ## Now your drupal site should be available.
 
@@ -65,7 +64,7 @@ drupal-container$ tail -f /var/log/nginx/access.log
 drupal-container$ mysql
 
 ## ... working with JS
-drupal-container$ cd modules/custom/dpc_user_management
+drupal-container$ cd html/modules/custom/dpc_user_management
 drupal-container$ npm run sass # or whatever commands you have defined in npm
 ```
 
@@ -82,11 +81,24 @@ After you install Drupal (see above), the following should be available in your 
 * http://localhost:8080/ (Drupal in the `drupal` container)
 * http://localhost:3001/ (Browsersync in the `frontend` container)
 
-### Adding custom module code
+### Adding external third party drupal dependencies
 
-Create custom modules in `src/modules/custom` and they will automatically be available to the Drupal container.
+In the case you need to add custom dependencies that can't be managed through composer,
+add them inside `./dev/modules/custom` or `./dev/themes/custom` accordingly.
 
 If your custom module is in a separate git repo then you can clone into that dir and that will also be fine.
+
+You will also need to uncomment the appropriate lines in the `docker-compose.yml` file 
+
+### Access to dependencies on your host
+
+Composer and docker-compose are configured so dependencies are installed into the project
+under `./html/` and `./vendor/`, without cluttering your project's codebase and without affecting
+the container's workspace
+
+```shell script
+you@your-computer$ composer install
+```
 
 ### Running Tests Manually
 
@@ -97,8 +109,8 @@ you@your-computer$ docker-compose exec drupal bash
 ## We have to run PHPUnit as a non-root user (otherwise it seems to fall back to
 ## running as the 'nobody' user who has no permissions to do anything)
 root@drupal-container> su www-data
-www-data@drupal-container> cd /var/www/html
-www-data@drupal-container> phpunit --verbose modules/my-module-under-development/
+www-data@drupal-container> cd /var/www
+www-data@drupal-container> phpunit --verbose modules/custom/my-module-under-development/
 ```
 
 ### Running tests as CI does
@@ -106,7 +118,7 @@ www-data@drupal-container> phpunit --verbose modules/my-module-under-development
 This runs all tests the same way CI does.
 
 ```sh
-you@your-computer$ docker-compose  exec drupal /root/run-ci.sh
+you@your-computer$ docker-compose exec drupal /root/run-ci.sh
 ```
 
 ### Drupal admin credentials
