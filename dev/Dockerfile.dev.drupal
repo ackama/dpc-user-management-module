@@ -34,7 +34,7 @@ RUN \
     echo 'PATH=$PATH:/var/www/vendor/bin' >> /etc/bash.bashrc;
 
 # Install Drush
-RUN composer global require drush/drush && \
+RUN composer global require drush/drush:^9 && \
     composer global update && \
     ln -s /root/.composer/vendor/bin/drush /usr/local/bin/drush
 
