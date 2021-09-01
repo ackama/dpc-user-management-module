@@ -21,7 +21,7 @@ drush site:install -vvv \
 chown -R www-data.www-data /var/www/html/sites/default/files/
 
 # Enable modules that make local development more pleasant
-drush --yes pm:enable devel,devel_generate,kint
+drush --yes pm:enable devel,devel_generate
 
 # webprofiler has to be enabled **after** devel - it fails when they are in the
 # same command for some reason.
