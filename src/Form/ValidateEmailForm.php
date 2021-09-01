@@ -17,7 +17,7 @@ class ValidateEmailForm extends FormBase{
      * @return string
      *   The unique string identifying the form.
      */
-    public function getFormId() {
+    public function getFormId(): string {
         return 'validate_email_form';
     }
 
@@ -25,6 +25,7 @@ class ValidateEmailForm extends FormBase{
     /**
      * @param array $form
      * @param FormStateInterface $form_state
+     * @param $parameter (optional)
      * @return array
      */
     public function buildForm(array $form, FormStateInterface $form_state, $parameter = NULL) {
