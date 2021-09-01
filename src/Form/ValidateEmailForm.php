@@ -6,7 +6,8 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class ValidateEmailForm extends FormBase{
+class ValidateEmailForm extends FormBase
+{
     /**
      * Returns a unique string identifying the form.
      *
@@ -17,7 +18,8 @@ class ValidateEmailForm extends FormBase{
      * @return string
      *   The unique string identifying the form.
      */
-    public function getFormId(): string {
+    public function getFormId(): string
+    {
         return 'validate_email_form';
     }
 
@@ -27,7 +29,8 @@ class ValidateEmailForm extends FormBase{
      * @param FormStateInterface $form_state
      * @return array
      */
-    public function buildForm(array $form, FormStateInterface $form_state) {
+    public function buildForm(array $form, FormStateInterface $form_state)
+    {
         $form['help'] = [
             '#type' => 'item',
             '#title' => t('Please click below to confirm email change'),
