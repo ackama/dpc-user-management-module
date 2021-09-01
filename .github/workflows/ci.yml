@@ -19,6 +19,19 @@ jobs:
       - name: Check out this repo
         uses: actions/checkout@v2
 
+      # Setup node
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      # Audit PHP dependencies
+      - name: Audit PHP
+        uses: docker://pplotka/local-php-security-checker-github-actions
+
+      # Audit NodeJS dependencies
+      - name: Audit NodeJS
+        run: npx audit-app
+
       - name: Show docker command versions (for later debugging)
         run: |
           docker --version
