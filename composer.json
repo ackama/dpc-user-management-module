@@ -20,7 +20,12 @@
         "drupal/group": "^1.4"
     },
     "require-dev": {
-        "drupal/core-dev": "^8.9",
+        "drupal/admin_toolbar": "^3.0",
+        "drupal/console": "^1.9",
+        "drupal/core-composer-scaffold": "^8.9.18",
+        "drupal/core-dev": "^8.9.18",
+        "drupal/core-recommended": "^8.9.18",
+        "drupal/devel": "^4.1",
         "drupal/mailsystem": "^4.3",
         "drupal/phpmailer_smtp": "^2.0"
     },
