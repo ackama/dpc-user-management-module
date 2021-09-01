@@ -4,7 +4,19 @@ dpc_user_management.verify-email:
     _controller: '\Drupal\dpc_user_management\Controller\UserEntityController::verifyEmail'
     _title: 'Email Verification'
   requirements:
-    _permission: 'access content'
+    # TODO: Fix with custom routing override.
+    _permission: 'access comments'
+  options:
+    parameters:
+      user:
+        type: entity:user
+dpc_user_management.form_api:
+  path: '/verify-confirm-email/{user}'
+  defaults:
+    _form:  '\Drupal\dpc_user_management\Form\ValidateEmailForm'
+    _title: 'Confirm Email Verification'
+  requirements:
+    _permission: 'access comments'
   options:
     parameters:
       user:
@@ -14,8 +26,9 @@ dpc_user_management.send-verification:
   defaults:
     _controller: '\Drupal\dpc_user_management\Controller\UserEntityController::sendVerification'
     _title: 'Email Verification'
+  # TODO: Fix with custom routing override.
   requirements:
-    _permission: 'access content'
+    _permission: 'access comments'
   options:
     parameters:
       user:
