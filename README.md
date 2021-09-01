@@ -46,7 +46,7 @@ you@your-computer$ docker-compose up --build
 ## Terminal 2 ########
 
 ## install Drupal (edit config/services/drupal/root/setup.sh if you want to
-change ## how Drupal is installed e.g. download and enable modules etc.)
+## change how Drupal is installed e.g. download and enable modules etc.)
 you@your-computer$ docker-compose exec drupal /root/setup.sh
 
 ## Now your drupal site should be available.
@@ -119,6 +119,20 @@ This runs all tests the same way CI does.
 
 ```sh
 you@your-computer$ docker-compose exec drupal /root/run-ci.sh
+```
+
+### Auditing your dependencies locally
+
+CI runs these checks for every PR but you can run them like this:
+
+#### PHP
+```shell
+you@your-computer$ docker run --rm -v `pwd`:/opt/php/ oxcom/php-security-checker:alpine --
+```
+
+#### NodeJS
+```shell
+you@your-computer$ npx audit-app
 ```
 
 ### Drupal admin credentials

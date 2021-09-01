@@ -35,6 +35,7 @@ RUN \
     echo 'PATH=$PATH:/var/www/vendor/bin' >> /etc/bash.bashrc;
 
 # Install Drush
+# Latest Drupal 8.x compatible version of drush is 9.7.2
 RUN composer global require drush/drush:^9 && \
     composer global update && \
     ln -s /root/.composer/vendor/bin/drush /usr/local/bin/drush
