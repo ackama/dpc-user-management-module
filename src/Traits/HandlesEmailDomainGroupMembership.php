@@ -119,7 +119,7 @@ trait HandlesEmailDomainGroupMembership
     static function userHasGroupEmailDomains(array $user_emails, Group $group)
     {
         $user_email_domains = array_map(function ($email) {
-            return explode('@', $email)[1];
+            return explode('@', strtolower($email))[1];
         }, $user_emails);
         $group_emails       = array_column($group->get('field_email_domain')->getValue(), 'value');
 
