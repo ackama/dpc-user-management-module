@@ -56,28 +56,6 @@ class UserAccountEventSubscriber implements EventSubscriberInterface
      */
     public function updateMailChimpAddress(Event $event)
     {
-        \Drupal::messenger()->addMessage('Event PrimaryEmailUpdated thrown by Subscriber in module dpc_user_management.', 'status', true);
-        \Drupal::messenger()->addStatus('attempt to update primary');
-
-        if (!$event->account->hasGroupContentAccess()) {
-            $event->stopPropagation();
-
-            return;
-        };
-
-        $new_email = $event->account->getEmail();
-
-        if ($event->old_address) {
-            // find the MC member and update their address
-            $this->updateEmail($event->account, $event->old_address, $new_email);
-
-            return;
-        }
-        \Drupal::messenger()->addStatus($event->account->getDisplayName() . ' primary email updated in MailChimp');
-        // subscribe the new email
-        $this->subscribe($event->account);
-
-        $event->stopPropagation();
     }
 
     /**
@@ -88,11 +66,5 @@ class UserAccountEventSubscriber implements EventSubscriberInterface
      */
     public function unsubscribeEmailAddress(Event $event)
     {
-        \Drupal::messenger()->addMessage('Event PrimaryEmailInvalidated thrown by Subscriber in module dpc_user_management.', 'status', true);
-        \Drupal::messenger()->addStatus($event->account->getDisplayName(). ' unsubscribed from MailChimp');
-
-        $this->unsubscribe($event->account, $event->address);
-
-        $event->stopPropagation();
     }
 }
