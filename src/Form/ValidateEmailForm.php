@@ -25,10 +25,9 @@ class ValidateEmailForm extends FormBase{
     /**
      * @param array $form
      * @param FormStateInterface $form_state
-     * @param $parameter (optional)
      * @return array
      */
-    public function buildForm(array $form, FormStateInterface $form_state, $parameter = NULL) {
+    public function buildForm(array $form, FormStateInterface $form_state) {
         $form['help'] = [
             '#type' => 'item',
             '#title' => t('Please click below to confirm email change'),
