@@ -18,41 +18,15 @@ jobs:
           docker --version
           docker-compose --version
 
-      - name: Login docker to Github packages registry
-        env:
-          EOIN_PAT: ${{secrets.EOIN_PAT}}
-        run: echo $EOIN_PAT | docker login docker.pkg.github.com -u eoinkelly --password-stdin
-
-      ##
-      # Pull images which can speed up building our images in a later step by providing cached layers.
-      #
-      # The images might be missing (for various reasons e.g. this might be
-      # your first push of this project) These commands won't error if the
-      # images are missing - that is what the `|| true` does.
-      #
-      # If anything is changed in the Dockerfiles on this branch then the
-      # cached layers will no longer apply and will be ignored.
-      #
-      # You may be wondering why we are explictly pulling these images when (in
-      # theory) DOCKER_BUILDKIT allows you to pull layers from a remote image.
-      # In practice (as of 2020-05-01) we could not get that working in this
-      # environment.
-      #
-      - name: Pull the base Drupal image (so we can use it as a source of layers via cache_from)
-        env:
-          EOIN_PAT: ${{secrets.EOIN_PAT}}
-        run: |
-          docker pull docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest || true
+      # In this step, this action saves a list of existing images,
+      # the cache is created without them in the post run.
+      # It also restores the cache if it exists.
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        # Ignore the failure of a step and avoid terminating the job.
+        continue-on-error: true
 
       - name: Build and start all containers
         run: docker-compose up -d --build
-
-      - name: Tag and push the Drupal image to the Github packages registry (so we can use it as a source of layers on future builds)
-        env:
-          EOIN_PAT: ${{secrets.EOIN_PAT}}
-        run: |
-          docker tag dpc-user-management-module_drupal:latest docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
-          docker push docker.pkg.github.com/ackama/dpc-user-management-module/drupal-dev:latest
 
       - name: Wait for MariaDB container to start
         # MariaDB isn't fully ready until it has said "ready for connections"
