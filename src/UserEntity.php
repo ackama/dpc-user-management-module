@@ -318,8 +318,9 @@ class UserEntity extends User
         $new_addresses = $this->get('field_email_addresses')->getValue();
         foreach ($new_addresses as $key => $address) {
             if (array_search($address['value'], array_column($addresses, 'value')) === false
-                && $user->getEmail() !== $address['value']) {
+                && $user->getEmail() !== $address['value'] && !!$address['skip_verification']) {
                 $new_addresses[$key]['status'] = 'new';
+                unset($new_addresses[$key]['skip_verification']);
             };
         }
 
