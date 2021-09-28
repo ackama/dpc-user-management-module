@@ -77,6 +77,21 @@ class UserEntity extends User
     public static $group_type_email_domain_label = 'DPC Managed - Email Domain Groups';
 
     /**
+     * Overrides e-mail verification by setting this to true
+     *
+     * @var bool
+     */
+    private $_skip_verification = false;
+
+    public function isSkipVerification() {
+        return $this->_skip_verification;
+    }
+
+    public function skipVerification($skip = true) {
+        $this->_skip_verification = $skip;
+    }
+
+    /**
      * @param EntityStorageInterface $storage
      *
      * @throws \Drupal\Core\TypedData\Exception\MissingDataException
@@ -318,9 +333,8 @@ class UserEntity extends User
         $new_addresses = $this->get('field_email_addresses')->getValue();
         foreach ($new_addresses as $key => $address) {
             if (array_search($address['value'], array_column($addresses, 'value')) === false
-                && $user->getEmail() !== $address['value'] && !$address['skip_verification']) {
+                && $user->getEmail() !== $address['value'] && !$this->isSkipVerification()) {
                 $new_addresses[$key]['status'] = 'new';
-                unset($new_addresses[$key]['skip_verification']);
             };
         }
 
