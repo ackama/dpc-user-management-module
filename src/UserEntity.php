@@ -326,7 +326,7 @@ class UserEntity extends User
      */
     private function getDirtyAddresses()
     {
-        $user          = \Drupal::entityManager()
+        $user          = \Drupal::entityTypeManager()
             ->getStorage('user')
             ->loadUnchanged($this->id());
         $addresses = $user->get('field_email_addresses')->getValue();
