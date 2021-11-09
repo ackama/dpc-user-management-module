@@ -187,10 +187,6 @@ class GroupEntity extends Group
      */
     public function processGroupMemberships()
     {
-        // Discover potential members and adds them to Group
-        $newMembers = $this->discoverMembers();
-        $this->addMembers($newMembers);
-
         // Discovers removable members and removes them from Group
         $discoverRemoveableMembers = $this->discoverRemovableMembers();
         $this->removeExistingMembers($discoverRemoveableMembers);

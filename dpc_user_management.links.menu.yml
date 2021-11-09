@@ -14,8 +14,3 @@ dpc_user_management.mailchimp.admin:
   title: 'Mailchimp'
   description: 'Manage Mailchimp Settings.'
   parent: system.admin_config_services
-dpc_user_management.user_import:
-  title: 'Import Users'
-  description: 'Import Users from uploaded CSV file'
-  route_name: dpc_user_management.user_import
-  parent: user.admin_index
